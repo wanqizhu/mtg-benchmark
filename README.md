@@ -189,6 +189,7 @@ PYTHONPATH=src python3 -m mtg_ai.analysis.report \
   --policy-selection-csv artifacts/eval/policy_selection.csv \
   --policy-matrix-csv artifacts/eval/policy_selection_matrix.csv \
   --milestones-csv artifacts/eval/milestones.csv \
+  --convergence-csv artifacts/eval/convergence.csv \
   --output artifacts/report.md \
   --seed 103
 ```
@@ -226,6 +227,18 @@ PYTHONPATH=src python3 -m mtg_ai.eval.milestones \
   --games 120 \
   --seed 3301 \
   --output-csv artifacts/eval/milestones.csv
+```
+
+### 14) Checkpoint convergence diagnostics
+
+```bash
+PYTHONPATH=src python3 -m mtg_ai.eval.convergence \
+  --checkpoint-dir artifacts/training/self_play_multi \
+  --games 80 \
+  --life 10 \
+  --opening-hand 7 \
+  --seed 4101 \
+  --output-csv artifacts/eval/convergence.csv
 ```
 
 ## Development checks

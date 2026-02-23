@@ -71,6 +71,7 @@ def generate_report(
     policy_selection_csv: Path | None = None,
     policy_matrix_csv: Path | None = None,
     milestones_csv: Path | None = None,
+    convergence_csv: Path | None = None,
 ) -> None:
     metrics = read_training_metrics(training_dir / "training_metrics.csv")
     checkpoint = latest_checkpoint(training_dir)
@@ -359,6 +360,33 @@ def generate_report(
     else:
         lines.append("No milestones CSV found.")
 
+    lines.append("")
+    lines.append("## Checkpoint convergence analysis")
+    if convergence_csv is not None and convergence_csv.exists():
+        with convergence_csv.open("r", encoding="utf-8") as f:
+            rows = list(csv.DictReader(f))
+        if rows:
+            deltas = [float(row["elo_delta_to"]) for row in rows]
+            trailing = deltas[-3:] if len(deltas) >= 3 else deltas
+            trailing_avg = sum(trailing) / len(trailing)
+            lines.append(
+                f"- Mean Elo delta for latest checkpoints: {trailing_avg:+.2f} "
+                f"(positive means later checkpoints still improving)"
+            )
+            points = [(idx + 1, delta) for idx, delta in enumerate(deltas)]
+            lines.append("```")
+            lines.append(ascii_line_chart(points))
+            lines.append("```")
+            for row in rows[-3:]:
+                lines.append(
+                    f"- {row['from']} -> {row['to']}: win_rate_from={row['win_rate_from']} "
+                    f"elo_delta_to={row['elo_delta_to']}"
+                )
+        else:
+            lines.append("Convergence CSV is empty.")
+    else:
+        lines.append("No convergence CSV found.")
+
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text("\n".join(lines), encoding="utf-8")
 
@@ -374,6 +402,7 @@ def main() -> None:
     parser.add_argument("--policy-selection-csv")
     parser.add_argument("--policy-matrix-csv")
     parser.add_argument("--milestones-csv")
+    parser.add_argument("--convergence-csv")
     parser.add_argument("--output", default="artifacts/report.md")
     parser.add_argument("--seed", type=int, default=97)
     args = parser.parse_args()
@@ -387,6 +416,7 @@ def main() -> None:
         policy_selection_csv=Path(args.policy_selection_csv) if args.policy_selection_csv else None,
         policy_matrix_csv=Path(args.policy_matrix_csv) if args.policy_matrix_csv else None,
         milestones_csv=Path(args.milestones_csv) if args.milestones_csv else None,
+        convergence_csv=Path(args.convergence_csv) if args.convergence_csv else None,
         output_path=Path(args.output),
         seed=args.seed,
     )

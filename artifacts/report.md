@@ -190,3 +190,24 @@ run_002_seed_79_sw_0.00_hw_0.10_eps_0.22/policy_final.json #####################
   - [PASS] deck_better_than_starter: metric=0.5500 threshold=0.5000 (min best-deck winrate vs starter)
   - [PASS] elo_improves_over_training: metric=8.0930 threshold=0.0000 (last checkpoint Elo minus first checkpoint Elo)
   - [PASS] solver_alignment: metric=0.8333 threshold=0.8000 (agreement on sampled minimax-optimal states)
+
+## Checkpoint convergence analysis
+- Mean Elo delta for latest checkpoints: +2.67 (positive means later checkpoints still improving)
+```
+                                                  *             
+                                                                
+                                                                
+                                                                
+                                                                
+                                                                
+*                                    *                         *
+                                                                
+                                                                
+                                                                
+                                                                
+            *            *                                      
+x:[1, 6] y:[-1.140, 4.560]
+```
+- checkpoint_ep20 -> checkpoint_ep25: win_rate_from=0.4250 elo_delta_to=1.78
+- checkpoint_ep25 -> checkpoint_ep30: win_rate_from=0.3125 elo_delta_to=4.56
+- checkpoint_ep30 -> checkpoint_ep35: win_rate_from=0.4375 elo_delta_to=1.66
