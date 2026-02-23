@@ -72,6 +72,8 @@ def generate_report(
     policy_matrix_csv: Path | None = None,
     milestones_csv: Path | None = None,
     convergence_csv: Path | None = None,
+    champion_json: Path | None = None,
+    champion_csv: Path | None = None,
 ) -> None:
     metrics = read_training_metrics(training_dir / "training_metrics.csv")
     checkpoint = latest_checkpoint(training_dir)
@@ -387,6 +389,31 @@ def generate_report(
     else:
         lines.append("No convergence CSV found.")
 
+    lines.append("")
+    lines.append("## Recommended champion policy")
+    if champion_json is not None and champion_json.exists():
+        payload = json.loads(champion_json.read_text(encoding="utf-8"))
+        lines.append(
+            f"- {payload['name']} objective={payload['robust_objective']} "
+            f"baseline_avg={payload['baseline_avg']} mixed_floor={payload['mixed_floor']} "
+            f"solver_alignment={payload['solver_alignment']}"
+        )
+    else:
+        lines.append("No champion JSON found.")
+
+    lines.append("")
+    lines.append("## Champion candidate leaderboard")
+    if champion_csv is not None and champion_csv.exists():
+        with champion_csv.open("r", encoding="utf-8") as f:
+            rows = list(csv.DictReader(f))
+        for row in rows[: min(5, len(rows))]:
+            lines.append(
+                f"- {row['name']}: robust={row['robust_objective']} baseline={row['baseline_avg']} "
+                f"mixed_floor={row['mixed_floor']} align={row['solver_alignment']}"
+            )
+    else:
+        lines.append("No champion leaderboard CSV found.")
+
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text("\n".join(lines), encoding="utf-8")
 
@@ -403,6 +430,8 @@ def main() -> None:
     parser.add_argument("--policy-matrix-csv")
     parser.add_argument("--milestones-csv")
     parser.add_argument("--convergence-csv")
+    parser.add_argument("--champion-json")
+    parser.add_argument("--champion-csv")
     parser.add_argument("--output", default="artifacts/report.md")
     parser.add_argument("--seed", type=int, default=97)
     args = parser.parse_args()
@@ -417,6 +446,8 @@ def main() -> None:
         policy_matrix_csv=Path(args.policy_matrix_csv) if args.policy_matrix_csv else None,
         milestones_csv=Path(args.milestones_csv) if args.milestones_csv else None,
         convergence_csv=Path(args.convergence_csv) if args.convergence_csv else None,
+        champion_json=Path(args.champion_json) if args.champion_json else None,
+        champion_csv=Path(args.champion_csv) if args.champion_csv else None,
         output_path=Path(args.output),
         seed=args.seed,
     )

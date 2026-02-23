@@ -211,3 +211,13 @@ x:[1, 6] y:[-1.140, 4.560]
 - checkpoint_ep20 -> checkpoint_ep25: win_rate_from=0.4250 elo_delta_to=1.78
 - checkpoint_ep25 -> checkpoint_ep30: win_rate_from=0.3125 elo_delta_to=4.56
 - checkpoint_ep30 -> checkpoint_ep35: win_rate_from=0.4375 elo_delta_to=1.66
+
+## Recommended champion policy
+- self_play/policy_final.json objective=0.7133 baseline_avg=0.8000 mixed_floor=0.4833 solver_alignment=1.0000
+
+## Champion candidate leaderboard
+- self_play/policy_final.json: robust=0.7133 baseline=0.8000 mixed_floor=0.4833 align=1.0000
+- solver_tune/policy_best.json: robust=0.7107 baseline=0.7934 mixed_floor=0.4833 align=1.0000
+- self_play_multi/policy_final.json: robust=0.7099 baseline=0.8080 mixed_floor=0.5500 align=0.8333
+- run_003_seed_79_sw_0.15_hw_0.00_eps_0.22/policy_final.json: robust=0.6968 baseline=0.7837 mixed_floor=0.5000 align=0.9167
+- self_play_hof/policy_final.json: robust=0.6818 baseline=0.7378 mixed_floor=0.4667 align=1.0000

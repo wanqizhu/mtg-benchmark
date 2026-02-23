@@ -190,6 +190,8 @@ PYTHONPATH=src python3 -m mtg_ai.analysis.report \
   --policy-matrix-csv artifacts/eval/policy_selection_matrix.csv \
   --milestones-csv artifacts/eval/milestones.csv \
   --convergence-csv artifacts/eval/convergence.csv \
+  --champion-json artifacts/eval/champion.json \
+  --champion-csv artifacts/eval/champion_selection.csv \
   --output artifacts/report.md \
   --seed 103
 ```
@@ -239,6 +241,17 @@ PYTHONPATH=src python3 -m mtg_ai.eval.convergence \
   --opening-hand 7 \
   --seed 4101 \
   --output-csv artifacts/eval/convergence.csv
+```
+
+### 15) Champion policy selection
+
+```bash
+PYTHONPATH=src python3 -m mtg_ai.eval.champion \
+  --policy-globs "artifacts/training/self_play*/policy*.json,artifacts/training/solver_tune/*.json,artifacts/training/sweep_seed_*/policy_final.json,artifacts/training/sweep_runs/*/policy_final.json" \
+  --games 60 \
+  --seed 5101 \
+  --output-csv artifacts/eval/champion_selection.csv \
+  --output-json artifacts/eval/champion.json
 ```
 
 ## Development checks

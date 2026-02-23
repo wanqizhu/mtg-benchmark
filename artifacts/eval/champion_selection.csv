@@ -1,0 +1,15 @@
+name,path,baseline_avg,mixed_avg,mixed_floor,solver_alignment,robust_objective
+self_play/policy_final.json,/workspace/artifacts/training/self_play/policy_final.json,0.8000,0.6125,0.4833,1.0000,0.7133
+solver_tune/policy_best.json,/workspace/artifacts/training/solver_tune/policy_best.json,0.7934,0.5722,0.4833,1.0000,0.7107
+self_play_multi/policy_final.json,/workspace/artifacts/training/self_play_multi/policy_final.json,0.8080,0.6139,0.5500,0.8333,0.7099
+run_003_seed_79_sw_0.15_hw_0.00_eps_0.22/policy_final.json,/workspace/artifacts/training/sweep_runs/run_003_seed_79_sw_0.15_hw_0.00_eps_0.22/policy_final.json,0.7837,0.5694,0.5000,0.9167,0.6968
+self_play_hof/policy_final.json,/workspace/artifacts/training/self_play_hof/policy_final.json,0.7378,0.5181,0.4667,1.0000,0.6818
+sweep_seed_13/policy_final.json,/workspace/artifacts/training/sweep_seed_13/policy_final.json,0.7510,0.5194,0.4333,1.0000,0.6738
+run_002_seed_79_sw_0.00_hw_0.10_eps_0.22/policy_final.json,/workspace/artifacts/training/sweep_runs/run_002_seed_79_sw_0.00_hw_0.10_eps_0.22/policy_final.json,0.7743,0.5486,0.4500,0.9167,0.6731
+self_play_solver/policy_final.json,/workspace/artifacts/training/self_play_solver/policy_final.json,0.7368,0.5000,0.4417,1.0000,0.6714
+run_001_seed_79_sw_0.00_hw_0.00_eps_0.22/policy_final.json,/workspace/artifacts/training/sweep_runs/run_001_seed_79_sw_0.00_hw_0.00_eps_0.22/policy_final.json,0.7826,0.5792,0.4667,0.8333,0.6664
+sweep_seed_23/policy_final.json,/workspace/artifacts/training/sweep_seed_23/policy_final.json,0.7694,0.5764,0.4667,0.8333,0.6611
+sweep_seed_17/policy_final.json,/workspace/artifacts/training/sweep_seed_17/policy_final.json,0.7670,0.5500,0.4167,0.8333,0.6401
+sweep_seed_19/policy_final.json,/workspace/artifacts/training/sweep_seed_19/policy_final.json,0.7181,0.4764,0.4000,0.9167,0.6306
+run_004_seed_79_sw_0.15_hw_0.10_eps_0.22/policy_final.json,/workspace/artifacts/training/sweep_runs/run_004_seed_79_sw_0.15_hw_0.10_eps_0.22/policy_final.json,0.7562,0.5403,0.4000,0.8333,0.6292
+sweep_seed_11/policy_final.json,/workspace/artifacts/training/sweep_seed_11/policy_final.json,0.7618,0.5347,0.3833,0.8333,0.6247
