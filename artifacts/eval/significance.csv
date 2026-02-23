@@ -1,0 +1,11 @@
+a,b,games,wins_a,wins_b,draws,win_rate_a,ci95_low,ci95_high,significant_vs_0_5,favored
+self_play/policy_final.json,solver_tune/policy_best.json,240,116,124,0,0.4833,0.4209,0.5463,0,solver_tune/policy_best.json
+self_play/policy_final.json,self_play_multi/policy_final.json,240,114,126,0,0.4750,0.4127,0.5381,0,self_play_multi/policy_final.json
+self_play/policy_final.json,run_003_seed_79_sw_0.15_hw_0.00_eps_0.22/policy_final.json,240,123,117,0,0.5125,0.4496,0.5750,0,self_play/policy_final.json
+self_play/policy_final.json,self_play_hof/policy_final.json,240,136,104,0,0.5667,0.5034,0.6278,1,self_play/policy_final.json
+solver_tune/policy_best.json,self_play_multi/policy_final.json,240,115,125,0,0.4792,0.4168,0.5422,0,self_play_multi/policy_final.json
+solver_tune/policy_best.json,run_003_seed_79_sw_0.15_hw_0.00_eps_0.22/policy_final.json,240,123,117,0,0.5125,0.4496,0.5750,0,solver_tune/policy_best.json
+solver_tune/policy_best.json,self_play_hof/policy_final.json,240,134,106,0,0.5583,0.4951,0.6198,0,solver_tune/policy_best.json
+self_play_multi/policy_final.json,run_003_seed_79_sw_0.15_hw_0.00_eps_0.22/policy_final.json,240,129,111,0,0.5375,0.4743,0.5995,0,self_play_multi/policy_final.json
+self_play_multi/policy_final.json,self_play_hof/policy_final.json,240,122,118,0,0.5083,0.4455,0.5710,0,self_play_multi/policy_final.json
+run_003_seed_79_sw_0.15_hw_0.00_eps_0.22/policy_final.json,self_play_hof/policy_final.json,240,140,100,0,0.5833,0.5201,0.6439,1,run_003_seed_79_sw_0.15_hw_0.00_eps_0.22/policy_final.json

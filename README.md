@@ -192,6 +192,7 @@ PYTHONPATH=src python3 -m mtg_ai.analysis.report \
   --convergence-csv artifacts/eval/convergence.csv \
   --champion-json artifacts/eval/champion.json \
   --champion-csv artifacts/eval/champion_selection.csv \
+  --significance-csv artifacts/eval/significance.csv \
   --output artifacts/report.md \
   --seed 103
 ```
@@ -252,6 +253,19 @@ PYTHONPATH=src python3 -m mtg_ai.eval.champion \
   --seed 5101 \
   --output-csv artifacts/eval/champion_selection.csv \
   --output-json artifacts/eval/champion.json
+```
+
+### 16) Pairwise statistical significance among top policies
+
+```bash
+PYTHONPATH=src python3 -m mtg_ai.eval.significance \
+  --selection-csv artifacts/eval/champion_selection.csv \
+  --top-k 5 \
+  --games 240 \
+  --seed 6201 \
+  --life 10 \
+  --opening-hand 7 \
+  --output-csv artifacts/eval/significance.csv
 ```
 
 ## Development checks

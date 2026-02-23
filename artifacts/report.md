@@ -221,3 +221,12 @@ x:[1, 6] y:[-1.140, 4.560]
 - self_play_multi/policy_final.json: robust=0.7099 baseline=0.8080 mixed_floor=0.5500 align=0.8333
 - run_003_seed_79_sw_0.15_hw_0.00_eps_0.22/policy_final.json: robust=0.6968 baseline=0.7837 mixed_floor=0.5000 align=0.9167
 - self_play_hof/policy_final.json: robust=0.6818 baseline=0.7378 mixed_floor=0.4667 align=1.0000
+
+## Head-to-head significance among top candidates
+- Significant pairwise outcomes: 2/10
+- self_play/policy_final.json vs solver_tune/policy_best.json: wr_a=0.4833 CI=[0.4209, 0.5463] favored=solver_tune/policy_best.json significant=0
+- self_play/policy_final.json vs self_play_multi/policy_final.json: wr_a=0.4750 CI=[0.4127, 0.5381] favored=self_play_multi/policy_final.json significant=0
+- self_play/policy_final.json vs run_003_seed_79_sw_0.15_hw_0.00_eps_0.22/policy_final.json: wr_a=0.5125 CI=[0.4496, 0.5750] favored=self_play/policy_final.json significant=0
+- self_play/policy_final.json vs self_play_hof/policy_final.json: wr_a=0.5667 CI=[0.5034, 0.6278] favored=self_play/policy_final.json significant=1
+- solver_tune/policy_best.json vs self_play_multi/policy_final.json: wr_a=0.4792 CI=[0.4168, 0.5422] favored=self_play_multi/policy_final.json significant=0
+- solver_tune/policy_best.json vs run_003_seed_79_sw_0.15_hw_0.00_eps_0.22/policy_final.json: wr_a=0.5125 CI=[0.4496, 0.5750] favored=solver_tune/policy_best.json significant=0

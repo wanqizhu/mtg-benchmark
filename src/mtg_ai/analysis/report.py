@@ -74,6 +74,7 @@ def generate_report(
     convergence_csv: Path | None = None,
     champion_json: Path | None = None,
     champion_csv: Path | None = None,
+    significance_csv: Path | None = None,
 ) -> None:
     metrics = read_training_metrics(training_dir / "training_metrics.csv")
     checkpoint = latest_checkpoint(training_dir)
@@ -414,6 +415,25 @@ def generate_report(
     else:
         lines.append("No champion leaderboard CSV found.")
 
+    lines.append("")
+    lines.append("## Head-to-head significance among top candidates")
+    if significance_csv is not None and significance_csv.exists():
+        with significance_csv.open("r", encoding="utf-8") as f:
+            rows = list(csv.DictReader(f))
+        if rows:
+            significant = [row for row in rows if int(row["significant_vs_0_5"]) == 1]
+            lines.append(f"- Significant pairwise outcomes: {len(significant)}/{len(rows)}")
+            for row in rows[: min(6, len(rows))]:
+                lines.append(
+                    f"- {row['a']} vs {row['b']}: wr_a={row['win_rate_a']} "
+                    f"CI=[{row['ci95_low']}, {row['ci95_high']}] favored={row['favored']} "
+                    f"significant={row['significant_vs_0_5']}"
+                )
+        else:
+            lines.append("Significance CSV is empty.")
+    else:
+        lines.append("No significance CSV found.")
+
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text("\n".join(lines), encoding="utf-8")
 
@@ -432,6 +452,7 @@ def main() -> None:
     parser.add_argument("--convergence-csv")
     parser.add_argument("--champion-json")
     parser.add_argument("--champion-csv")
+    parser.add_argument("--significance-csv")
     parser.add_argument("--output", default="artifacts/report.md")
     parser.add_argument("--seed", type=int, default=97)
     args = parser.parse_args()
@@ -448,6 +469,7 @@ def main() -> None:
         convergence_csv=Path(args.convergence_csv) if args.convergence_csv else None,
         champion_json=Path(args.champion_json) if args.champion_json else None,
         champion_csv=Path(args.champion_csv) if args.champion_csv else None,
+        significance_csv=Path(args.significance_csv) if args.significance_csv else None,
         output_path=Path(args.output),
         seed=args.seed,
     )
