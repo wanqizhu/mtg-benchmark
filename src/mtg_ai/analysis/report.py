@@ -66,6 +66,8 @@ def generate_report(
     seed: int,
     generalization_csv: Path | None = None,
     sweep_csv: Path | None = None,
+    solver_tune_history_csv: Path | None = None,
+    deck_vs_starter_csv: Path | None = None,
 ) -> None:
     metrics = read_training_metrics(training_dir / "training_metrics.csv")
     checkpoint = latest_checkpoint(training_dir)
@@ -183,6 +185,19 @@ def generate_report(
         lines.append("No deck search CSV found.")
 
     lines.append("")
+    lines.append("## Best deck vs starter validation")
+    if deck_vs_starter_csv is not None and deck_vs_starter_csv.exists():
+        with deck_vs_starter_csv.open("r", encoding="utf-8") as f:
+            rows = list(csv.DictReader(f))
+        for row in rows:
+            lines.append(
+                f"- life={row['life']} hand={row['opening_hand']} deck={row['best_deck']} "
+                f"win_rate={row['best_vs_starter_win_rate']} ({row['wins']}-{row['losses']}-{row['draws']})"
+            )
+    else:
+        lines.append("No best-deck-vs-starter CSV found.")
+
+    lines.append("")
     lines.append("## Generalization matrix (trained vs baselines)")
     if generalization_csv is not None and generalization_csv.exists():
         with generalization_csv.open("r", encoding="utf-8") as f:
@@ -272,6 +287,27 @@ def generate_report(
     else:
         lines.append("No hyperparameter sweep CSV found.")
 
+    lines.append("")
+    lines.append("## Solver-tuning trajectory")
+    if solver_tune_history_csv is not None and solver_tune_history_csv.exists():
+        with solver_tune_history_csv.open("r", encoding="utf-8") as f:
+            rows = list(csv.DictReader(f))
+        if rows:
+            points = [(int(row["iteration"]), float(row["objective"])) for row in rows]
+            lines.append("```")
+            lines.append(ascii_line_chart(points))
+            lines.append("```")
+            final = rows[-1]
+            lines.append(
+                f"Final tuned objective={final['objective']} "
+                f"baseline_avg={final['baseline_avg']} mixed_floor={final['mixed_floor']} "
+                f"solver_alignment={final['solver_alignment']}"
+            )
+        else:
+            lines.append("Solver tuning history CSV is empty.")
+    else:
+        lines.append("No solver tuning history CSV found.")
+
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text("\n".join(lines), encoding="utf-8")
 
@@ -282,6 +318,8 @@ def main() -> None:
     parser.add_argument("--deck-search-csv", default="artifacts/deck_search/results.csv")
     parser.add_argument("--generalization-csv", default="artifacts/eval/generalization_matrix.csv")
     parser.add_argument("--sweep-csv")
+    parser.add_argument("--solver-tune-history-csv")
+    parser.add_argument("--deck-vs-starter-csv")
     parser.add_argument("--output", default="artifacts/report.md")
     parser.add_argument("--seed", type=int, default=97)
     args = parser.parse_args()
@@ -290,6 +328,8 @@ def main() -> None:
         deck_search_csv=Path(args.deck_search_csv),
         generalization_csv=Path(args.generalization_csv),
         sweep_csv=Path(args.sweep_csv) if args.sweep_csv else None,
+        solver_tune_history_csv=Path(args.solver_tune_history_csv) if args.solver_tune_history_csv else None,
+        deck_vs_starter_csv=Path(args.deck_vs_starter_csv) if args.deck_vs_starter_csv else None,
         output_path=Path(args.output),
         seed=args.seed,
     )

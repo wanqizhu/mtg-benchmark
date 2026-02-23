@@ -70,14 +70,6 @@ x:[5, 35] y:[1193.711, 1209.329]
 - life=20 hand=5: M=3 B=6 G=3 score=0.9688
 - life=20 hand=7: M=3 B=6 G=3 score=1.0000
 
-## Best deck vs starter validation
-- life=5 hand=5 deck=M4/B4/G4 win_rate=0.5800 (58-42-0)
-- life=5 hand=7 deck=M5/B5/G2 win_rate=0.5500 (55-45-0)
-- life=10 hand=5 deck=M4/B6/G2 win_rate=0.6000 (60-40-0)
-- life=10 hand=7 deck=M4/B4/G4 win_rate=0.5500 (55-45-0)
-- life=20 hand=5 deck=M3/B6/G3 win_rate=0.6600 (66-34-0)
-- life=20 hand=7 deck=M3/B6/G3 win_rate=0.7500 (75-25-0)
-
 ## Generalization matrix (trained vs baselines)
 - life=5 hand=5 vs random: win_rate=0.8500 (102-18-0)
 - life=5 hand=5 vs bolt: win_rate=0.7500 (90-30-0)

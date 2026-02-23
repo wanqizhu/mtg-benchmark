@@ -121,7 +121,7 @@ PYTHONPATH=src python3 -m mtg_ai.training.value_iteration_baseline \
 ```bash
 PYTHONPATH=src python3 -m mtg_ai.deck.search \
   --policy trained \
-  --trained-path artifacts/training/self_play_multi/policy_final.json \
+  --trained-path artifacts/training/solver_tune/policy_best.json \
   --deck-size 12 \
   --mode evolutionary \
   --population-size 8 \
@@ -130,19 +130,19 @@ PYTHONPATH=src python3 -m mtg_ai.deck.search \
   --life-values 5,10,20 \
   --hand-sizes 5,7 \
   --seed 91 \
-  --output-csv artifacts/deck_search/results_multi.csv
+  --output-csv artifacts/deck_search/results_tuned.csv
 ```
 
 ### 7) Generalization matrix export
 
 ```bash
 PYTHONPATH=src python3 -m mtg_ai.eval.generalization \
-  --policy-path artifacts/training/self_play_multi/policy_final.json \
+  --policy-path artifacts/training/solver_tune/policy_best.json \
   --life-values 5,10,20 \
   --hand-values 5,7 \
   --games 120 \
   --seed 1300 \
-  --output-csv artifacts/eval/generalization_matrix.csv
+  --output-csv artifacts/eval/generalization_matrix_tuned.csv
 ```
 
 ### 8) Hyperparameter sweep (optional deeper search)
@@ -161,16 +161,44 @@ PYTHONPATH=src python3 -m mtg_ai.training.hyperparam_sweep \
   --output-csv artifacts/training/sweep_results.csv
 ```
 
-### 9) Final aggregate report
+### 9) Solver-aware policy tuning (optional)
+
+```bash
+PYTHONPATH=src python3 -m mtg_ai.training.solver_tune \
+  --base-policy-path artifacts/training/self_play_multi/policy_final.json \
+  --iterations 30 \
+  --candidates-per-iter 6 \
+  --sigma 0.35 \
+  --games 20 \
+  --seed 313 \
+  --alignment-depth 7 \
+  --alignment-samples 10 \
+  --output-dir artifacts/training/solver_tune
+```
+
+### 10) Final aggregate report
 
 ```bash
 PYTHONPATH=src python3 -m mtg_ai.analysis.report \
   --training-dir artifacts/training/self_play_multi \
-  --deck-search-csv artifacts/deck_search/results_multi.csv \
-  --generalization-csv artifacts/eval/generalization_matrix.csv \
+  --deck-search-csv artifacts/deck_search/results_tuned.csv \
+  --generalization-csv artifacts/eval/generalization_matrix_tuned.csv \
   --sweep-csv artifacts/training/sweep_results.csv \
+  --solver-tune-history-csv artifacts/training/solver_tune/history.csv \
+  --deck-vs-starter-csv artifacts/eval/deck_vs_starter_tuned.csv \
   --output artifacts/report.md \
   --seed 103
+```
+
+### 11) Validate best decks against starter deck
+
+```bash
+PYTHONPATH=src python3 -m mtg_ai.eval.deck_validation \
+  --policy-path artifacts/training/solver_tune/policy_best.json \
+  --deck-search-csv artifacts/deck_search/results_tuned.csv \
+  --games 100 \
+  --seed 2200 \
+  --output-csv artifacts/eval/deck_vs_starter_tuned.csv
 ```
 
 ## Development checks
