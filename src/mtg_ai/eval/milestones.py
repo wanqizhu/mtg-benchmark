@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import json
 from pathlib import Path
 
 from mtg_ai.bots.fixed_bots import BoltFaceBot, GoblinAggroBot, MixedBoltFaceBot
@@ -31,12 +32,17 @@ def _record(rows: list[dict[str, object]], name: str, metric: float, threshold: 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Run milestone validation suite for constrained MTG AI project.")
     parser.add_argument("--policy-path", default="artifacts/training/solver_tune/policy_best.json")
+    parser.add_argument("--champion-json")
     parser.add_argument("--games", type=int, default=120)
     parser.add_argument("--seed", type=int, default=3301)
     parser.add_argument("--output-csv", default="artifacts/eval/milestones.csv")
     args = parser.parse_args()
 
-    policy = WeightedHeuristicPolicy.load(args.policy_path)
+    policy_path = args.policy_path
+    if args.champion_json:
+        payload = json.loads(Path(args.champion_json).read_text(encoding="utf-8"))
+        policy_path = payload["path"]
+    policy = WeightedHeuristicPolicy.load(policy_path)
     rows: list[dict[str, object]] = []
 
     starter_deck = _deck(10, 10, 10)

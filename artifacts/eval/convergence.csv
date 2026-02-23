@@ -1,7 +1,7 @@
 from,to,games,win_rate_from,wins_from,wins_to,draws,elo_from_before,elo_to_before,elo_from_after,elo_to_after,elo_delta_to
-checkpoint_ep5,checkpoint_ep10,16,0.3750,6,10,0,1200.00,1200.00,1197.00,1203.00,3.00
-checkpoint_ep10,checkpoint_ep15,16,0.5000,8,8,0,1203.00,1200.00,1202.90,1200.10,0.10
-checkpoint_ep15,checkpoint_ep20,16,0.4375,7,9,0,1200.10,1200.00,1198.60,1201.50,1.50
-checkpoint_ep20,checkpoint_ep25,16,0.6250,10,6,0,1201.50,1200.00,1204.45,1197.05,-2.95
-checkpoint_ep25,checkpoint_ep30,16,0.6250,10,6,0,1197.05,1200.00,1200.15,1196.90,-3.10
-checkpoint_ep30,checkpoint_ep35,16,0.3750,6,10,0,1196.90,1200.00,1194.01,1202.89,2.89
+checkpoint_ep5,checkpoint_ep10,16,0.4375,7,9,0,1200.00,1200.00,1198.50,1201.50,1.50
+checkpoint_ep10,checkpoint_ep15,16,0.3750,6,10,0,1201.50,1200.00,1198.45,1203.05,3.05
+checkpoint_ep15,checkpoint_ep20,16,0.3125,5,11,0,1203.05,1200.00,1198.45,1204.61,4.61
+checkpoint_ep20,checkpoint_ep25,16,0.4375,7,9,0,1204.61,1200.00,1202.95,1201.66,1.66
+checkpoint_ep25,checkpoint_ep30,16,0.3750,6,10,0,1201.66,1200.00,1198.60,1203.06,3.06
+checkpoint_ep30,checkpoint_ep35,16,0.3125,5,11,0,1203.06,1200.00,1198.45,1204.61,4.61

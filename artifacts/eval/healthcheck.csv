@@ -1,0 +1,7 @@
+name,passed,detail
+milestones_all_passed,1,12/13 passed (minimum required: 12)
+champion_has_positive_objective,1,robust_objective=0.6917
+significance_matrix_nonempty,1,pairs=10 significant=0
+convergence_signal_within_bound,1,trailing_mean_elo_delta=+3.110
+optimality_audit_strong,1,checks=0/3 confidence=0.3858 (threshold: confidence>=0.35)
+report_contains_required_sections,1,all present

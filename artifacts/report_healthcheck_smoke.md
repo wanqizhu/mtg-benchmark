@@ -38,28 +38,28 @@ Convergence check (fitness delta between recent windows): +0.0000
 
 ## League Elo snapshot
 ```
-trained                  ################################################ 1229.795
-mixed_bolt_face          ############################################### 1223.062
-goblin_aggro             ############################################## 1187.239
-random                   ############################################## 1185.262
-bolt_face                ############################################# 1174.643
+trained                  ################################################ 1229.756
+mixed_bolt_face          ############################################### 1222.385
+goblin_aggro             ############################################## 1187.047
+random                   ############################################## 1186.034
+bolt_face                ############################################# 1174.777
 ```
 
 ## Checkpoint league progression
 ```
-                                          *                     
-                                                                
-                                                                
-                     *                                          
-                                                                
                                *                                
                                                                 
                                                                 
                                                                 
-          *                                                     
-                                                               *
-*                                                   *           
-x:[5, 35] y:[1193.711, 1209.329]
+                                                                
+                                                                
+                     *                                          
+                                                                
+*                                                              *
+                                                                
+                                                                
+          *                               *         *           
+x:[5, 35] y:[1196.575, 1207.194]
 ```
 
 ## Deck search summary
@@ -105,22 +105,22 @@ x:[5, 35] y:[1193.711, 1209.329]
 - life=20 hand=7 vs mixed: win_rate=0.6167 (72-44-4)
 
 ## Decision differences on sampled states
-- State 1: step=precombat_main P0 life=10 P1 life=10
+- State 1: step=precombat_main P0 life=7 P1 life=10
   - trained: play_land
   - mixed: play_land
   - bolt: play_land
   - goblin: play_land
-- State 2: step=precombat_main P0 life=10 P1 life=10
+- State 2: step=precombat_main P0 life=7 P1 life=10
   - trained: cast_goblin
   - mixed: cast_bolt_face
   - bolt: cast_bolt_face
   - goblin: cast_goblin
-- State 3: step=declare_attackers P0 life=10 P1 life=10
-  - trained: declare_attackers_1
-  - mixed: declare_attackers_1
-  - bolt: declare_attackers_1
-  - goblin: declare_attackers_1
-- State 4: step=upkeep P0 life=10 P1 life=10
+- State 3: step=begin_combat P0 life=7 P1 life=10
+  - trained: cast_bolt_face
+  - mixed: cast_bolt_face
+  - bolt: cast_bolt_face
+  - goblin: pass_priority
+- State 4: step=combat_damage P0 life=7 P1 life=10
   - trained: cast_bolt_face
   - mixed: cast_bolt_face
   - bolt: cast_bolt_face
@@ -129,7 +129,7 @@ x:[5, 35] y:[1193.711, 1209.329]
 ## Solver alignment in tractable low-life regime
 - Compared states: 12
 - Trained agreement: 0.833
-- Mixed baseline agreement: 0.917
+- Mixed baseline agreement: 1.000
 - Bolt baseline agreement: 1.000
 - Goblin baseline agreement: 0.833
 
@@ -260,10 +260,10 @@ x:[1, 6] y:[1.500, 4.610]
 - confidence=0.3858
 
 ## Healthcheck summary
-- Passed checks: 6/6
-  - [PASS] milestones_all_passed: 12/13 passed (minimum required: 12)
+- Passed checks: 4/6
+  - [FAIL] milestones_all_passed: 12/13 passed
   - [PASS] champion_has_positive_objective: robust_objective=0.6917
   - [PASS] significance_matrix_nonempty: pairs=10 significant=0
   - [PASS] convergence_signal_within_bound: trailing_mean_elo_delta=+3.110
-  - [PASS] optimality_audit_strong: checks=0/3 confidence=0.3858 (threshold: confidence>=0.35)
+  - [FAIL] optimality_audit_strong: checks=0/3 confidence=0.3858 (thresholds: checks>=1, confidence>=0.35)
   - [PASS] report_contains_required_sections: all present

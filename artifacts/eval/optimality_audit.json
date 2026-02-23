@@ -1,12 +1,12 @@
 {
-  "best_baseline_alignment": 0.9166666666666666,
-  "champion_name": "self_play/policy_final.json",
-  "champion_objective_margin": 0.03849999999999998,
-  "confidence": 0.8104444444444444,
-  "convergence_trailing_mean_elo_delta": -1.0533333333333335,
-  "pass_convergence": 1,
-  "pass_margin": 1,
+  "best_baseline_alignment": 1.0,
+  "champion_name": "solver_tune/policy_best.json",
+  "champion_objective_margin": 0.0020999999999999908,
+  "confidence": 0.38583333333333314,
+  "convergence_trailing_mean_elo_delta": 3.11,
+  "pass_convergence": 0,
+  "pass_margin": 0,
   "pass_solver_gap": 0,
-  "solver_alignment": 0.75,
+  "solver_alignment": 0.8333333333333334,
   "solver_gap_to_best_baseline": 0.16666666666666663
 }

@@ -198,6 +198,7 @@ PYTHONPATH=src python3 -m mtg_ai.analysis.report \
   --replay-index-csv artifacts/replays/samples/index.csv \
   --manifest-json artifacts/eval/manifest.json \
   --optimality-audit-json artifacts/eval/optimality_audit.json \
+  --healthcheck-csv artifacts/eval/healthcheck.csv \
   --output artifacts/report.md \
   --seed 103
 ```
@@ -329,6 +330,19 @@ PYTHONPATH=src python3 -m mtg_ai.eval.optimality_audit \
   --objective-margin-tolerance 0.01 \
   --output-json artifacts/eval/optimality_audit.json \
   --output-csv artifacts/eval/optimality_audit.csv
+```
+
+### 21) Artifact healthcheck summary
+
+```bash
+PYTHONPATH=src python3 -m mtg_ai.eval.healthcheck \
+  --milestones-csv artifacts/eval/milestones.csv \
+  --champion-json artifacts/eval/champion.json \
+  --significance-csv artifacts/eval/significance.csv \
+  --convergence-csv artifacts/eval/convergence.csv \
+  --optimality-json artifacts/eval/optimality_audit.json \
+  --report-md artifacts/report.md \
+  --output-csv artifacts/eval/healthcheck.csv
 ```
 
 ## Development checks
