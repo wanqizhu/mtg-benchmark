@@ -75,6 +75,7 @@ def generate_report(
     champion_json: Path | None = None,
     champion_csv: Path | None = None,
     significance_csv: Path | None = None,
+    replay_index_csv: Path | None = None,
 ) -> None:
     metrics = read_training_metrics(training_dir / "training_metrics.csv")
     checkpoint = latest_checkpoint(training_dir)
@@ -434,6 +435,19 @@ def generate_report(
     else:
         lines.append("No significance CSV found.")
 
+    lines.append("")
+    lines.append("## Replay sample index")
+    if replay_index_csv is not None and replay_index_csv.exists():
+        with replay_index_csv.open("r", encoding="utf-8") as f:
+            rows = list(csv.DictReader(f))
+        for row in rows:
+            lines.append(
+                f"- {row['matchup']}: winner={row['winner']} result={row['result']} "
+                f"turns={row['turns']} actions={row['actions']} replay={row['replay_path']}"
+            )
+    else:
+        lines.append("No replay index CSV found.")
+
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text("\n".join(lines), encoding="utf-8")
 
@@ -453,6 +467,7 @@ def main() -> None:
     parser.add_argument("--champion-json")
     parser.add_argument("--champion-csv")
     parser.add_argument("--significance-csv")
+    parser.add_argument("--replay-index-csv")
     parser.add_argument("--output", default="artifacts/report.md")
     parser.add_argument("--seed", type=int, default=97)
     args = parser.parse_args()
@@ -470,6 +485,7 @@ def main() -> None:
         champion_json=Path(args.champion_json) if args.champion_json else None,
         champion_csv=Path(args.champion_csv) if args.champion_csv else None,
         significance_csv=Path(args.significance_csv) if args.significance_csv else None,
+        replay_index_csv=Path(args.replay_index_csv) if args.replay_index_csv else None,
         output_path=Path(args.output),
         seed=args.seed,
     )

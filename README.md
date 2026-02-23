@@ -193,6 +193,7 @@ PYTHONPATH=src python3 -m mtg_ai.analysis.report \
   --champion-json artifacts/eval/champion.json \
   --champion-csv artifacts/eval/champion_selection.csv \
   --significance-csv artifacts/eval/significance.csv \
+  --replay-index-csv artifacts/replays/samples/index.csv \
   --output artifacts/report.md \
   --seed 103
 ```
@@ -266,6 +267,16 @@ PYTHONPATH=src python3 -m mtg_ai.eval.significance \
   --life 10 \
   --opening-hand 7 \
   --output-csv artifacts/eval/significance.csv
+```
+
+### 17) Generate replay samples for key matchups
+
+```bash
+PYTHONPATH=src python3 -m mtg_ai.eval.replay_samples \
+  --champion-json artifacts/eval/champion.json \
+  --output-dir artifacts/replays/samples \
+  --index-csv artifacts/replays/samples/index.csv \
+  --seed 7101
 ```
 
 ## Development checks

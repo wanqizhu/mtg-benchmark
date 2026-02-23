@@ -230,3 +230,11 @@ x:[1, 6] y:[-1.140, 4.560]
 - self_play/policy_final.json vs self_play_hof/policy_final.json: wr_a=0.5667 CI=[0.5034, 0.6278] favored=self_play/policy_final.json significant=1
 - solver_tune/policy_best.json vs self_play_multi/policy_final.json: wr_a=0.4792 CI=[0.4168, 0.5422] favored=self_play_multi/policy_final.json significant=0
 - solver_tune/policy_best.json vs run_003_seed_79_sw_0.15_hw_0.00_eps_0.22/policy_final.json: wr_a=0.5125 CI=[0.4496, 0.5750] favored=solver_tune/policy_best.json significant=0
+
+## Replay sample index
+- champion_vs_mixed_l10_h7: winner=1 result=player_1_wins turns=5 actions=99 replay=artifacts/replays/samples/champion_vs_mixed_l10_h7.jsonl
+- champion_vs_bolt_l10_h7: winner=1 result=player_1_wins turns=5 actions=99 replay=artifacts/replays/samples/champion_vs_bolt_l10_h7.jsonl
+- champion_vs_random_l10_h7: winner=0 result=player_0_wins turns=5 actions=97 replay=artifacts/replays/samples/champion_vs_random_l10_h7.jsonl
+- champion_vs_goblin_l5_h5: winner=0 result=player_0_wins turns=3 actions=57 replay=artifacts/replays/samples/champion_vs_goblin_l5_h5.jsonl
+- mixed_vs_bolt_l10_h7: winner=0 result=player_0_wins turns=5 actions=96 replay=artifacts/replays/samples/mixed_vs_bolt_l10_h7.jsonl
+- mixed_vs_goblin_l10_h7: winner=0 result=player_0_wins turns=5 actions=96 replay=artifacts/replays/samples/mixed_vs_goblin_l10_h7.jsonl
