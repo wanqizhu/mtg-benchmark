@@ -45,23 +45,6 @@ random                   ############################################## 1185.262
 bolt_face                ############################################# 1174.643
 ```
 
-## Checkpoint league progression
-```
-                                          *                     
-                                                                
-                                                                
-                     *                                          
-                                                                
-                               *                                
-                                                                
-                                                                
-                                                                
-          *                                                     
-                                                               *
-*                                                   *           
-x:[5, 35] y:[1193.711, 1209.329]
-```
-
 ## Deck search summary
 - life=5 hand=5: M=4 B=8 G=0 score=0.8750
 - life=5 hand=7: M=2 B=8 G=2 score=0.8438
@@ -69,32 +52,6 @@ x:[5, 35] y:[1193.711, 1209.329]
 - life=10 hand=7: M=5 B=5 G=2 score=0.9688
 - life=20 hand=5: M=3 B=6 G=3 score=0.9219
 - life=20 hand=7: M=4 B=4 G=4 score=0.9688
-
-## Generalization matrix (trained vs baselines)
-- life=5 hand=5 vs random: win_rate=0.9500 (114-6-0)
-- life=5 hand=5 vs bolt: win_rate=0.6917 (83-37-0)
-- life=5 hand=5 vs goblin: win_rate=0.9500 (114-6-0)
-- life=5 hand=5 vs mixed: win_rate=0.5750 (69-51-0)
-- life=5 hand=7 vs random: win_rate=0.9083 (109-11-0)
-- life=5 hand=7 vs bolt: win_rate=0.6167 (74-46-0)
-- life=5 hand=7 vs goblin: win_rate=0.9917 (119-1-0)
-- life=5 hand=7 vs mixed: win_rate=0.5667 (68-52-0)
-- life=10 hand=5 vs random: win_rate=0.9083 (108-10-2)
-- life=10 hand=5 vs bolt: win_rate=0.9292 (111-8-1)
-- life=10 hand=5 vs goblin: win_rate=0.9208 (110-9-1)
-- life=10 hand=5 vs mixed: win_rate=0.5333 (64-56-0)
-- life=10 hand=7 vs random: win_rate=0.9333 (112-8-0)
-- life=10 hand=7 vs bolt: win_rate=0.8500 (102-18-0)
-- life=10 hand=7 vs goblin: win_rate=0.9583 (115-5-0)
-- life=10 hand=7 vs mixed: win_rate=0.5417 (65-55-0)
-- life=20 hand=5 vs random: win_rate=0.6542 (37-0-83)
-- life=20 hand=5 vs bolt: win_rate=0.8458 (83-0-37)
-- life=20 hand=5 vs goblin: win_rate=0.8125 (81-6-33)
-- life=20 hand=5 vs mixed: win_rate=0.6458 (65-30-25)
-- life=20 hand=7 vs random: win_rate=0.7958 (72-1-47)
-- life=20 hand=7 vs bolt: win_rate=0.9625 (111-0-9)
-- life=20 hand=7 vs goblin: win_rate=0.9333 (108-4-8)
-- life=20 hand=7 vs mixed: win_rate=0.7167 (84-32-4)
 
 ## Decision differences on sampled states
 - State 1: step=precombat_main P0 life=10 P1 life=10

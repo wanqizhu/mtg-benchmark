@@ -77,31 +77,45 @@ PYTHONPATH=src python3 -m mtg_ai.eval.scenarios \
 
 ```bash
 PYTHONPATH=src python3 -m mtg_ai.training.self_play \
-  --episodes 80 \
-  --epsilon 0.25 \
-  --eval-interval 10 \
-  --eval-games 20 \
+  --episodes 35 \
+  --epsilon 0.22 \
+  --eval-interval 5 \
+  --eval-games 8 \
   --life 10 \
   --opening-hand 7 \
-  --seed 13 \
-  --output-dir artifacts/training/self_play
+  --life-values 5,10,20 \
+  --hand-values 5,7 \
+  --seed 41 \
+  --output-dir artifacts/training/self_play_multi
 ```
 
 ### 4) Elo progression over training checkpoints
 
 ```bash
 PYTHONPATH=src python3 -m mtg_ai.training.league \
-  --checkpoint-dir artifacts/training/self_play \
+  --checkpoint-dir artifacts/training/self_play_multi \
   --games-per-pair 30 \
   --life 10 --opening-hand 7 --seed 111
 ```
 
-### 5) Deck search (trained policy)
+### 5) Solver-backed low-life validation
+
+```bash
+PYTHONPATH=src python3 -m mtg_ai.training.value_iteration_baseline \
+  --life 10 \
+  --opening-hand 4 \
+  --depth 7 \
+  --sample-count 12 \
+  --seed 5 \
+  --policy-path artifacts/training/self_play_multi/policy_final.json
+```
+
+### 6) Deck search (trained policy)
 
 ```bash
 PYTHONPATH=src python3 -m mtg_ai.deck.search \
   --policy trained \
-  --trained-path artifacts/training/self_play/policy_final.json \
+  --trained-path artifacts/training/self_play_multi/policy_final.json \
   --deck-size 12 \
   --mode evolutionary \
   --population-size 8 \
@@ -109,18 +123,31 @@ PYTHONPATH=src python3 -m mtg_ai.deck.search \
   --games-per-opponent 8 \
   --life-values 5,10,20 \
   --hand-sizes 5,7 \
-  --seed 77 \
-  --output-csv artifacts/deck_search/results.csv
+  --seed 91 \
+  --output-csv artifacts/deck_search/results_multi.csv
 ```
 
-### 6) Final aggregate report
+### 7) Generalization matrix export
+
+```bash
+PYTHONPATH=src python3 -m mtg_ai.eval.generalization \
+  --policy-path artifacts/training/self_play_multi/policy_final.json \
+  --life-values 5,10,20 \
+  --hand-values 5,7 \
+  --games 120 \
+  --seed 1300 \
+  --output-csv artifacts/eval/generalization_matrix.csv
+```
+
+### 8) Final aggregate report
 
 ```bash
 PYTHONPATH=src python3 -m mtg_ai.analysis.report \
-  --training-dir artifacts/training/self_play \
-  --deck-search-csv artifacts/deck_search/results.csv \
+  --training-dir artifacts/training/self_play_multi \
+  --deck-search-csv artifacts/deck_search/results_multi.csv \
+  --generalization-csv artifacts/eval/generalization_matrix.csv \
   --output artifacts/report.md \
-  --seed 97
+  --seed 103
 ```
 
 ## Development checks

@@ -242,6 +242,8 @@ class RulesEngine:
     def _legal_mana_abilities(self, state: GameState, player_id: int) -> list[ActivateManaAbilityAction]:
         legal: list[ActivateManaAbilityAction] = []
         for permanent_id in state.players[player_id].battlefield:
+            if permanent_id not in state.permanents:
+                continue
             permanent = state.permanents[permanent_id]
             if permanent.tapped:
                 continue
@@ -256,7 +258,8 @@ class RulesEngine:
         untapped_mountains = [
             permanent_id
             for permanent_id in player.battlefield
-            if not state.permanents[permanent_id].tapped
+            if permanent_id in state.permanents
+            and not state.permanents[permanent_id].tapped
             and self.registry.get(state.card_instances[state.permanents[permanent_id].card_id].definition_name).has_mana_ability
         ]
         for card_id in player.hand:
@@ -307,6 +310,8 @@ class RulesEngine:
     def _legal_declare_attackers(self, state: GameState, player_id: int) -> list[DeclareAttackersAction]:
         candidates: list[str] = []
         for permanent_id in state.players[player_id].battlefield:
+            if permanent_id not in state.permanents:
+                continue
             permanent = state.permanents[permanent_id]
             definition = self.registry.get(state.card_instances[permanent.card_id].definition_name)
             if not definition.is_creature or permanent.tapped:
@@ -332,6 +337,8 @@ class RulesEngine:
         attackers = [attacker for attacker in state.combat.attackers if attacker in state.permanents]
         blockers = []
         for permanent_id in state.players[player_id].battlefield:
+            if permanent_id not in state.permanents:
+                continue
             permanent = state.permanents[permanent_id]
             definition = self.registry.get(state.card_instances[permanent.card_id].definition_name)
             if definition.is_creature and not permanent.tapped:

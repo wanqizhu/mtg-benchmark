@@ -10,6 +10,7 @@ from mtg_ai.bots.random_bot import RandomBot
 from mtg_ai.core.rules_engine import GameConfig
 from mtg_ai.eval.tournament import Entrant, play_match
 from mtg_ai.training.rl_policy import WeightedHeuristicPolicy
+from mtg_ai.training.value_iteration_baseline import evaluate_solver_alignment
 
 
 def build_deck(mountains: int, bolts: int, goblins: int) -> list[str]:
@@ -37,6 +38,21 @@ def evaluate_policy(
     return results
 
 
+def _aggregate_metrics(metric_rows: list[dict[str, float]]) -> dict[str, float]:
+    if not metric_rows:
+        return {
+            "winrate_vs_random": 0.0,
+            "winrate_vs_bolt": 0.0,
+            "winrate_vs_goblin": 0.0,
+            "winrate_vs_mixed": 0.0,
+        }
+    keys = list(metric_rows[0].keys())
+    aggregated: dict[str, float] = {}
+    for key in keys:
+        aggregated[key] = sum(row[key] for row in metric_rows) / len(metric_rows)
+    return aggregated
+
+
 def _fitness(win_rates: dict[str, float]) -> float:
     return (
         0.15 * win_rates["winrate_vs_random"]
@@ -56,6 +72,12 @@ def train_self_play(
     eval_games: int,
     starting_life: int,
     opening_hand_size: int,
+    solver_weight: float = 0.0,
+    solver_seed: int = 101,
+    solver_depth: int = 6,
+    solver_sample_count: int = 6,
+    train_life_values: list[int] | None = None,
+    train_hand_values: list[int] | None = None,
 ) -> WeightedHeuristicPolicy:
     _ = alpha
     policy = WeightedHeuristicPolicy(name="weighted_heuristic")
@@ -64,14 +86,37 @@ def train_self_play(
     metrics_path = output_dir / "training_metrics.csv"
     rng = random.Random(seed)
     sigma = max(0.2, epsilon * 8.0)
-    best_metrics = evaluate_policy(
-        policy=policy,
-        eval_games=max(20, eval_games),
-        config=GameConfig(starting_life=starting_life, opening_hand_size=opening_hand_size, random_seed=seed),
-        seed=seed,
-        deck=train_deck,
-    )
+    life_values = train_life_values or [starting_life]
+    hand_values = train_hand_values or [opening_hand_size]
+
+    best_metric_rows: list[dict[str, float]] = []
+    eval_seed_cursor = seed
+    for life in life_values:
+        for hand in hand_values:
+            best_metric_rows.append(
+                evaluate_policy(
+                    policy=policy,
+                    eval_games=max(20, eval_games),
+                    config=GameConfig(starting_life=life, opening_hand_size=hand, random_seed=eval_seed_cursor),
+                    seed=eval_seed_cursor,
+                    deck=train_deck,
+                )
+            )
+            eval_seed_cursor += 100
+    best_metrics = _aggregate_metrics(best_metric_rows)
     best_fitness = _fitness(best_metrics)
+    best_solver_alignment = 0.0
+    if solver_weight > 0:
+        alignment = evaluate_solver_alignment(
+            trained_policy=policy,
+            seed=solver_seed,
+            life=max(5, min(10, starting_life)),
+            opening_hand=max(3, min(4, opening_hand_size)),
+            depth=solver_depth,
+            sample_count=solver_sample_count,
+        )
+        best_solver_alignment = alignment.trained_agreement
+        best_fitness += solver_weight * best_solver_alignment
 
     with metrics_path.open("w", newline="", encoding="utf-8") as csvfile:
         fieldnames = [
@@ -81,6 +126,7 @@ def train_self_play(
             "winrate_vs_bolt",
             "winrate_vs_goblin",
             "winrate_vs_mixed",
+            "solver_alignment",
             "sigma",
         ]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -90,24 +136,45 @@ def train_self_play(
             candidates = [policy] + [policy.mutate(rng, sigma) for _ in range(5)]
             scored: list[tuple[float, WeightedHeuristicPolicy, dict[str, float]]] = []
             for idx, candidate in enumerate(candidates):
-                metrics = evaluate_policy(
-                    policy=candidate,
-                    eval_games=eval_games,
-                    config=GameConfig(
-                        starting_life=starting_life,
-                        opening_hand_size=opening_hand_size,
-                        random_seed=seed + episode * 17 + idx,
-                    ),
-                    seed=seed + episode * 19 + idx,
-                    deck=train_deck,
-                )
+                metric_rows: list[dict[str, float]] = []
+                scenario_seed_cursor = seed + episode * 1000 + idx * 100
+                for life in life_values:
+                    for hand in hand_values:
+                        metric_rows.append(
+                            evaluate_policy(
+                                policy=candidate,
+                                eval_games=eval_games,
+                                config=GameConfig(
+                                    starting_life=life,
+                                    opening_hand_size=hand,
+                                    random_seed=scenario_seed_cursor,
+                                ),
+                                seed=scenario_seed_cursor,
+                                deck=train_deck,
+                            )
+                        )
+                        scenario_seed_cursor += 17
+                metrics = _aggregate_metrics(metric_rows)
                 scored.append((_fitness(metrics), candidate, metrics))
             scored.sort(key=lambda item: item[0], reverse=True)
             candidate_fitness, candidate_policy, candidate_metrics = scored[0]
+            candidate_solver_alignment = 0.0
+            if solver_weight > 0:
+                alignment = evaluate_solver_alignment(
+                    trained_policy=candidate_policy,
+                    seed=solver_seed + episode,
+                    life=max(5, min(10, starting_life)),
+                    opening_hand=max(3, min(4, opening_hand_size)),
+                    depth=solver_depth,
+                    sample_count=solver_sample_count,
+                )
+                candidate_solver_alignment = alignment.trained_agreement
+                candidate_fitness += solver_weight * candidate_solver_alignment
             if candidate_fitness >= best_fitness:
                 policy = candidate_policy
                 best_fitness = candidate_fitness
                 best_metrics = candidate_metrics
+                best_solver_alignment = candidate_solver_alignment
                 sigma = max(0.05, sigma * 0.98)
             else:
                 sigma = min(2.5, sigma * 1.03)
@@ -119,6 +186,7 @@ def train_self_play(
                 "winrate_vs_bolt": f"{best_metrics['winrate_vs_bolt']:.4f}",
                 "winrate_vs_goblin": f"{best_metrics['winrate_vs_goblin']:.4f}",
                 "winrate_vs_mixed": f"{best_metrics['winrate_vs_mixed']:.4f}",
+                "solver_alignment": f"{best_solver_alignment:.4f}",
                 "sigma": f"{sigma:.4f}",
             }
             writer.writerow(row)
@@ -140,8 +208,17 @@ def main() -> None:
     parser.add_argument("--eval-games", type=int, default=24)
     parser.add_argument("--life", type=int, default=20)
     parser.add_argument("--opening-hand", type=int, default=7)
+    parser.add_argument("--life-values")
+    parser.add_argument("--hand-values")
+    parser.add_argument("--solver-weight", type=float, default=0.0)
+    parser.add_argument("--solver-seed", type=int, default=101)
+    parser.add_argument("--solver-depth", type=int, default=6)
+    parser.add_argument("--solver-sample-count", type=int, default=6)
     parser.add_argument("--output-dir", default="artifacts/training/self_play")
     args = parser.parse_args()
+
+    life_values = [int(token.strip()) for token in args.life_values.split(",")] if args.life_values else None
+    hand_values = [int(token.strip()) for token in args.hand_values.split(",")] if args.hand_values else None
     train_self_play(
         episodes=args.episodes,
         alpha=args.alpha,
@@ -152,6 +229,12 @@ def main() -> None:
         eval_games=args.eval_games,
         starting_life=args.life,
         opening_hand_size=args.opening_hand,
+        solver_weight=args.solver_weight,
+        solver_seed=args.solver_seed,
+        solver_depth=args.solver_depth,
+        solver_sample_count=args.solver_sample_count,
+        train_life_values=life_values,
+        train_hand_values=hand_values,
     )
     print(f"Training complete: {args.output_dir}")
 
