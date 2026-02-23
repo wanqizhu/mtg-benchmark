@@ -1,0 +1,24 @@
+
+=== Tournament Results ===
+
+Agent                          ELO
+-----------------------------------
+trained_final               1471.3
+trained_v3                  1419.9
+trained_v1                  1321.8
+mixed                       1192.3
+aggro_goblin                 738.0
+random                       449.4
+bolt_face                    407.2
+
+
+=== Win Rate Matrix ===
+
+                      trained_fi  trained_v3  trained_v1       mixed  aggro_gobl      random   bolt_face
+       trained_final         ---      51.7%      76.7%      71.7%      97.0%      97.3%      99.3%
+          trained_v3      48.3%         ---      59.0%      56.3%      89.3%      98.0%      96.0%
+          trained_v1      23.3%      41.0%         ---      72.7%      78.7%      92.7%      95.0%
+               mixed      28.3%      43.7%      27.3%         ---      87.3%      99.3%      98.7%
+        aggro_goblin       3.0%      10.7%      21.3%      12.7%         ---      75.7%      98.0%
+              random       2.7%       2.0%       7.3%       0.7%      24.3%         ---      38.0%
+           bolt_face       0.7%       4.0%       5.0%       1.3%       2.0%      62.0%         ---

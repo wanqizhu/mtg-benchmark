@@ -88,14 +88,15 @@ Grid search over deck compositions (mountains, bolts, goblins) with two-phase ev
 
 | Agent | ELO | vs Random | vs BoltFace | vs AggroGoblin | vs Mixed |
 |-------|-----|-----------|-------------|----------------|----------|
-| trained_v3 | 1459 | 98.7% | 96.3% | 92.0% | 54.7% |
-| mixed | 1378 | 97.0% | 100.0% | 83.7% | — |
-| trained_v1 | 1336 | 96.3% | 94.3% | 78.0% | 72.7% |
-| aggro_goblin | 823 | 72.3% | 98.3% | — | 16.3% |
-| bolt_face | 580 | 56.3% | — | 1.7% | 0.0% |
-| random | 424 | — | 43.7% | 27.7% | 3.0% |
+| **trained_final** | **1471** | **97.3%** | **99.3%** | **97.0%** | **71.7%** |
+| trained_v3 | 1420 | 98.0% | 96.0% | 89.3% | 56.3% |
+| trained_v1 | 1322 | 92.7% | 95.0% | 78.7% | 72.7% |
+| mixed | 1192 | 99.3% | 98.7% | 87.3% | — |
+| aggro_goblin | 738 | 75.7% | 98.0% | — | 12.7% |
+| random | 449 | — | 38.0% | 24.3% | 0.7% |
+| bolt_face | 407 | 62.0% | — | 2.0% | 1.3% |
 
-trained_v3 beats trained_v1 head-to-head 63.3% to 36.7%.
+Head-to-head: trained_final beats trained_v1 76.7%, trained_v3 51.7%. The trained agent has an ELO gap of ~280 over the best hand-coded bot.
 
 ### Key Findings
 
