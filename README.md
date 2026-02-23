@@ -279,6 +279,18 @@ PYTHONPATH=src python3 -m mtg_ai.eval.replay_samples \
   --seed 7101
 ```
 
+### 18) End-to-end evaluation pipeline (single command)
+
+```bash
+PYTHONPATH=src python3 -m mtg_ai.eval.full_pipeline \
+  --seed 103 \
+  --champion-games 60 \
+  --significance-games 240 \
+  --milestone-games 120 \
+  --convergence-games 80 \
+  --output-report artifacts/report.md
+```
+
 ## Development checks
 
 Syntax validation:

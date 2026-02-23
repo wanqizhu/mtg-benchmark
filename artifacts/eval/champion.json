@@ -1,9 +1,9 @@
 {
-  "baseline_avg": "0.8000",
-  "mixed_avg": "0.6125",
-  "mixed_floor": "0.4833",
-  "name": "self_play/policy_final.json",
-  "path": "/workspace/artifacts/training/self_play/policy_final.json",
-  "robust_objective": "0.7133",
+  "baseline_avg": "0.7958",
+  "mixed_avg": "0.5875",
+  "mixed_floor": "0.4500",
+  "name": "self_play_multi/policy_final.json",
+  "path": "/workspace/artifacts/training/self_play_multi/policy_final.json",
+  "robust_objective": "0.6983",
   "solver_alignment": "1.0000"
 }
