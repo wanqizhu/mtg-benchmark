@@ -192,6 +192,26 @@ def main() -> None:
         ],
     )
     run_step(
+        "artifact manifest",
+        "mtg_ai.eval.manifest",
+        [
+            "--paths",
+            "artifacts/eval/champion.json",
+            "artifacts/eval/champion_selection.csv",
+            "artifacts/eval/generalization_matrix_tuned.csv",
+            "artifacts/deck_search/results_tuned.csv",
+            "artifacts/eval/deck_vs_starter_tuned.csv",
+            "artifacts/eval/policy_selection.csv",
+            "artifacts/eval/policy_selection_matrix.csv",
+            "artifacts/eval/significance.csv",
+            "artifacts/eval/milestones.csv",
+            "artifacts/eval/convergence.csv",
+            "artifacts/replays/samples/index.csv",
+            "--output-json",
+            "artifacts/eval/manifest.json",
+        ],
+    )
+    run_step(
         "final report",
         "mtg_ai.analysis.report",
         [
@@ -223,6 +243,8 @@ def main() -> None:
             "artifacts/eval/significance.csv",
             "--replay-index-csv",
             "artifacts/replays/samples/index.csv",
+            "--manifest-json",
+            "artifacts/eval/manifest.json",
             "--output",
             args.output_report,
             "--seed",

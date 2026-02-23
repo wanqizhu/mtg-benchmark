@@ -38,11 +38,11 @@ Convergence check (fitness delta between recent windows): +0.0000
 
 ## League Elo snapshot
 ```
-trained                  ################################################ 1229.795
-mixed_bolt_face          ############################################### 1223.062
-goblin_aggro             ############################################## 1187.239
-random                   ############################################## 1185.262
-bolt_face                ############################################# 1174.643
+trained                  ################################################ 1229.212
+mixed_bolt_face          ############################################### 1223.068
+goblin_aggro             ############################################## 1186.515
+random                   ############################################## 1185.835
+bolt_face                ############################################# 1175.370
 ```
 
 ## Checkpoint league progression
@@ -50,16 +50,16 @@ bolt_face                ############################################# 1174.643
                                           *                     
                                                                 
                                                                 
-                     *                                          
-                                                                
-                               *                                
                                                                 
                                                                 
+                     *         *                                
                                                                 
-          *                                                     
-                                                               *
+                                                                
+                                                                
+                                                                
 *                                                   *           
-x:[5, 35] y:[1193.711, 1209.329]
+          *                                                    *
+x:[5, 35] y:[1195.809, 1207.540]
 ```
 
 ## Deck search summary
@@ -120,7 +120,7 @@ x:[5, 35] y:[1193.711, 1209.329]
   - mixed: declare_attackers_1
   - bolt: declare_attackers_1
   - goblin: declare_attackers_1
-- State 4: step=upkeep P0 life=10 P1 life=10
+- State 4: step=upkeep P0 life=10 P1 life=9
   - trained: cast_bolt_face
   - mixed: cast_bolt_face
   - bolt: cast_bolt_face
@@ -129,7 +129,7 @@ x:[5, 35] y:[1193.711, 1209.329]
 ## Solver alignment in tractable low-life regime
 - Compared states: 12
 - Trained agreement: 0.833
-- Mixed baseline agreement: 0.917
+- Mixed baseline agreement: 1.000
 - Bolt baseline agreement: 1.000
 - Goblin baseline agreement: 0.833
 

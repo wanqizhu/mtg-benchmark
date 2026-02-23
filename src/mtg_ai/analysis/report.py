@@ -76,6 +76,7 @@ def generate_report(
     champion_csv: Path | None = None,
     significance_csv: Path | None = None,
     replay_index_csv: Path | None = None,
+    manifest_json: Path | None = None,
 ) -> None:
     metrics = read_training_metrics(training_dir / "training_metrics.csv")
     checkpoint = latest_checkpoint(training_dir)
@@ -448,6 +449,22 @@ def generate_report(
     else:
         lines.append("No replay index CSV found.")
 
+    lines.append("")
+    lines.append("## Artifact manifest")
+    if manifest_json is not None and manifest_json.exists():
+        payload = json.loads(manifest_json.read_text(encoding="utf-8"))
+        lines.append(f"- git_head: {payload.get('git_head', 'unknown')}")
+        lines.append(f"- created_at_utc: {payload.get('created_at_utc', 'unknown')}")
+        records = payload.get("records", [])
+        present = [record for record in records if record.get("exists")]
+        lines.append(f"- recorded artifacts: {len(records)} (present: {len(present)})")
+        for record in present[: min(8, len(present))]:
+            lines.append(
+                f"  - {record['path']} bytes={record['bytes']} sha256={record['sha256'][:16]}..."
+            )
+    else:
+        lines.append("No artifact manifest JSON found.")
+
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text("\n".join(lines), encoding="utf-8")
 
@@ -468,6 +485,7 @@ def main() -> None:
     parser.add_argument("--champion-csv")
     parser.add_argument("--significance-csv")
     parser.add_argument("--replay-index-csv")
+    parser.add_argument("--manifest-json")
     parser.add_argument("--output", default="artifacts/report.md")
     parser.add_argument("--seed", type=int, default=97)
     args = parser.parse_args()
@@ -486,6 +504,7 @@ def main() -> None:
         champion_csv=Path(args.champion_csv) if args.champion_csv else None,
         significance_csv=Path(args.significance_csv) if args.significance_csv else None,
         replay_index_csv=Path(args.replay_index_csv) if args.replay_index_csv else None,
+        manifest_json=Path(args.manifest_json) if args.manifest_json else None,
         output_path=Path(args.output),
         seed=args.seed,
     )

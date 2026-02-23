@@ -1,0 +1,72 @@
+{
+  "created_at_utc": "2026-02-23T04:53:35.395814+00:00",
+  "git_head": "34faea18324390169267f2992280fa76a12ad778",
+  "records": [
+    {
+      "bytes": 331,
+      "exists": true,
+      "path": "artifacts/eval/champion.json",
+      "sha256": "f21ef9168b98d38ac65054ca9ea4bd35ca65fa16eacc73ddf24550779533aed2"
+    },
+    {
+      "bytes": 2156,
+      "exists": true,
+      "path": "artifacts/eval/champion_selection.csv",
+      "sha256": "eb2c22e68ee648f69ce9961f50c7940b0db01c449ae85f43057292d7b88e6f27"
+    },
+    {
+      "bytes": 816,
+      "exists": true,
+      "path": "artifacts/eval/generalization_matrix_tuned.csv",
+      "sha256": "560d3a996d36b4a031dcc184a987edcc87e7990bba83e95ca56598fb86b5c0c3"
+    },
+    {
+      "bytes": 272,
+      "exists": true,
+      "path": "artifacts/deck_search/results_tuned.csv",
+      "sha256": "864f41e345340b71a46a0fae2e1f5aa847d121cda8710735b79119d22e502c6e"
+    },
+    {
+      "bytes": 250,
+      "exists": true,
+      "path": "artifacts/eval/deck_vs_starter_tuned.csv",
+      "sha256": "9badb069b0a61ddb243499aeb3c3601789b96e821e0da5146869dbb183e4dc3e"
+    },
+    {
+      "bytes": 2149,
+      "exists": true,
+      "path": "artifacts/eval/policy_selection.csv",
+      "sha256": "3dc655247d8cfb77ff7761310e773fa3cbc5b4f25ce591cf6689e3b0bc986d18"
+    },
+    {
+      "bytes": 1884,
+      "exists": true,
+      "path": "artifacts/eval/policy_selection_matrix.csv",
+      "sha256": "648223c1bdb3cc39cccb40c9506ebca9a3f5062d1cbf9782e669756a7a02b8d2"
+    },
+    {
+      "bytes": 1623,
+      "exists": true,
+      "path": "artifacts/eval/significance.csv",
+      "sha256": "f689332a735571e12a8e9501b36f50906ab98a8f798189cc628720c429cb0ffa"
+    },
+    {
+      "bytes": 899,
+      "exists": true,
+      "path": "artifacts/eval/milestones.csv",
+      "sha256": "7a00ae4efa748058339fefb0c5d175b83d3519f8bea85aca859369a84c8c2c86"
+    },
+    {
+      "bytes": 643,
+      "exists": true,
+      "path": "artifacts/eval/convergence.csv",
+      "sha256": "2414916675df455f59d50e5bb0a69c702e60d6648cbf81d2898a1a13cdefe823"
+    },
+    {
+      "bytes": 1274,
+      "exists": true,
+      "path": "artifacts/replays/samples/index.csv",
+      "sha256": "30c1881da03491961c76e3ac493a10b3ca5862014460e0f420e78d3693caeea9"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 life,opening_hand,mode,deck_size,mountains,bolts,goblins,score
-5,5,evolutionary,12,4,7,1,0.8438
-5,7,evolutionary,12,8,4,0,0.8750
+5,5,evolutionary,12,5,4,3,0.8438
+5,7,evolutionary,12,5,6,1,0.8438
 10,5,evolutionary,12,4,5,3,1.0000
-10,7,evolutionary,12,5,6,1,0.9375
-20,5,evolutionary,12,4,4,4,0.9219
-20,7,evolutionary,12,4,5,3,1.0000
+10,7,evolutionary,12,5,4,3,0.9062
+20,5,evolutionary,12,3,9,0,0.9844
+20,7,evolutionary,12,4,7,1,1.0000
