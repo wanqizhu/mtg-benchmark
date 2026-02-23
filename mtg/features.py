@@ -4,37 +4,24 @@ from .enums import ActionType, TargetType, Step
 from .game import Action, GameView
 
 NUM_STEPS = 12
-MAX_CREATURES = 10
+MAX_CREATURES = 8
 STATE_DIM = 33
-# Action index layout:
+
+# Compact action layout:
 # 0: PASS_PRIORITY
 # 1: PLAY_MOUNTAIN
 # 2: CAST_BOLT → opponent
 # 3: CAST_BOLT → self
-# 4..4+MC-1: CAST_BOLT → my creature [0..MC-1]
-# 4+MC..4+2MC-1: CAST_BOLT → opp creature [0..MC-1]
-# 4+2MC: CAST_GOBLIN
-# 4+2MC+1 .. 4+2MC+2^MC: DECLARE_ATTACKERS bitmask [0..2^MC-1]
-# next: NO_BLOCK
-# next+1..next+MC: BLOCK_WITH_CREATURE [0..MC-1]
-# next: KEEP_HAND
-# next: MULLIGAN
-# next..next+6: PUT_CARD_ON_BOTTOM [0..6]
-_BOLT_OPP = 2
-_BOLT_SELF = 3
-_BOLT_MY_CREATURE_START = 4
-_BOLT_OPP_CREATURE_START = 4 + MAX_CREATURES
-_CAST_GOBLIN = 4 + 2 * MAX_CREATURES
-_ATTACK_START = _CAST_GOBLIN + 1
-_ATTACK_END = _ATTACK_START + (1 << MAX_CREATURES)
-_NO_BLOCK = _ATTACK_END
-_BLOCK_START = _NO_BLOCK + 1
-_BLOCK_END = _BLOCK_START + MAX_CREATURES
-_KEEP_HAND = _BLOCK_END
-_MULLIGAN = _KEEP_HAND + 1
-_BOTTOM_CARD_START = _MULLIGAN + 1
-_BOTTOM_CARD_END = _BOTTOM_CARD_START + 7
-ACTION_DIM = _BOTTOM_CARD_END
+# 4..11: CAST_BOLT → my creature [0..7]
+# 12..19: CAST_BOLT → opp creature [0..7]
+# 20: CAST_GOBLIN
+# 21..276: DECLARE_ATTACKERS bitmask [0..255] (up to 8 creatures)
+# 277: NO_BLOCK
+# 278..285: BLOCK_WITH_CREATURE [0..7]
+# 286: KEEP_HAND
+# 287: MULLIGAN
+# 288..294: PUT_CARD_ON_BOTTOM [hand idx 0..6]
+ACTION_DIM = 295
 
 STEP_INDEX = {s: i for i, s in enumerate([
     Step.UNTAP, Step.UPKEEP, Step.DRAW,
@@ -84,12 +71,12 @@ def state_to_features(view: GameView) -> np.ndarray:
     return f
 
 
-def _creature_slot(creature_id: int, battlefield: list, my: bool) -> int:
-    creatures = sorted(
-        [c for c in battlefield if c.is_creature],
-        key=lambda c: c.instance_id
-    )
-    for i, c in enumerate(creatures):
+def _sorted_creatures(battlefield: list) -> list:
+    return sorted([c for c in battlefield if c.is_creature], key=lambda c: c.instance_id)
+
+
+def _creature_slot(creature_id: int, battlefield: list) -> int:
+    for i, c in enumerate(_sorted_creatures(battlefield)):
         if c.instance_id == creature_id:
             return i
     return -1
@@ -100,7 +87,6 @@ def action_to_index(action: Action, view: GameView) -> int:
 
     if at == ActionType.PASS_PRIORITY:
         return 0
-
     if at == ActionType.PLAY_LAND:
         return 1
 
@@ -109,53 +95,43 @@ def action_to_index(action: Action, view: GameView) -> int:
             if action.targets:
                 t = action.targets[0]
                 if t.target_type == TargetType.PLAYER:
-                    if t.target_id != view.my_player:
-                        return _BOLT_OPP
-                    else:
-                        return _BOLT_SELF
+                    return 2 if t.target_id != view.my_player else 3
                 elif t.target_type == TargetType.CREATURE:
-                    slot = _creature_slot(t.target_id, view.my_battlefield, True)
+                    slot = _creature_slot(t.target_id, view.my_battlefield)
                     if 0 <= slot < MAX_CREATURES:
-                        return _BOLT_MY_CREATURE_START + slot
-                    slot = _creature_slot(t.target_id, view.opp_battlefield, False)
+                        return 4 + slot
+                    slot = _creature_slot(t.target_id, view.opp_battlefield)
                     if 0 <= slot < MAX_CREATURES:
-                        return _BOLT_OPP_CREATURE_START + slot
-            return _BOLT_OPP
-
+                        return 12 + slot
+            return 2
         if action.card.name == "Raging Goblin":
-            return _CAST_GOBLIN
+            return 20
 
     if at == ActionType.DECLARE_ATTACKERS:
-        my_creatures = sorted(
-            [c for c in view.my_battlefield if c.is_creature],
-            key=lambda c: c.instance_id
-        )
+        my_creatures = _sorted_creatures(view.my_battlefield)
         mask = 0
-        for i, c in enumerate(my_creatures):
-            if i >= MAX_CREATURES:
-                break
+        for i, c in enumerate(my_creatures[:MAX_CREATURES]):
             if c.instance_id in action.attackers:
                 mask |= (1 << i)
-        return _ATTACK_START + min(mask, (1 << MAX_CREATURES) - 1)
+        return 21 + mask
 
     if at == ActionType.DECLARE_BLOCKERS:
         if action.blocker_id is None:
-            return _NO_BLOCK
-        slot = _creature_slot(action.blocker_id, view.my_battlefield, True)
+            return 277
+        slot = _creature_slot(action.blocker_id, view.my_battlefield)
         if 0 <= slot < MAX_CREATURES:
-            return _BLOCK_START + slot
-        return _NO_BLOCK
+            return 278 + slot
+        return 277
 
     if at == ActionType.MULLIGAN_KEEP:
-        return _KEEP_HAND
-
+        return 286
     if at == ActionType.MULLIGAN_TAKE:
-        return _MULLIGAN
+        return 287
 
     if at == ActionType.CHOOSE_BOTTOM_CARD:
         if action.hand_index is not None:
-            return _BOTTOM_CARD_START + min(action.hand_index, 6)
-        return _BOTTOM_CARD_START
+            return 288 + min(action.hand_index, 6)
+        return 288
 
     return 0
 
@@ -164,7 +140,8 @@ def get_legal_action_mask(legal_actions: list[Action], view: GameView) -> np.nda
     mask = np.zeros(ACTION_DIM, dtype=np.bool_)
     for a in legal_actions:
         idx = action_to_index(a, view)
-        mask[idx] = True
+        if idx < ACTION_DIM:
+            mask[idx] = True
     return mask
 
 
