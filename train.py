@@ -80,12 +80,12 @@ def train(
     print(f"Training with life={starting_life}, deck={deck_str}, episodes={total_episodes}")
 
     for ep in range(1, total_episodes + 1):
-        # Mixed opponent strategy: 30% random/fixed, 30% past checkpoints, 40% self-play
+        # Training strategy: heavy focus on beating fixed bots + self-play for generalization
         r = rng.random()
-        if r < 0.3:
+        if r < 0.5:
             opp_name, opp_cls = rng.choice(FIXED_OPPONENTS)
             opp = opp_cls()
-        elif r < 0.6 and checkpoint_nets:
+        elif r < 0.7 and checkpoint_nets:
             ckpt_net = rng.choice(checkpoint_nets)
             opp = NNAgent(ckpt_net, epsilon=0.05)
         else:

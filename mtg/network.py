@@ -6,16 +6,14 @@ from .features import STATE_DIM, ACTION_DIM
 
 
 class QNetwork(nn.Module):
-    def __init__(self, state_dim: int = STATE_DIM, action_dim: int = ACTION_DIM, hidden: int = 256):
+    def __init__(self, state_dim: int = STATE_DIM, action_dim: int = ACTION_DIM, hidden: int = 128):
         super().__init__()
         self.net = nn.Sequential(
             nn.Linear(state_dim, hidden),
             nn.ReLU(),
             nn.Linear(hidden, hidden),
             nn.ReLU(),
-            nn.Linear(hidden, hidden // 2),
-            nn.ReLU(),
-            nn.Linear(hidden // 2, action_dim),
+            nn.Linear(hidden, action_dim),
         )
 
     def forward(self, state: torch.Tensor) -> torch.Tensor:
