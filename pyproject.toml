@@ -19,6 +19,7 @@ mtg-replay = "mtg_ai.replay.replay_cli:main"
 mtg-gauntlet = "mtg_ai.eval.scenarios:main"
 mtg-generalization = "mtg_ai.eval.generalization:main"
 mtg-train = "mtg_ai.training.self_play:main"
+mtg-train-sweep = "mtg_ai.training.hyperparam_sweep:main"
 mtg-deck-search = "mtg_ai.deck.search:main"
 mtg-report = "mtg_ai.analysis.report:main"
 

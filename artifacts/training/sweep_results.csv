@@ -1,0 +1,5 @@
+run_id,seed,epsilon,solver_weight,history_weight,baseline_avg_winrate,mixed_floor_winrate,solver_alignment,objective,run_dir
+1,79,0.22,0.0,0.0,0.7906,0.4000,0.9167,0.7119,artifacts/training/sweep_runs/run_001_seed_79_sw_0.00_hw_0.00_eps_0.22
+2,79,0.22,0.0,0.1,0.7906,0.4000,0.9167,0.7119,artifacts/training/sweep_runs/run_002_seed_79_sw_0.00_hw_0.10_eps_0.22
+3,79,0.22,0.15,0.0,0.7906,0.4000,0.9167,0.7119,artifacts/training/sweep_runs/run_003_seed_79_sw_0.15_hw_0.00_eps_0.22
+4,79,0.22,0.15,0.1,0.7906,0.4000,0.9167,0.7119,artifacts/training/sweep_runs/run_004_seed_79_sw_0.15_hw_0.10_eps_0.22

@@ -145,13 +145,30 @@ PYTHONPATH=src python3 -m mtg_ai.eval.generalization \
   --output-csv artifacts/eval/generalization_matrix.csv
 ```
 
-### 8) Final aggregate report
+### 8) Hyperparameter sweep (optional deeper search)
+
+```bash
+PYTHONPATH=src python3 -m mtg_ai.training.hyperparam_sweep \
+  --episodes 20 \
+  --eval-games 6 \
+  --life-values 5,10,20 \
+  --hand-values 5,7 \
+  --epsilons 0.18,0.22 \
+  --solver-weights 0.0,0.1,0.2 \
+  --history-weights 0.0,0.1 \
+  --seeds 71,73 \
+  --output-dir artifacts/training/sweep_runs \
+  --output-csv artifacts/training/sweep_results.csv
+```
+
+### 9) Final aggregate report
 
 ```bash
 PYTHONPATH=src python3 -m mtg_ai.analysis.report \
   --training-dir artifacts/training/self_play_multi \
   --deck-search-csv artifacts/deck_search/results_multi.csv \
   --generalization-csv artifacts/eval/generalization_matrix.csv \
+  --sweep-csv artifacts/training/sweep_results.csv \
   --output artifacts/report.md \
   --seed 103
 ```

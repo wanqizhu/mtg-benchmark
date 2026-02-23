@@ -65,6 +65,7 @@ def generate_report(
     output_path: Path,
     seed: int,
     generalization_csv: Path | None = None,
+    sweep_csv: Path | None = None,
 ) -> None:
     metrics = read_training_metrics(training_dir / "training_metrics.csv")
     checkpoint = latest_checkpoint(training_dir)
@@ -252,6 +253,25 @@ def generate_report(
     else:
         lines.append("No checkpoint available for solver alignment.")
 
+    lines.append("")
+    lines.append("## Hyperparameter sweep summary")
+    if sweep_csv is not None and sweep_csv.exists():
+        with sweep_csv.open("r", encoding="utf-8") as f:
+            rows = list(csv.DictReader(f))
+        if rows:
+            top_rows = rows[: min(5, len(rows))]
+            for row in top_rows:
+                lines.append(
+                    f"- run {row['run_id']} seed={row['seed']} eps={row['epsilon']} "
+                    f"solver_w={row['solver_weight']} history_w={row['history_weight']} "
+                    f"obj={row['objective']} base={row['baseline_avg_winrate']} "
+                    f"mixed_floor={row['mixed_floor_winrate']} align={row['solver_alignment']}"
+                )
+        else:
+            lines.append("Sweep CSV is empty.")
+    else:
+        lines.append("No hyperparameter sweep CSV found.")
+
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text("\n".join(lines), encoding="utf-8")
 
@@ -261,6 +281,7 @@ def main() -> None:
     parser.add_argument("--training-dir", default="artifacts/training/self_play")
     parser.add_argument("--deck-search-csv", default="artifacts/deck_search/results.csv")
     parser.add_argument("--generalization-csv", default="artifacts/eval/generalization_matrix.csv")
+    parser.add_argument("--sweep-csv")
     parser.add_argument("--output", default="artifacts/report.md")
     parser.add_argument("--seed", type=int, default=97)
     args = parser.parse_args()
@@ -268,6 +289,7 @@ def main() -> None:
         training_dir=Path(args.training_dir),
         deck_search_csv=Path(args.deck_search_csv),
         generalization_csv=Path(args.generalization_csv),
+        sweep_csv=Path(args.sweep_csv) if args.sweep_csv else None,
         output_path=Path(args.output),
         seed=args.seed,
     )
