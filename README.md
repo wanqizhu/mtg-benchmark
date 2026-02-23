@@ -84,15 +84,18 @@ Grid search over deck compositions (mountains, bolts, goblins) with two-phase ev
 
 ## Results
 
-### Tournament Rankings (Life=20, deck=20M/10B/10G)
+### Tournament Rankings (Life=20, deck=20M/10B/10G, 300 games/pair)
 
 | Agent | ELO | vs Random | vs BoltFace | vs AggroGoblin | vs Mixed |
 |-------|-----|-----------|-------------|----------------|----------|
-| Trained (best) | 1376 | 93.8% | 91.6% | 78.9% | 65.6% |
-| Mixed | 1366 | ~95% | ~100% | ~83% | — |
-| AggroGoblin | 936 | ~73% | ~98% | — | ~17% |
-| BoltFace | 846 | ~58% | — | ~2% | ~0% |
-| Random | 477 | — | ~43% | ~27% | ~3% |
+| trained_v3 | 1459 | 98.7% | 96.3% | 92.0% | 54.7% |
+| mixed | 1378 | 97.0% | 100.0% | 83.7% | — |
+| trained_v1 | 1336 | 96.3% | 94.3% | 78.0% | 72.7% |
+| aggro_goblin | 823 | 72.3% | 98.3% | — | 16.3% |
+| bolt_face | 580 | 56.3% | — | 1.7% | 0.0% |
+| random | 424 | — | 43.7% | 27.7% | 3.0% |
+
+trained_v3 beats trained_v1 head-to-head 63.3% to 36.7%.
 
 ### Key Findings
 
