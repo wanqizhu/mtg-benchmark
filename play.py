@@ -56,14 +56,19 @@ def main():
     parser.add_argument("--verbose", action="store_true", help="Show game log")
     parser.add_argument("--first", type=int, default=None, choices=[0, 1],
                         help="Who goes first (random if not set)")
-    parser.add_argument("--model1", default="models/final.pt",
-                        help="Model path for trained player 1")
-    parser.add_argument("--model2", default="models/final.pt",
-                        help="Model path for trained player 2")
+    parser.add_argument("--model", default="models/life20_v3/finetuned.pt",
+                        help="Model path for trained agents (used by both unless overridden)")
+    parser.add_argument("--model1", default=None,
+                        help="Model path for trained player 1 (overrides --model)")
+    parser.add_argument("--model2", default=None,
+                        help="Model path for trained player 2 (overrides --model)")
     args = parser.parse_args()
 
     deck1 = parse_deck(args.deck1)
     deck2 = parse_deck(args.deck2) if args.deck2 else list(deck1)
+
+    model1 = args.model1 or args.model
+    model2 = args.model2 or args.model
 
     def make_agent(ptype, model_path):
         if ptype == "trained":
@@ -75,8 +80,8 @@ def main():
     verbose = args.verbose or is_human
 
     if args.games == 1 or is_human:
-        agent1 = make_agent(args.p1, args.model1)
-        agent2 = make_agent(args.p2, args.model2)
+        agent1 = make_agent(args.p1, model1)
+        agent2 = make_agent(args.p2, model2)
         game = Game(
             decks=[deck1, deck2],
             agents=[agent1, agent2],
@@ -90,8 +95,8 @@ def main():
     else:
         wins = [0, 0, 0]
         for i in range(args.games):
-            agent1 = make_agent(args.p1, args.model1)
-            agent2 = make_agent(args.p2, args.model2)
+            agent1 = make_agent(args.p1, model1)
+            agent2 = make_agent(args.p2, model2)
             game = Game(
                 decks=[deck1, deck2],
                 agents=[agent1, agent2],

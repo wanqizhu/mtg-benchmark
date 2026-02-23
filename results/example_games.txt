@@ -1,0 +1,758 @@
+============================================================
+  EXAMPLE GAME 1: Trained Agent vs MixedBoltFace (Life=20)
+============================================================
+  Player 0 draws Raging Goblin
+  Player 0 draws Mountain
+  Player 0 draws Mountain
+  Player 0 draws Mountain
+  Player 0 draws Mountain
+  Player 0 draws Lightning Bolt
+  Player 0 draws Lightning Bolt
+  Player 1 draws Lightning Bolt
+  Player 1 draws Lightning Bolt
+  Player 1 draws Mountain
+  Player 1 draws Mountain
+  Player 1 draws Raging Goblin
+  Player 1 draws Raging Goblin
+  Player 1 draws Raging Goblin
+  Player 0 mulligans (count: 1)
+  Player 0 draws Lightning Bolt
+  Player 0 draws Raging Goblin
+  Player 0 draws Raging Goblin
+  Player 0 draws Mountain
+  Player 0 draws Raging Goblin
+  Player 0 draws Mountain
+  Player 0 draws Mountain
+  Player 0 keeps (mulliganed 1 times)
+  Player 0 puts Raging Goblin on bottom
+  Player 1 keeps (mulliganed 0 times)
+
+=== Turn 1 (Player 0) ===
+  Player 0 skips first draw
+  P0: Play Mountain
+  P0: Cast Raging Goblin → no target
+  Resolving: Raging Goblin
+  Raging Goblin#33 enters the battlefield for Player 0
+  P0: Attack with creatures (33,)
+  Raging Goblin#33 deals 1 to Player 1 (now 19)
+
+=== Turn 2 (Player 1) ===
+  Player 1 draws Raging Goblin
+  P1: Play Mountain
+  P1: Cast Raging Goblin → no target
+  Resolving: Raging Goblin
+  Raging Goblin#76 enters the battlefield for Player 1
+  P1: Attack with creatures (76,)
+  Raging Goblin#76 deals 1 to Player 0 (now 19)
+
+=== Turn 3 (Player 0) ===
+  Player 0 draws Raging Goblin
+  P0: Cast Lightning Bolt → Creature#76
+  Resolving: Lightning Bolt
+  Lightning Bolt deals 3 damage to Raging Goblin#76
+  Raging Goblin#76 dies (SBA)
+  P0: Play Mountain
+  P0: Cast Raging Goblin → no target
+  Resolving: Raging Goblin
+  Raging Goblin#35 enters the battlefield for Player 0
+  P0: Attack with creatures (33, 35)
+  Raging Goblin#33 deals 1 to Player 1 (now 18)
+  Raging Goblin#35 deals 1 to Player 1 (now 17)
+
+=== Turn 4 (Player 1) ===
+  P1: Cast Lightning Bolt → Player 0
+  Resolving: Lightning Bolt
+  Lightning Bolt deals 3 damage to Player 0 (now 16)
+  Player 1 draws Mountain
+  P1: Play Mountain
+  P1: Cast Raging Goblin → no target
+  Resolving: Raging Goblin
+  Raging Goblin#79 enters the battlefield for Player 1
+  P1: Attack with creatures (79,)
+  Raging Goblin#79 deals 1 to Player 0 (now 15)
+
+=== Turn 5 (Player 0) ===
+  Player 0 draws Mountain
+  P0: Play Mountain
+  P0: Cast Raging Goblin → no target
+  Resolving: Raging Goblin
+  Raging Goblin#30 enters the battlefield for Player 0
+  P0: Attack with creatures (35,)
+  Raging Goblin#35 deals 1 to Player 1 (now 16)
+
+=== Turn 6 (Player 1) ===
+  P1: Cast Lightning Bolt → Player 0
+  Resolving: Lightning Bolt
+  Lightning Bolt deals 3 damage to Player 0 (now 12)
+  Player 1 draws Mountain
+  P1: Play Mountain
+  P1: Cast Raging Goblin → no target
+  Resolving: Raging Goblin
+  Raging Goblin#71 enters the battlefield for Player 1
+  P1: Cast Raging Goblin → no target
+  Resolving: Raging Goblin
+  Raging Goblin#75 enters the battlefield for Player 1
+  P1: Attack with creatures (79, 71, 75)
+  P0: Block attacker #79 with creature #30
+  P0: Block attacker #71 with creature #33
+  Raging Goblin#79 and Raging Goblin#30 exchange damage
+  Raging Goblin#71 and Raging Goblin#33 exchange damage
+  Raging Goblin#75 deals 1 to Player 0 (now 11)
+  Raging Goblin#33 dies (SBA)
+  Raging Goblin#30 dies (SBA)
+  Raging Goblin#79 dies (SBA)
+  Raging Goblin#71 dies (SBA)
+
+=== Turn 7 (Player 0) ===
+  Player 0 draws Raging Goblin
+  P0: Play Mountain
+  P0: Cast Raging Goblin → no target
+  Resolving: Raging Goblin
+  Raging Goblin#37 enters the battlefield for Player 0
+  P0: Attack with no creatures
+
+=== Turn 8 (Player 1) ===
+  Player 1 draws Raging Goblin
+  P1: Play Mountain
+  P1: Cast Raging Goblin → no target
+  Resolving: Raging Goblin
+  Raging Goblin#73 enters the battlefield for Player 1
+  P1: Attack with creatures (75, 73)
+  P0: Block attacker #75 with creature #35
+  P0: Block attacker #73 with creature #37
+  Raging Goblin#75 and Raging Goblin#35 exchange damage
+  Raging Goblin#73 and Raging Goblin#37 exchange damage
+  Raging Goblin#35 dies (SBA)
+  Raging Goblin#37 dies (SBA)
+  Raging Goblin#75 dies (SBA)
+  Raging Goblin#73 dies (SBA)
+
+=== Turn 9 (Player 0) ===
+  Player 0 draws Mountain
+  P0: Play Mountain
+  Player 0 has no creatures to attack with
+
+=== Turn 10 (Player 1) ===
+  Player 1 draws Lightning Bolt
+  P1: Cast Lightning Bolt → Player 0
+  Resolving: Lightning Bolt
+  Lightning Bolt deals 3 damage to Player 0 (now 8)
+  Player 1 has no creatures to attack with
+
+=== Turn 11 (Player 0) ===
+  Player 0 draws Mountain
+  Player 0 has no creatures to attack with
+  P0: Play Mountain
+
+=== Turn 12 (Player 1) ===
+  Player 1 draws Lightning Bolt
+  P1: Cast Lightning Bolt → Player 0
+  Resolving: Lightning Bolt
+  Lightning Bolt deals 3 damage to Player 0 (now 5)
+  Player 1 has no creatures to attack with
+
+=== Turn 13 (Player 0) ===
+  Player 0 draws Mountain
+  Player 0 has no creatures to attack with
+
+=== Turn 14 (Player 1) ===
+  Player 1 draws Lightning Bolt
+  P1: Cast Lightning Bolt → Player 0
+  Resolving: Lightning Bolt
+  Lightning Bolt deals 3 damage to Player 0 (now 2)
+  Player 1 has no creatures to attack with
+
+=== Turn 15 (Player 0) ===
+  Player 0 draws Mountain
+  Player 0 has no creatures to attack with
+  P0: Play Mountain
+
+=== Turn 16 (Player 1) ===
+  Player 1 draws Raging Goblin
+  P1: Cast Raging Goblin → no target
+  Resolving: Raging Goblin
+  Raging Goblin#72 enters the battlefield for Player 1
+  P1: Attack with creatures (72,)
+  Raging Goblin#72 deals 1 to Player 0 (now 1)
+
+=== Turn 17 (Player 0) ===
+  Player 0 draws Lightning Bolt
+  Player 0 has no creatures to attack with
+
+=== Turn 18 (Player 1) ===
+  Player 1 draws Lightning Bolt
+  P1: Cast Lightning Bolt → Player 0
+  P0: Cast Lightning Bolt → Player 0
+  Resolving: Lightning Bolt
+  Lightning Bolt deals 3 damage to Player 0 (now -2)
+  >>> Player 1 wins! <<<
+
+Result: WIN_1 (Turn 18)
+Final life: P0=-2, P1=16
+
+============================================================
+  EXAMPLE GAME 2: Trained Agent vs BoltFace (Life=10)
+============================================================
+  Player 0 draws Raging Goblin
+  Player 0 draws Raging Goblin
+  Player 0 draws Lightning Bolt
+  Player 0 draws Raging Goblin
+  Player 0 draws Lightning Bolt
+  Player 0 draws Lightning Bolt
+  Player 0 draws Mountain
+  Player 1 draws Mountain
+  Player 1 draws Raging Goblin
+  Player 1 draws Raging Goblin
+  Player 1 draws Lightning Bolt
+  Player 1 draws Lightning Bolt
+  Player 1 draws Raging Goblin
+  Player 1 draws Mountain
+  Player 0 keeps (mulliganed 0 times)
+  Player 1 keeps (mulliganed 0 times)
+
+=== Turn 1 (Player 0) ===
+  Player 0 skips first draw
+  P0: Play Mountain
+  P0: Cast Raging Goblin → no target
+  Resolving: Raging Goblin
+  Raging Goblin#38 enters the battlefield for Player 0
+  P0: Attack with creatures (38,)
+  Raging Goblin#38 deals 1 to Player 1 (now 9)
+
+=== Turn 2 (Player 1) ===
+  Player 1 draws Mountain
+  P1: Play Mountain
+  P1: Cast Lightning Bolt → Player 0
+  Resolving: Lightning Bolt
+  Lightning Bolt deals 3 damage to Player 0 (now 7)
+  Player 1 has no creatures to attack with
+
+=== Turn 3 (Player 0) ===
+  Player 0 draws Mountain
+  P0: Cast Raging Goblin → no target
+  Resolving: Raging Goblin
+  Raging Goblin#30 enters the battlefield for Player 0
+  P0: Play Mountain
+  P0: Cast Raging Goblin → no target
+  Resolving: Raging Goblin
+  Raging Goblin#35 enters the battlefield for Player 0
+  P0: Attack with creatures (30, 35)
+  Raging Goblin#30 deals 1 to Player 1 (now 8)
+  Raging Goblin#35 deals 1 to Player 1 (now 7)
+
+=== Turn 4 (Player 1) ===
+  P1: Cast Lightning Bolt → Player 0
+  Resolving: Lightning Bolt
+  Lightning Bolt deals 3 damage to Player 0 (now 4)
+  Player 1 draws Mountain
+  P1: Play Mountain
+  Player 1 has no creatures to attack with
+
+=== Turn 5 (Player 0) ===
+  P0: Cast Lightning Bolt → Player 1
+  P0: Cast Lightning Bolt → Player 1
+  Resolving: Lightning Bolt
+  Lightning Bolt deals 3 damage to Player 1 (now 4)
+  Resolving: Lightning Bolt
+  Lightning Bolt deals 3 damage to Player 1 (now 1)
+  Player 0 draws Lightning Bolt
+  P0: Attack with creatures (30,)
+  Raging Goblin#30 deals 1 to Player 1 (now 0)
+  >>> Player 0 wins! <<<
+
+Result: WIN_0 (Turn 5)
+Final life: P0=4, P1=0
+
+============================================================
+  EXAMPLE GAME 3: Trained vs Trained (Life=20)
+============================================================
+  Player 0 draws Mountain
+  Player 0 draws Raging Goblin
+  Player 0 draws Mountain
+  Player 0 draws Lightning Bolt
+  Player 0 draws Raging Goblin
+  Player 0 draws Mountain
+  Player 0 draws Mountain
+  Player 1 draws Raging Goblin
+  Player 1 draws Lightning Bolt
+  Player 1 draws Raging Goblin
+  Player 1 draws Lightning Bolt
+  Player 1 draws Mountain
+  Player 1 draws Mountain
+  Player 1 draws Raging Goblin
+  Player 0 mulligans (count: 1)
+  Player 0 draws Lightning Bolt
+  Player 0 draws Mountain
+  Player 0 draws Raging Goblin
+  Player 0 draws Mountain
+  Player 0 draws Raging Goblin
+  Player 0 draws Lightning Bolt
+  Player 0 draws Mountain
+  Player 0 keeps (mulliganed 1 times)
+  Player 0 puts Raging Goblin on bottom
+  Player 1 keeps (mulliganed 0 times)
+
+=== Turn 1 (Player 0) ===
+  Player 0 skips first draw
+  P0: Play Mountain
+  P0: Cast Raging Goblin → no target
+  Resolving: Raging Goblin
+  Raging Goblin#31 enters the battlefield for Player 0
+  P0: Attack with creatures (31,)
+  Raging Goblin#31 deals 1 to Player 1 (now 19)
+
+=== Turn 2 (Player 1) ===
+  Player 1 draws Lightning Bolt
+  P1: Play Mountain
+  P1: Cast Lightning Bolt → Creature#31
+  Resolving: Lightning Bolt
+  Lightning Bolt deals 3 damage to Raging Goblin#31
+  Raging Goblin#31 dies (SBA)
+  Player 1 has no creatures to attack with
+
+=== Turn 3 (Player 0) ===
+  Player 0 draws Raging Goblin
+  P0: Cast Raging Goblin → no target
+  Resolving: Raging Goblin
+  Raging Goblin#35 enters the battlefield for Player 0
+  P0: Play Mountain
+  P0: Attack with creatures (35,)
+  Raging Goblin#35 deals 1 to Player 1 (now 18)
+
+=== Turn 4 (Player 1) ===
+  P1: Cast Lightning Bolt → Creature#35
+  Resolving: Lightning Bolt
+  Lightning Bolt deals 3 damage to Raging Goblin#35
+  Raging Goblin#35 dies (SBA)
+  Player 1 draws Raging Goblin
+  P1: Play Mountain
+  P1: Cast Lightning Bolt → Player 0
+  Resolving: Lightning Bolt
+  Lightning Bolt deals 3 damage to Player 0 (now 17)
+  Player 1 has no creatures to attack with
+
+=== Turn 5 (Player 0) ===
+  Player 0 draws Lightning Bolt
+  Player 0 has no creatures to attack with
+
+=== Turn 6 (Player 1) ===
+  Player 1 draws Lightning Bolt
+  P1: Cast Lightning Bolt → Player 0
+  Resolving: Lightning Bolt
+  Lightning Bolt deals 3 damage to Player 0 (now 14)
+  P0: Cast Lightning Bolt → Player 1
+  Resolving: Lightning Bolt
+  Lightning Bolt deals 3 damage to Player 1 (now 15)
+  Player 1 has no creatures to attack with
+  P0: Cast Lightning Bolt → Player 1
+  Resolving: Lightning Bolt
+  Lightning Bolt deals 3 damage to Player 1 (now 12)
+  P1: Cast Raging Goblin → no target
+  Resolving: Raging Goblin
+  Raging Goblin#70 enters the battlefield for Player 1
+
+=== Turn 7 (Player 0) ===
+  P0: Cast Lightning Bolt → Creature#70
+  Resolving: Lightning Bolt
+  Lightning Bolt deals 3 damage to Raging Goblin#70
+  Raging Goblin#70 dies (SBA)
+  Player 0 draws Mountain
+  Player 0 has no creatures to attack with
+  P0: Play Mountain
+
+=== Turn 8 (Player 1) ===
+  Player 1 draws Mountain
+  P1: Play Mountain
+  P1: Cast Raging Goblin → no target
+  Resolving: Raging Goblin
+  Raging Goblin#72 enters the battlefield for Player 1
+  P1: Cast Raging Goblin → no target
+  Resolving: Raging Goblin
+  Raging Goblin#74 enters the battlefield for Player 1
+  P1: Cast Raging Goblin → no target
+  Resolving: Raging Goblin
+  Raging Goblin#77 enters the battlefield for Player 1
+  P1: Attack with creatures (74, 77)
+  Raging Goblin#74 deals 1 to Player 0 (now 13)
+  Raging Goblin#77 deals 1 to Player 0 (now 12)
+
+=== Turn 9 (Player 0) ===
+  Player 0 draws Raging Goblin
+  P0: Cast Raging Goblin → no target
+  Resolving: Raging Goblin
+  Raging Goblin#38 enters the battlefield for Player 0
+  P0: Play Mountain
+  P0: Attack with no creatures
+
+=== Turn 10 (Player 1) ===
+  Player 1 draws Lightning Bolt
+  P1: Cast Lightning Bolt → Creature#38
+  Resolving: Lightning Bolt
+  Lightning Bolt deals 3 damage to Raging Goblin#38
+  Raging Goblin#38 dies (SBA)
+  P1: Attack with creatures (72, 74, 77)
+  Raging Goblin#72 deals 1 to Player 0 (now 11)
+  Raging Goblin#74 deals 1 to Player 0 (now 10)
+  Raging Goblin#77 deals 1 to Player 0 (now 9)
+
+=== Turn 11 (Player 0) ===
+  Player 0 draws Mountain
+  P0: Play Mountain
+  Player 0 has no creatures to attack with
+
+=== Turn 12 (Player 1) ===
+  Player 1 draws Mountain
+  P1: Play Mountain
+  P1: Attack with creatures (72, 74, 77)
+  Raging Goblin#72 deals 1 to Player 0 (now 8)
+  Raging Goblin#74 deals 1 to Player 0 (now 7)
+  Raging Goblin#77 deals 1 to Player 0 (now 6)
+
+=== Turn 13 (Player 0) ===
+  Player 0 draws Raging Goblin
+  P0: Cast Raging Goblin → no target
+  Resolving: Raging Goblin
+  Raging Goblin#34 enters the battlefield for Player 0
+  P0: Attack with no creatures
+
+=== Turn 14 (Player 1) ===
+  Player 1 draws Mountain
+  P1: Play Mountain
+  P1: Attack with creatures (72, 74, 77)
+  P0: Block attacker #72 with creature #34
+  Raging Goblin#72 and Raging Goblin#34 exchange damage
+  Raging Goblin#74 deals 1 to Player 0 (now 5)
+  Raging Goblin#77 deals 1 to Player 0 (now 4)
+  Raging Goblin#34 dies (SBA)
+  Raging Goblin#72 dies (SBA)
+
+=== Turn 15 (Player 0) ===
+  Player 0 draws Lightning Bolt
+  Player 0 has no creatures to attack with
+
+=== Turn 16 (Player 1) ===
+  Player 1 draws Lightning Bolt
+  P1: Attack with creatures (74, 77)
+  P0: Cast Lightning Bolt → Creature#74
+  Resolving: Lightning Bolt
+  Lightning Bolt deals 3 damage to Raging Goblin#74
+  Raging Goblin#74 dies (SBA)
+  Raging Goblin#77 deals 1 to Player 0 (now 3)
+
+=== Turn 17 (Player 0) ===
+  Player 0 draws Raging Goblin
+  P0: Cast Raging Goblin → no target
+  Resolving: Raging Goblin
+  Raging Goblin#30 enters the battlefield for Player 0
+  P1: Cast Lightning Bolt → Creature#30
+  Resolving: Lightning Bolt
+  Lightning Bolt deals 3 damage to Raging Goblin#30
+  Raging Goblin#30 dies (SBA)
+  Player 0 has no creatures to attack with
+
+=== Turn 18 (Player 1) ===
+  Player 1 draws Raging Goblin
+  P1: Cast Raging Goblin → no target
+  Resolving: Raging Goblin
+  Raging Goblin#75 enters the battlefield for Player 1
+  P1: Attack with no creatures
+
+=== Turn 19 (Player 0) ===
+  Player 0 draws Lightning Bolt
+  Player 0 has no creatures to attack with
+
+=== Turn 20 (Player 1) ===
+  Player 1 draws Raging Goblin
+  P1: Cast Raging Goblin → no target
+  Resolving: Raging Goblin
+  Raging Goblin#79 enters the battlefield for Player 1
+  P0: Cast Lightning Bolt → Creature#75
+  Resolving: Lightning Bolt
+  Lightning Bolt deals 3 damage to Raging Goblin#75
+  Raging Goblin#75 dies (SBA)
+  P1: Attack with no creatures
+
+=== Turn 21 (Player 0) ===
+  Player 0 draws Raging Goblin
+  P0: Cast Raging Goblin → no target
+  Resolving: Raging Goblin
+  Raging Goblin#33 enters the battlefield for Player 0
+  P0: Attack with no creatures
+
+=== Turn 22 (Player 1) ===
+  Player 1 draws Raging Goblin
+  P1: Cast Raging Goblin → no target
+  Resolving: Raging Goblin
+  Raging Goblin#76 enters the battlefield for Player 1
+  P1: Attack with no creatures
+
+=== Turn 23 (Player 0) ===
+  Player 0 draws Mountain
+  P0: Play Mountain
+  P0: Attack with no creatures
+
+=== Turn 24 (Player 1) ===
+  Player 1 draws Mountain
+  P1: Play Mountain
+  P1: Attack with no creatures
+
+=== Turn 25 (Player 0) ===
+  Player 0 draws Mountain
+  P0: Play Mountain
+  P0: Attack with no creatures
+
+=== Turn 26 (Player 1) ===
+  Player 1 draws Mountain
+  P1: Play Mountain
+  P1: Attack with no creatures
+
+=== Turn 27 (Player 0) ===
+  Player 0 draws Mountain
+  P0: Play Mountain
+  P0: Attack with no creatures
+
+=== Turn 28 (Player 1) ===
+  Player 1 draws Lightning Bolt
+  P1: Cast Lightning Bolt → Creature#33
+  Resolving: Lightning Bolt
+  Lightning Bolt deals 3 damage to Raging Goblin#33
+  Raging Goblin#33 dies (SBA)
+  P1: Attack with no creatures
+
+=== Turn 29 (Player 0) ===
+  Player 0 draws Mountain
+  P0: Play Mountain
+  Player 0 has no creatures to attack with
+
+=== Turn 30 (Player 1) ===
+  Player 1 draws Mountain
+  P1: Play Mountain
+  P1: Attack with no creatures
+
+=== Turn 31 (Player 0) ===
+  Player 0 draws Lightning Bolt
+  Player 0 has no creatures to attack with
+
+=== Turn 32 (Player 1) ===
+  Player 1 draws Raging Goblin
+  P1: Cast Raging Goblin → no target
+  P0: Cast Lightning Bolt → Creature#76
+  Resolving: Lightning Bolt
+  Lightning Bolt deals 3 damage to Raging Goblin#76
+  Raging Goblin#76 dies (SBA)
+  Resolving: Raging Goblin
+  Raging Goblin#78 enters the battlefield for Player 1
+  P1: Attack with no creatures
+
+=== Turn 33 (Player 0) ===
+  Player 0 draws Lightning Bolt
+  Player 0 has no creatures to attack with
+
+=== Turn 34 (Player 1) ===
+  Player 1 draws Lightning Bolt
+  P0: Cast Lightning Bolt → Creature#77
+  Resolving: Lightning Bolt
+  Lightning Bolt deals 3 damage to Raging Goblin#77
+  Raging Goblin#77 dies (SBA)
+  P1: Attack with no creatures
+
+=== Turn 35 (Player 0) ===
+  Player 0 draws Mountain
+  P0: Play Mountain
+  Player 0 has no creatures to attack with
+
+=== Turn 36 (Player 1) ===
+  Player 1 draws Lightning Bolt
+  P1: Attack with no creatures
+
+=== Turn 37 (Player 0) ===
+  Player 0 draws Mountain
+  P0: Play Mountain
+  Player 0 has no creatures to attack with
+
+=== Turn 38 (Player 1) ===
+  Player 1 draws Mountain
+  P1: Play Mountain
+  P1: Attack with no creatures
+
+=== Turn 39 (Player 0) ===
+  Player 0 draws Raging Goblin
+  P0: Cast Raging Goblin → no target
+  P1: Cast Lightning Bolt → Player 1
+  P1: Cast Lightning Bolt → Player 1
+  Resolving: Lightning Bolt
+  Lightning Bolt deals 3 damage to Player 1 (now 9)
+  Resolving: Lightning Bolt
+  Lightning Bolt deals 3 damage to Player 1 (now 6)
+  Resolving: Raging Goblin
+  Raging Goblin#39 enters the battlefield for Player 0
+  P0: Attack with no creatures
+
+=== Turn 40 (Player 1) ===
+  Player 1 draws Raging Goblin
+  P1: Attack with no creatures
+
+=== Turn 41 (Player 0) ===
+  Player 0 draws Mountain
+  P0: Play Mountain
+  P0: Attack with no creatures
+
+=== Turn 42 (Player 1) ===
+  Player 1 draws Mountain
+  P1: Play Mountain
+  P1: Attack with no creatures
+
+=== Turn 43 (Player 0) ===
+  Player 0 draws Mountain
+  P0: Play Mountain
+  P0: Attack with no creatures
+
+=== Turn 44 (Player 1) ===
+  Player 1 draws Mountain
+  P1: Play Mountain
+  P1: Attack with no creatures
+
+=== Turn 45 (Player 0) ===
+  Player 0 draws Mountain
+  P0: Play Mountain
+  P0: Attack with no creatures
+
+=== Turn 46 (Player 1) ===
+  Player 1 draws Mountain
+  P1: Play Mountain
+  P1: Attack with no creatures
+
+=== Turn 47 (Player 0) ===
+  Player 0 draws Mountain
+  P0: Play Mountain
+  P0: Attack with no creatures
+
+=== Turn 48 (Player 1) ===
+  Player 1 draws Mountain
+  P1: Play Mountain
+  P1: Attack with no creatures
+
+=== Turn 49 (Player 0) ===
+  Player 0 draws Mountain
+  P0: Play Mountain
+  P0: Attack with no creatures
+
+=== Turn 50 (Player 1) ===
+  Player 1 draws Lightning Bolt
+  P1: Cast Lightning Bolt → Creature#39
+  Resolving: Lightning Bolt
+  Lightning Bolt deals 3 damage to Raging Goblin#39
+  Raging Goblin#39 dies (SBA)
+  P1: Attack with no creatures
+
+=== Turn 51 (Player 0) ===
+  Player 0 draws Mountain
+  P0: Play Mountain
+  Player 0 has no creatures to attack with
+
+=== Turn 52 (Player 1) ===
+  Player 1 draws Mountain
+  P1: Play Mountain
+  P1: Cast Raging Goblin → no target
+  Resolving: Raging Goblin
+  Raging Goblin#73 enters the battlefield for Player 1
+  P1: Attack with no creatures
+
+=== Turn 53 (Player 0) ===
+  Player 0 draws Lightning Bolt
+  Player 0 has no creatures to attack with
+  P0: Cast Lightning Bolt → Creature#73
+  Resolving: Lightning Bolt
+  Lightning Bolt deals 3 damage to Raging Goblin#73
+  Raging Goblin#73 dies (SBA)
+
+=== Turn 54 (Player 1) ===
+  Player 1 draws Mountain
+  P1: Play Mountain
+  P1: Attack with no creatures
+
+=== Turn 55 (Player 0) ===
+  Player 0 draws Raging Goblin
+  P0: Cast Raging Goblin → no target
+  Resolving: Raging Goblin
+  Raging Goblin#37 enters the battlefield for Player 0
+  P0: Attack with no creatures
+
+=== Turn 56 (Player 1) ===
+  Player 1 draws Raging Goblin
+  P1: Attack with no creatures
+
+=== Turn 57 (Player 0) ===
+  Player 0 draws Mountain
+  P0: Play Mountain
+  P0: Attack with no creatures
+
+=== Turn 58 (Player 1) ===
+  Player 1 draws Mountain
+  P1: Play Mountain
+  P1: Attack with no creatures
+
+=== Turn 59 (Player 0) ===
+  Player 0 draws Mountain
+  P0: Play Mountain
+  P0: Attack with no creatures
+
+=== Turn 60 (Player 1) ===
+  Player 1 draws Mountain
+  P1: Play Mountain
+  P1: Attack with no creatures
+
+=== Turn 61 (Player 0) ===
+  Player 0 draws Raging Goblin
+  P0: Cast Raging Goblin → no target
+  Resolving: Raging Goblin
+  Raging Goblin#36 enters the battlefield for Player 0
+  P0: Attack with no creatures
+
+=== Turn 62 (Player 1) ===
+  Player 1 draws Mountain
+  P1: Play Mountain
+  P1: Attack with no creatures
+
+=== Turn 63 (Player 0) ===
+  Player 0 draws Mountain
+  P0: Play Mountain
+  P0: Attack with no creatures
+
+=== Turn 64 (Player 1) ===
+  Player 1 draws Mountain
+  P1: Play Mountain
+  P1: Attack with no creatures
+
+=== Turn 65 (Player 0) ===
+  Player 0 draws Lightning Bolt
+  P0: Cast Lightning Bolt → Player 1
+  Resolving: Lightning Bolt
+  Lightning Bolt deals 3 damage to Player 1 (now 3)
+  P0: Attack with creatures (37, 36)
+  P1: Block attacker #37 with creature #79
+  P1: Block attacker #36 with creature #78
+  Raging Goblin#37 and Raging Goblin#79 exchange damage
+  Raging Goblin#36 and Raging Goblin#78 exchange damage
+  Raging Goblin#37 dies (SBA)
+  Raging Goblin#36 dies (SBA)
+  Raging Goblin#79 dies (SBA)
+  Raging Goblin#78 dies (SBA)
+
+=== Turn 66 (Player 1) ===
+  Player 1 draws Mountain
+  P1: Cast Raging Goblin → no target
+  Resolving: Raging Goblin
+  Raging Goblin#71 enters the battlefield for Player 1
+  P1: Play Mountain
+  P1: Attack with no creatures
+
+=== Turn 67 (Player 0) ===
+  Player 0 draws Lightning Bolt
+  P0: Cast Lightning Bolt → Player 1
+  Resolving: Lightning Bolt
+  Lightning Bolt deals 3 damage to Player 1 (now 0)
+  >>> Player 0 wins! <<<
+
+Result: WIN_0 (Turn 67)
+Final life: P0=3, P1=0
