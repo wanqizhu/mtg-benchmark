@@ -199,6 +199,7 @@ PYTHONPATH=src python3 -m mtg_ai.analysis.report \
   --manifest-json artifacts/eval/manifest.json \
   --optimality-audit-json artifacts/eval/optimality_audit.json \
   --healthcheck-csv artifacts/eval/healthcheck.csv \
+  --plan-completion-csv artifacts/eval/plan_completion.csv \
   --output artifacts/report.md \
   --seed 103
 ```
@@ -343,6 +344,20 @@ PYTHONPATH=src python3 -m mtg_ai.eval.healthcheck \
   --optimality-json artifacts/eval/optimality_audit.json \
   --report-md artifacts/report.md \
   --output-csv artifacts/eval/healthcheck.csv
+```
+
+### 22) Plan completion checklist
+
+```bash
+PYTHONPATH=src python3 -m mtg_ai.eval.plan_completion \
+  --milestones-csv artifacts/eval/milestones.csv \
+  --generalization-csv artifacts/eval/generalization_matrix_tuned.csv \
+  --deck-vs-starter-csv artifacts/eval/deck_vs_starter_tuned.csv \
+  --convergence-csv artifacts/eval/convergence.csv \
+  --optimality-json artifacts/eval/optimality_audit.json \
+  --replay-index-csv artifacts/replays/samples/index.csv \
+  --report-md artifacts/report.md \
+  --output-csv artifacts/eval/plan_completion.csv
 ```
 
 ## Development checks

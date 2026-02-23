@@ -267,3 +267,14 @@ x:[1, 6] y:[1.500, 4.610]
   - [PASS] convergence_signal_within_bound: trailing_mean_elo_delta=+3.110
   - [PASS] optimality_audit_strong: checks=0/3 confidence=0.3858 (threshold: confidence>=0.35)
   - [PASS] report_contains_required_sections: all present
+
+## Plan completion checks
+- Passed checks: 8/8
+  - [PASS] rules_and_milestones: passed=12/13 (allows <=1 fail)
+  - [PASS] replay_interface: replay_rows=6
+  - [PASS] generalization: min_winrate_vs_mixed=0.4750 (threshold=0.45)
+  - [PASS] deck_better_than_starter: min_best_vs_starter=0.5300
+  - [PASS] convergence_signal: trailing_mean_elo_delta=+3.1100
+  - [PASS] solver_alignment: solver_alignment=0.8333
+  - [PASS] optimality_confidence: confidence=0.3858
+  - [PASS] report_completeness: all present

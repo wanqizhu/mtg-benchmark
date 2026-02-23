@@ -79,6 +79,7 @@ def generate_report(
     manifest_json: Path | None = None,
     optimality_audit_json: Path | None = None,
     healthcheck_csv: Path | None = None,
+    plan_completion_csv: Path | None = None,
 ) -> None:
     metrics = read_training_metrics(training_dir / "training_metrics.csv")
     checkpoint = latest_checkpoint(training_dir)
@@ -502,6 +503,19 @@ def generate_report(
     else:
         lines.append("No healthcheck CSV found.")
 
+    lines.append("")
+    lines.append("## Plan completion checks")
+    if plan_completion_csv is not None and plan_completion_csv.exists():
+        with plan_completion_csv.open("r", encoding="utf-8") as f:
+            rows = list(csv.DictReader(f))
+        passed = sum(int(row["passed"]) for row in rows)
+        lines.append(f"- Passed checks: {passed}/{len(rows)}")
+        for row in rows:
+            status = "PASS" if int(row["passed"]) else "FAIL"
+            lines.append(f"  - [{status}] {row['check_id']}: {row['detail']}")
+    else:
+        lines.append("No plan completion CSV found.")
+
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text("\n".join(lines), encoding="utf-8")
 
@@ -525,6 +539,7 @@ def main() -> None:
     parser.add_argument("--manifest-json")
     parser.add_argument("--optimality-audit-json")
     parser.add_argument("--healthcheck-csv")
+    parser.add_argument("--plan-completion-csv")
     parser.add_argument("--output", default="artifacts/report.md")
     parser.add_argument("--seed", type=int, default=97)
     args = parser.parse_args()
@@ -546,6 +561,7 @@ def main() -> None:
         manifest_json=Path(args.manifest_json) if args.manifest_json else None,
         optimality_audit_json=Path(args.optimality_audit_json) if args.optimality_audit_json else None,
         healthcheck_csv=Path(args.healthcheck_csv) if args.healthcheck_csv else None,
+        plan_completion_csv=Path(args.plan_completion_csv) if args.plan_completion_csv else None,
         output_path=Path(args.output),
         seed=args.seed,
     )

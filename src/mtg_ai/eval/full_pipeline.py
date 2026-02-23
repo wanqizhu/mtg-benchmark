@@ -304,6 +304,28 @@ def main() -> None:
         ],
     )
     run_step(
+        "plan completion checks",
+        "mtg_ai.eval.plan_completion",
+        [
+            "--milestones-csv",
+            "artifacts/eval/milestones.csv",
+            "--generalization-csv",
+            "artifacts/eval/generalization_matrix_tuned.csv",
+            "--deck-vs-starter-csv",
+            "artifacts/eval/deck_vs_starter_tuned.csv",
+            "--convergence-csv",
+            "artifacts/eval/convergence.csv",
+            "--optimality-json",
+            "artifacts/eval/optimality_audit.json",
+            "--replay-index-csv",
+            "artifacts/replays/samples/index.csv",
+            "--report-md",
+            args.output_report,
+            "--output-csv",
+            "artifacts/eval/plan_completion.csv",
+        ],
+    )
+    run_step(
         "final report (healthcheck included)",
         "mtg_ai.analysis.report",
         [
@@ -341,6 +363,8 @@ def main() -> None:
             "artifacts/eval/optimality_audit.json",
             "--healthcheck-csv",
             "artifacts/eval/healthcheck.csv",
+            "--plan-completion-csv",
+            "artifacts/eval/plan_completion.csv",
             "--output",
             args.output_report,
             "--seed",

@@ -1,0 +1,9 @@
+check_id,description,passed,detail
+rules_and_milestones,Rules engine + baseline/trained milestone suite passes,1,passed=12/13 (allows <=1 fail)
+replay_interface,Replay index contains representative sample games,1,replay_rows=6
+generalization,Champion policy generalizes across life/hand settings,1,min_winrate_vs_mixed=0.4750 (threshold=0.45)
+deck_better_than_starter,Searched decks outperform starter deck across scenarios,1,min_best_vs_starter=0.5300
+convergence_signal,League progression shows narrowing checkpoint gains,1,trailing_mean_elo_delta=+3.1100
+solver_alignment,Solver alignment is strong in tractable regimes,1,solver_alignment=0.8333
+optimality_confidence,Overall optimality audit confidence is acceptable,1,confidence=0.3858
+report_completeness,Report contains required comprehensive sections,1,all present
