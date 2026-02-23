@@ -25,6 +25,9 @@ class NNAgent(Agent):
         self.last_state = None
         self.last_action_idx = None
         self.last_mask = None
+        self.last_life = None
+        self.last_opp_life = None
+        self.player_idx = None
         self.transitions: list[tuple] = []
 
     def choose_action(self, view: GameView, legal_actions: list[Action]) -> Action:
@@ -33,15 +36,26 @@ class NNAgent(Agent):
         action_idx = self.q_net.select_action(state, mask, self.epsilon)
         action = index_to_action(action_idx, legal_actions, view)
 
+        if self.player_idx is None:
+            self.player_idx = view.my_player
+
+        # Reward shaping: small reward for life advantage changes
+        shaped_reward = 0.0
         if self.last_state is not None:
+            if self.last_life is not None:
+                life_delta = (view.my_life - self.last_life) - (view.opp_life - self.last_opp_life)
+                shaped_reward = life_delta * 0.02
+
             self.transitions.append((
-                self.last_state, self.last_action_idx, 0.0,
+                self.last_state, self.last_action_idx, shaped_reward,
                 state, False, mask,
             ))
 
         self.last_state = state
         self.last_action_idx = action_idx
         self.last_mask = mask
+        self.last_life = view.my_life
+        self.last_opp_life = view.opp_life
         return action
 
     def game_over_callback(self, result: GameResult, player: int):
@@ -58,6 +72,9 @@ class NNAgent(Agent):
         self.last_state = None
         self.last_action_idx = None
         self.last_mask = None
+        self.last_life = None
+        self.last_opp_life = None
+        self.player_idx = None
         self.transitions = []
 
 
