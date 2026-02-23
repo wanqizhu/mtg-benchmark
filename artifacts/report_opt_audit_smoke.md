@@ -38,28 +38,28 @@ Convergence check (fitness delta between recent windows): +0.0000
 
 ## League Elo snapshot
 ```
-trained                  ################################################ 1229.795
-mixed_bolt_face          ############################################### 1223.062
-goblin_aggro             ############################################## 1187.239
-random                   ############################################## 1185.262
-bolt_face                ############################################# 1174.643
+trained                  ################################################ 1229.414
+mixed_bolt_face          ############################################### 1223.047
+goblin_aggro             ############################################## 1186.701
+random                   ############################################## 1185.635
+bolt_face                ############################################# 1175.204
 ```
 
 ## Checkpoint league progression
 ```
-                                          *                     
-                                                                
-                                                                
                      *                                          
                                                                 
+*                                                               
+                                                               *
+          *                                                     
+                                          *                     
                                *                                
                                                                 
                                                                 
                                                                 
-          *                                                     
-                                                               *
-*                                                   *           
-x:[5, 35] y:[1193.711, 1209.329]
+                                                                
+                                                    *           
+x:[5, 35] y:[1188.009, 1207.038]
 ```
 
 ## Deck search summary
@@ -111,20 +111,20 @@ x:[5, 35] y:[1193.711, 1209.329]
   - bolt: play_land
   - goblin: play_land
 - State 2: step=precombat_main P0 life=10 P1 life=10
-  - trained: cast_goblin
-  - mixed: cast_bolt_face
-  - bolt: cast_bolt_face
-  - goblin: cast_goblin
-- State 3: step=declare_attackers P0 life=10 P1 life=10
-  - trained: declare_attackers_1
-  - mixed: declare_attackers_1
-  - bolt: declare_attackers_1
-  - goblin: declare_attackers_1
-- State 4: step=upkeep P0 life=10 P1 life=10
   - trained: cast_bolt_face
   - mixed: cast_bolt_face
   - bolt: cast_bolt_face
   - goblin: pass_priority
+- State 3: step=upkeep P0 life=7 P1 life=7
+  - trained: cast_bolt_face
+  - mixed: cast_bolt_face
+  - bolt: cast_bolt_face
+  - goblin: pass_priority
+- State 4: step=precombat_main P0 life=7 P1 life=4
+  - trained: play_land
+  - mixed: play_land
+  - bolt: play_land
+  - goblin: play_land
 
 ## Solver alignment in tractable low-life regime
 - Compared states: 12
@@ -254,7 +254,7 @@ x:[1, 6] y:[-3.100, 3.000]
 
 ## Optimality audit
 - champion: self_play/policy_final.json
-- solver_alignment=0.7500 best_baseline_alignment=0.9167 solver_gap=0.1667
+- solver_alignment=0.6667 best_baseline_alignment=1.0000 solver_gap=0.3333
 - convergence_trailing_mean_elo_delta=-1.0533 objective_margin=0.0385
 - checks: solver_gap=0 convergence=1 margin=1
-- confidence=0.8104
+- confidence=0.7438

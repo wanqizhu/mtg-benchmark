@@ -212,6 +212,34 @@ def main() -> None:
         ],
     )
     run_step(
+        "optimality audit",
+        "mtg_ai.eval.optimality_audit",
+        [
+            "--champion-json",
+            "artifacts/eval/champion.json",
+            "--convergence-csv",
+            "artifacts/eval/convergence.csv",
+            "--policy-selection-csv",
+            "artifacts/eval/champion_selection.csv",
+            "--seed",
+            str(args.seed + 6100),
+            "--solver-depth",
+            "7",
+            "--solver-samples",
+            "12",
+            "--solver-gap-tolerance",
+            "0.12",
+            "--convergence-tolerance",
+            "3.0",
+            "--objective-margin-tolerance",
+            "0.01",
+            "--output-json",
+            "artifacts/eval/optimality_audit.json",
+            "--output-csv",
+            "artifacts/eval/optimality_audit.csv",
+        ],
+    )
+    run_step(
         "final report",
         "mtg_ai.analysis.report",
         [
@@ -245,6 +273,8 @@ def main() -> None:
             "artifacts/replays/samples/index.csv",
             "--manifest-json",
             "artifacts/eval/manifest.json",
+            "--optimality-audit-json",
+            "artifacts/eval/optimality_audit.json",
             "--output",
             args.output_report,
             "--seed",

@@ -1,0 +1,2 @@
+champion_name,solver_alignment,best_baseline_alignment,solver_gap_to_best_baseline,convergence_trailing_mean_elo_delta,champion_objective_margin,pass_solver_gap,pass_convergence,pass_margin,confidence
+self_play/policy_final.json,0.75,0.9166666666666666,0.16666666666666663,-1.0533333333333335,0.03849999999999998,0,1,1,0.8104444444444444

@@ -197,6 +197,7 @@ PYTHONPATH=src python3 -m mtg_ai.analysis.report \
   --significance-csv artifacts/eval/significance.csv \
   --replay-index-csv artifacts/replays/samples/index.csv \
   --manifest-json artifacts/eval/manifest.json \
+  --optimality-audit-json artifacts/eval/optimality_audit.json \
   --output artifacts/report.md \
   --seed 103
 ```
@@ -311,6 +312,23 @@ PYTHONPATH=src python3 -m mtg_ai.eval.manifest \
     artifacts/eval/convergence.csv \
     artifacts/replays/samples/index.csv \
   --output-json artifacts/eval/manifest.json
+```
+
+### 20) Optimality audit (solver gap + convergence + margin)
+
+```bash
+PYTHONPATH=src python3 -m mtg_ai.eval.optimality_audit \
+  --champion-json artifacts/eval/champion.json \
+  --convergence-csv artifacts/eval/convergence.csv \
+  --policy-selection-csv artifacts/eval/champion_selection.csv \
+  --seed 7301 \
+  --solver-depth 7 \
+  --solver-samples 12 \
+  --solver-gap-tolerance 0.12 \
+  --convergence-tolerance 3.0 \
+  --objective-margin-tolerance 0.01 \
+  --output-json artifacts/eval/optimality_audit.json \
+  --output-csv artifacts/eval/optimality_audit.csv
 ```
 
 ## Development checks

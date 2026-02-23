@@ -1,72 +1,72 @@
 {
-  "created_at_utc": "2026-02-23T04:53:35.395814+00:00",
-  "git_head": "34faea18324390169267f2992280fa76a12ad778",
+  "created_at_utc": "2026-02-23T04:58:02.245348+00:00",
+  "git_head": "1c646c7ba02642441e11b94867451e823b92de6d",
   "records": [
     {
-      "bytes": 331,
+      "bytes": 258,
       "exists": true,
       "path": "artifacts/eval/champion.json",
-      "sha256": "f21ef9168b98d38ac65054ca9ea4bd35ca65fa16eacc73ddf24550779533aed2"
+      "sha256": "b79f0783ce0002594de6a3df86a3e22e3d1aff4700c505412e99e7e62d1eda8a"
     },
     {
       "bytes": 2156,
       "exists": true,
       "path": "artifacts/eval/champion_selection.csv",
-      "sha256": "eb2c22e68ee648f69ce9961f50c7940b0db01c449ae85f43057292d7b88e6f27"
+      "sha256": "21a6fb040a5d54a89c4a0d7be956aace62238d6dcbb6b35a1aaf7e12776ce732"
     },
     {
-      "bytes": 816,
+      "bytes": 815,
       "exists": true,
       "path": "artifacts/eval/generalization_matrix_tuned.csv",
-      "sha256": "560d3a996d36b4a031dcc184a987edcc87e7990bba83e95ca56598fb86b5c0c3"
+      "sha256": "15edd791f57cdd0f2b7552fa8907188a5fb81111a5d543976245f9e13ce1b013"
     },
     {
       "bytes": 272,
       "exists": true,
       "path": "artifacts/deck_search/results_tuned.csv",
-      "sha256": "864f41e345340b71a46a0fae2e1f5aa847d121cda8710735b79119d22e502c6e"
+      "sha256": "e031bb2df25dae4ab4e13057244f5ecae8c630f909bb8d40a9f401030a2862b0"
     },
     {
       "bytes": 250,
       "exists": true,
       "path": "artifacts/eval/deck_vs_starter_tuned.csv",
-      "sha256": "9badb069b0a61ddb243499aeb3c3601789b96e821e0da5146869dbb183e4dc3e"
+      "sha256": "5c7391b9fe9d1938ff6b8f55768017ed88276a87c418b18de5e531f1c3991a42"
     },
     {
       "bytes": 2149,
       "exists": true,
       "path": "artifacts/eval/policy_selection.csv",
-      "sha256": "3dc655247d8cfb77ff7761310e773fa3cbc5b4f25ce591cf6689e3b0bc986d18"
+      "sha256": "2662f5de619f05e75a6d109566eaac6a03a94464275f4fa86738ef66a9978a8d"
     },
     {
-      "bytes": 1884,
+      "bytes": 1740,
       "exists": true,
       "path": "artifacts/eval/policy_selection_matrix.csv",
-      "sha256": "648223c1bdb3cc39cccb40c9506ebca9a3f5062d1cbf9782e669756a7a02b8d2"
+      "sha256": "7eee9b6d701a7ee4ddaf3099bc6f230a6de3b4140a1306800537ca48841e468f"
     },
     {
-      "bytes": 1623,
+      "bytes": 1631,
       "exists": true,
       "path": "artifacts/eval/significance.csv",
-      "sha256": "f689332a735571e12a8e9501b36f50906ab98a8f798189cc628720c429cb0ffa"
+      "sha256": "99db6b10807e5e638652437c59cbc93ec3b3504e3ac09dac267479ec9a025ca4"
     },
     {
-      "bytes": 899,
+      "bytes": 897,
       "exists": true,
       "path": "artifacts/eval/milestones.csv",
-      "sha256": "7a00ae4efa748058339fefb0c5d175b83d3519f8bea85aca859369a84c8c2c86"
+      "sha256": "aea76b4b828d813d94ee568b5fe5fefe1857a404e68bc53485747295a196839d"
     },
     {
-      "bytes": 643,
+      "bytes": 645,
       "exists": true,
       "path": "artifacts/eval/convergence.csv",
-      "sha256": "2414916675df455f59d50e5bb0a69c702e60d6648cbf81d2898a1a13cdefe823"
+      "sha256": "8e1b088a1cebc31f42a06f4b9a2b4340a37120d5e41f05215ce2c4a556dcd03b"
     },
     {
-      "bytes": 1274,
+      "bytes": 1088,
       "exists": true,
       "path": "artifacts/replays/samples/index.csv",
-      "sha256": "30c1881da03491961c76e3ac493a10b3ca5862014460e0f420e78d3693caeea9"
+      "sha256": "6d23d47a682f104c1da323ac1a9bcce565d1fc162998861de3856bcac7154400"
     }
   ]
 }

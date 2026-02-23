@@ -77,6 +77,7 @@ def generate_report(
     significance_csv: Path | None = None,
     replay_index_csv: Path | None = None,
     manifest_json: Path | None = None,
+    optimality_audit_json: Path | None = None,
 ) -> None:
     metrics = read_training_metrics(training_dir / "training_metrics.csv")
     checkpoint = latest_checkpoint(training_dir)
@@ -465,6 +466,28 @@ def generate_report(
     else:
         lines.append("No artifact manifest JSON found.")
 
+    lines.append("")
+    lines.append("## Optimality audit")
+    if optimality_audit_json is not None and optimality_audit_json.exists():
+        payload = json.loads(optimality_audit_json.read_text(encoding="utf-8"))
+        lines.append(f"- champion: {payload['champion_name']}")
+        lines.append(
+            f"- solver_alignment={payload['solver_alignment']:.4f} "
+            f"best_baseline_alignment={payload['best_baseline_alignment']:.4f} "
+            f"solver_gap={payload['solver_gap_to_best_baseline']:.4f}"
+        )
+        lines.append(
+            f"- convergence_trailing_mean_elo_delta={payload['convergence_trailing_mean_elo_delta']:+.4f} "
+            f"objective_margin={payload['champion_objective_margin']:.4f}"
+        )
+        lines.append(
+            f"- checks: solver_gap={payload['pass_solver_gap']} "
+            f"convergence={payload['pass_convergence']} margin={payload['pass_margin']}"
+        )
+        lines.append(f"- confidence={payload['confidence']:.4f}")
+    else:
+        lines.append("No optimality audit JSON found.")
+
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text("\n".join(lines), encoding="utf-8")
 
@@ -486,6 +509,7 @@ def main() -> None:
     parser.add_argument("--significance-csv")
     parser.add_argument("--replay-index-csv")
     parser.add_argument("--manifest-json")
+    parser.add_argument("--optimality-audit-json")
     parser.add_argument("--output", default="artifacts/report.md")
     parser.add_argument("--seed", type=int, default=97)
     args = parser.parse_args()
@@ -505,6 +529,7 @@ def main() -> None:
         significance_csv=Path(args.significance_csv) if args.significance_csv else None,
         replay_index_csv=Path(args.replay_index_csv) if args.replay_index_csv else None,
         manifest_json=Path(args.manifest_json) if args.manifest_json else None,
+        optimality_audit_json=Path(args.optimality_audit_json) if args.optimality_audit_json else None,
         output_path=Path(args.output),
         seed=args.seed,
     )
