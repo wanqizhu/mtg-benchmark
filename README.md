@@ -186,6 +186,8 @@ PYTHONPATH=src python3 -m mtg_ai.analysis.report \
   --sweep-csv artifacts/training/sweep_results.csv \
   --solver-tune-history-csv artifacts/training/solver_tune/history.csv \
   --deck-vs-starter-csv artifacts/eval/deck_vs_starter_tuned.csv \
+  --policy-selection-csv artifacts/eval/policy_selection.csv \
+  --policy-matrix-csv artifacts/eval/policy_selection_matrix.csv \
   --output artifacts/report.md \
   --seed 103
 ```
@@ -199,6 +201,20 @@ PYTHONPATH=src python3 -m mtg_ai.eval.deck_validation \
   --games 100 \
   --seed 2200 \
   --output-csv artifacts/eval/deck_vs_starter_tuned.csv
+```
+
+### 12) Policy frontier selection across saved policies
+
+```bash
+PYTHONPATH=src python3 -m mtg_ai.eval.policy_selection \
+  --policy-globs "artifacts/training/*/policy*.json,artifacts/training/solver_tune/*.json" \
+  --games 30 \
+  --seed 2501 \
+  --top-k 6 \
+  --alignment-depth 7 \
+  --alignment-samples 8 \
+  --output-csv artifacts/eval/policy_selection.csv \
+  --matrix-csv artifacts/eval/policy_selection_matrix.csv
 ```
 
 ## Development checks

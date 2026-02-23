@@ -68,6 +68,8 @@ def generate_report(
     sweep_csv: Path | None = None,
     solver_tune_history_csv: Path | None = None,
     deck_vs_starter_csv: Path | None = None,
+    policy_selection_csv: Path | None = None,
+    policy_matrix_csv: Path | None = None,
 ) -> None:
     metrics = read_training_metrics(training_dir / "training_metrics.csv")
     checkpoint = latest_checkpoint(training_dir)
@@ -308,6 +310,38 @@ def generate_report(
     else:
         lines.append("No solver tuning history CSV found.")
 
+    lines.append("")
+    lines.append("## Policy selection frontier")
+    if policy_selection_csv is not None and policy_selection_csv.exists():
+        with policy_selection_csv.open("r", encoding="utf-8") as f:
+            rows = list(csv.DictReader(f))
+        if rows:
+            for row in rows[: min(6, len(rows))]:
+                lines.append(
+                    f"- {row['name']}: objective={row['objective']} baseline_avg={row['baseline_avg']} "
+                    f"mixed_floor={row['mixed_floor']} solver_alignment={row['solver_alignment']}"
+                )
+        else:
+            lines.append("Policy selection CSV is empty.")
+    else:
+        lines.append("No policy selection CSV found.")
+
+    lines.append("")
+    lines.append("## Policy selection top-league Elo")
+    if policy_matrix_csv is not None and policy_matrix_csv.exists():
+        with policy_matrix_csv.open("r", encoding="utf-8") as f:
+            rows = list(csv.DictReader(f))
+        elo_rows = [row for row in rows if row["b"] == "__elo__"]
+        if elo_rows:
+            elo_items = sorted(((row["a"], float(row["win_rate_a"])) for row in elo_rows), key=lambda item: item[1], reverse=True)
+            lines.append("```")
+            lines.append(bar_chart(elo_items))
+            lines.append("```")
+        else:
+            lines.append("No Elo rows found in policy matrix CSV.")
+    else:
+        lines.append("No policy matrix CSV found.")
+
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text("\n".join(lines), encoding="utf-8")
 
@@ -320,6 +354,8 @@ def main() -> None:
     parser.add_argument("--sweep-csv")
     parser.add_argument("--solver-tune-history-csv")
     parser.add_argument("--deck-vs-starter-csv")
+    parser.add_argument("--policy-selection-csv")
+    parser.add_argument("--policy-matrix-csv")
     parser.add_argument("--output", default="artifacts/report.md")
     parser.add_argument("--seed", type=int, default=97)
     args = parser.parse_args()
@@ -330,6 +366,8 @@ def main() -> None:
         sweep_csv=Path(args.sweep_csv) if args.sweep_csv else None,
         solver_tune_history_csv=Path(args.solver_tune_history_csv) if args.solver_tune_history_csv else None,
         deck_vs_starter_csv=Path(args.deck_vs_starter_csv) if args.deck_vs_starter_csv else None,
+        policy_selection_csv=Path(args.policy_selection_csv) if args.policy_selection_csv else None,
+        policy_matrix_csv=Path(args.policy_matrix_csv) if args.policy_matrix_csv else None,
         output_path=Path(args.output),
         seed=args.seed,
     )

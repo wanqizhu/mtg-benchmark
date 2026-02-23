@@ -156,3 +156,21 @@ x:[5, 35] y:[1193.711, 1209.329]
 x:[1, 16] y:[0.753, 1.753]
 ```
 Final tuned objective=0.7534 baseline_avg=0.8316 mixed_floor=0.5833 solver_alignment=0.8750
+
+## Policy selection frontier
+- run_003_seed_79_sw_0.15_hw_0.00_eps_0.22/policy_final.json: objective=0.7330 baseline_avg=0.7956 mixed_floor=0.5000 solver_alignment=1.0000
+- run_002_seed_79_sw_0.00_hw_0.10_eps_0.22/policy_final.json: objective=0.7207 baseline_avg=0.7682 mixed_floor=0.5000 solver_alignment=1.0000
+- self_play/policy_final.json: objective=0.7152 baseline_avg=0.8047 mixed_floor=0.4375 solver_alignment=1.0000
+- sweep_seed_11/policy_final.json: objective=0.7006 baseline_avg=0.7721 mixed_floor=0.4375 solver_alignment=1.0000
+- sweep_seed_19/policy_final.json: objective=0.6953 baseline_avg=0.7604 mixed_floor=0.4375 solver_alignment=1.0000
+- run_004_seed_79_sw_0.15_hw_0.10_eps_0.22/policy_final.json: objective=0.6846 baseline_avg=0.7852 mixed_floor=0.3750 solver_alignment=1.0000
+
+## Policy selection top-league Elo
+```
+sweep_seed_11/policy_final.json ################################################ 1206.020
+self_play/policy_final.json ############################################### 1205.260
+run_003_seed_79_sw_0.15_hw_0.00_eps_0.22/policy_final.json ############################################### 1202.810
+sweep_seed_19/policy_final.json ############################################### 1199.910
+run_004_seed_79_sw_0.15_hw_0.10_eps_0.22/policy_final.json ############################################### 1199.910
+run_002_seed_79_sw_0.00_hw_0.10_eps_0.22/policy_final.json ############################################### 1186.100
+```
