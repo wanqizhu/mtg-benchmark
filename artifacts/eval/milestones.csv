@@ -1,0 +1,14 @@
+milestone,metric,threshold,passed,details
+random_bot_runs,1.0000,1.0000,1,wins=12/9 draws=9
+lower_life_totals_behavior,0.7500,0.5500,1,mixed_vs_random life=5
+fixed_bolt_bot,0.8750,0.5500,1,bolt-only deck vs random
+fixed_goblin_bot,0.9208,0.5200,1,goblin-only deck vs random
+fixed_mixed_bot,0.8542,0.5500,1,mixed baseline vs random
+trained_beats_random,0.9250,0.5000,1,life=10 hand=7
+trained_beats_bolt,0.8417,0.5000,1,life=10 hand=7
+trained_beats_goblin,0.9750,0.5000,1,life=10 hand=7
+trained_beats_mixed,0.5167,0.5000,1,life=10 hand=7
+trained_generalizes_life_hand,0.5500,0.5000,1,"min winrate vs mixed over life∈{5,10,20}, hand∈{5,7}"
+deck_better_than_starter,0.5500,0.5000,1,min best-deck winrate vs starter
+elo_improves_over_training,8.0930,0.0000,1,last checkpoint Elo minus first checkpoint Elo
+solver_alignment,0.8333,0.8000,1,agreement on sampled minimax-optimal states

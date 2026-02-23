@@ -188,6 +188,7 @@ PYTHONPATH=src python3 -m mtg_ai.analysis.report \
   --deck-vs-starter-csv artifacts/eval/deck_vs_starter_tuned.csv \
   --policy-selection-csv artifacts/eval/policy_selection.csv \
   --policy-matrix-csv artifacts/eval/policy_selection_matrix.csv \
+  --milestones-csv artifacts/eval/milestones.csv \
   --output artifacts/report.md \
   --seed 103
 ```
@@ -215,6 +216,16 @@ PYTHONPATH=src python3 -m mtg_ai.eval.policy_selection \
   --alignment-samples 8 \
   --output-csv artifacts/eval/policy_selection.csv \
   --matrix-csv artifacts/eval/policy_selection_matrix.csv
+```
+
+### 13) Milestone validation suite
+
+```bash
+PYTHONPATH=src python3 -m mtg_ai.eval.milestones \
+  --policy-path artifacts/training/solver_tune/policy_best.json \
+  --games 120 \
+  --seed 3301 \
+  --output-csv artifacts/eval/milestones.csv
 ```
 
 ## Development checks

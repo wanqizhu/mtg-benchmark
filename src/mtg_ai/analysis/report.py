@@ -70,6 +70,7 @@ def generate_report(
     deck_vs_starter_csv: Path | None = None,
     policy_selection_csv: Path | None = None,
     policy_matrix_csv: Path | None = None,
+    milestones_csv: Path | None = None,
 ) -> None:
     metrics = read_training_metrics(training_dir / "training_metrics.csv")
     checkpoint = latest_checkpoint(training_dir)
@@ -342,6 +343,22 @@ def generate_report(
     else:
         lines.append("No policy matrix CSV found.")
 
+    lines.append("")
+    lines.append("## Milestone checklist")
+    if milestones_csv is not None and milestones_csv.exists():
+        with milestones_csv.open("r", encoding="utf-8") as f:
+            rows = list(csv.DictReader(f))
+        passed = sum(int(row["passed"]) for row in rows)
+        total = len(rows)
+        lines.append(f"- Passed {passed}/{total} milestones")
+        for row in rows:
+            status = "PASS" if int(row["passed"]) else "FAIL"
+            lines.append(
+                f"  - [{status}] {row['milestone']}: metric={row['metric']} threshold={row['threshold']} ({row['details']})"
+            )
+    else:
+        lines.append("No milestones CSV found.")
+
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text("\n".join(lines), encoding="utf-8")
 
@@ -356,6 +373,7 @@ def main() -> None:
     parser.add_argument("--deck-vs-starter-csv")
     parser.add_argument("--policy-selection-csv")
     parser.add_argument("--policy-matrix-csv")
+    parser.add_argument("--milestones-csv")
     parser.add_argument("--output", default="artifacts/report.md")
     parser.add_argument("--seed", type=int, default=97)
     args = parser.parse_args()
@@ -368,6 +386,7 @@ def main() -> None:
         deck_vs_starter_csv=Path(args.deck_vs_starter_csv) if args.deck_vs_starter_csv else None,
         policy_selection_csv=Path(args.policy_selection_csv) if args.policy_selection_csv else None,
         policy_matrix_csv=Path(args.policy_matrix_csv) if args.policy_matrix_csv else None,
+        milestones_csv=Path(args.milestones_csv) if args.milestones_csv else None,
         output_path=Path(args.output),
         seed=args.seed,
     )

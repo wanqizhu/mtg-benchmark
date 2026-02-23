@@ -174,3 +174,19 @@ sweep_seed_19/policy_final.json ############################################### 
 run_004_seed_79_sw_0.15_hw_0.10_eps_0.22/policy_final.json ############################################### 1199.910
 run_002_seed_79_sw_0.00_hw_0.10_eps_0.22/policy_final.json ############################################### 1186.100
 ```
+
+## Milestone checklist
+- Passed 13/13 milestones
+  - [PASS] random_bot_runs: metric=1.0000 threshold=1.0000 (wins=12/9 draws=9)
+  - [PASS] lower_life_totals_behavior: metric=0.7500 threshold=0.5500 (mixed_vs_random life=5)
+  - [PASS] fixed_bolt_bot: metric=0.8750 threshold=0.5500 (bolt-only deck vs random)
+  - [PASS] fixed_goblin_bot: metric=0.9208 threshold=0.5200 (goblin-only deck vs random)
+  - [PASS] fixed_mixed_bot: metric=0.8542 threshold=0.5500 (mixed baseline vs random)
+  - [PASS] trained_beats_random: metric=0.9250 threshold=0.5000 (life=10 hand=7)
+  - [PASS] trained_beats_bolt: metric=0.8417 threshold=0.5000 (life=10 hand=7)
+  - [PASS] trained_beats_goblin: metric=0.9750 threshold=0.5000 (life=10 hand=7)
+  - [PASS] trained_beats_mixed: metric=0.5167 threshold=0.5000 (life=10 hand=7)
+  - [PASS] trained_generalizes_life_hand: metric=0.5500 threshold=0.5000 (min winrate vs mixed over life∈{5,10,20}, hand∈{5,7})
+  - [PASS] deck_better_than_starter: metric=0.5500 threshold=0.5000 (min best-deck winrate vs starter)
+  - [PASS] elo_improves_over_training: metric=8.0930 threshold=0.0000 (last checkpoint Elo minus first checkpoint Elo)
+  - [PASS] solver_alignment: metric=0.8333 threshold=0.8000 (agreement on sampled minimax-optimal states)
