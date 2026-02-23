@@ -157,3 +157,21 @@ class WeightedHeuristicPolicy(BotPolicy):
             payload = json.load(f)
         return cls(name=payload.get("name", "weighted_heuristic"), weights=payload["weights"])
 
+    @classmethod
+    def blend(
+        cls,
+        policy_a: "WeightedHeuristicPolicy",
+        policy_b: "WeightedHeuristicPolicy",
+        alpha: float,
+        name: str = "blended_weighted_heuristic",
+    ) -> "WeightedHeuristicPolicy":
+        if alpha < 0.0 or alpha > 1.0:
+            raise ValueError("alpha must be in [0, 1].")
+        keys = set(policy_a.weights) | set(policy_b.weights)
+        blended: dict[str, float] = {}
+        for key in keys:
+            value_a = policy_a.weights.get(key, 0.0)
+            value_b = policy_b.weights.get(key, 0.0)
+            blended[key] = alpha * value_a + (1.0 - alpha) * value_b
+        return cls(name=name, weights=blended)
+

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import copy
 import csv
 from pathlib import Path
 import random
@@ -53,6 +54,30 @@ def _aggregate_metrics(metric_rows: list[dict[str, float]]) -> dict[str, float]:
     return aggregated
 
 
+def _historical_win_rate(
+    candidate: WeightedHeuristicPolicy,
+    historical_policies: list[WeightedHeuristicPolicy],
+    deck: list[str],
+    eval_games: int,
+    seed: int,
+    life: int,
+    opening_hand: int,
+) -> float:
+    if not historical_policies:
+        return 0.0
+    rates: list[float] = []
+    for idx, historical in enumerate(historical_policies):
+        summary = play_match(
+            Entrant("candidate", candidate, deck),
+            Entrant("historical", historical, deck),
+            games=eval_games,
+            config=GameConfig(starting_life=life, opening_hand_size=opening_hand, random_seed=seed + idx),
+            seed=seed + idx * 97,
+        )
+        rates.append(summary.win_rate_a)
+    return sum(rates) / len(rates)
+
+
 def _fitness(win_rates: dict[str, float]) -> float:
     return (
         0.15 * win_rates["winrate_vs_random"]
@@ -76,6 +101,8 @@ def train_self_play(
     solver_seed: int = 101,
     solver_depth: int = 6,
     solver_sample_count: int = 6,
+    history_weight: float = 0.0,
+    history_games: int = 12,
     train_life_values: list[int] | None = None,
     train_hand_values: list[int] | None = None,
 ) -> WeightedHeuristicPolicy:
@@ -106,6 +133,8 @@ def train_self_play(
     best_metrics = _aggregate_metrics(best_metric_rows)
     best_fitness = _fitness(best_metrics)
     best_solver_alignment = 0.0
+    hall_of_fame: list[WeightedHeuristicPolicy] = []
+    best_history_win_rate = 0.0
     if solver_weight > 0:
         alignment = evaluate_solver_alignment(
             trained_policy=policy,
@@ -117,6 +146,17 @@ def train_self_play(
         )
         best_solver_alignment = alignment.trained_agreement
         best_fitness += solver_weight * best_solver_alignment
+    if history_weight > 0:
+        best_history_win_rate = _historical_win_rate(
+            candidate=policy,
+            historical_policies=hall_of_fame,
+            deck=train_deck,
+            eval_games=history_games,
+            seed=seed,
+            life=starting_life,
+            opening_hand=opening_hand_size,
+        )
+        best_fitness += history_weight * best_history_win_rate
 
     with metrics_path.open("w", newline="", encoding="utf-8") as csvfile:
         fieldnames = [
@@ -127,6 +167,7 @@ def train_self_play(
             "winrate_vs_goblin",
             "winrate_vs_mixed",
             "solver_alignment",
+            "history_win_rate",
             "sigma",
         ]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -170,11 +211,24 @@ def train_self_play(
                 )
                 candidate_solver_alignment = alignment.trained_agreement
                 candidate_fitness += solver_weight * candidate_solver_alignment
+            candidate_history_win_rate = 0.0
+            if history_weight > 0:
+                candidate_history_win_rate = _historical_win_rate(
+                    candidate=candidate_policy,
+                    historical_policies=hall_of_fame[-5:],
+                    deck=train_deck,
+                    eval_games=history_games,
+                    seed=seed + episode * 37,
+                    life=starting_life,
+                    opening_hand=opening_hand_size,
+                )
+                candidate_fitness += history_weight * candidate_history_win_rate
             if candidate_fitness >= best_fitness:
                 policy = candidate_policy
                 best_fitness = candidate_fitness
                 best_metrics = candidate_metrics
                 best_solver_alignment = candidate_solver_alignment
+                best_history_win_rate = candidate_history_win_rate
                 sigma = max(0.05, sigma * 0.98)
             else:
                 sigma = min(2.5, sigma * 1.03)
@@ -187,12 +241,14 @@ def train_self_play(
                 "winrate_vs_goblin": f"{best_metrics['winrate_vs_goblin']:.4f}",
                 "winrate_vs_mixed": f"{best_metrics['winrate_vs_mixed']:.4f}",
                 "solver_alignment": f"{best_solver_alignment:.4f}",
+                "history_win_rate": f"{best_history_win_rate:.4f}",
                 "sigma": f"{sigma:.4f}",
             }
             writer.writerow(row)
             if episode % eval_interval == 0 or episode == episodes:
                 checkpoint_path = output_dir / f"checkpoint_ep{episode}.json"
                 policy.save(checkpoint_path)
+                hall_of_fame.append(copy.deepcopy(policy))
 
     policy.save(output_dir / "policy_final.json")
     return policy
@@ -214,6 +270,8 @@ def main() -> None:
     parser.add_argument("--solver-seed", type=int, default=101)
     parser.add_argument("--solver-depth", type=int, default=6)
     parser.add_argument("--solver-sample-count", type=int, default=6)
+    parser.add_argument("--history-weight", type=float, default=0.0)
+    parser.add_argument("--history-games", type=int, default=12)
     parser.add_argument("--output-dir", default="artifacts/training/self_play")
     args = parser.parse_args()
 
@@ -233,6 +291,8 @@ def main() -> None:
         solver_seed=args.solver_seed,
         solver_depth=args.solver_depth,
         solver_sample_count=args.solver_sample_count,
+        history_weight=args.history_weight,
+        history_games=args.history_games,
         train_life_values=life_values,
         train_hand_values=hand_values,
     )

@@ -85,6 +85,12 @@ PYTHONPATH=src python3 -m mtg_ai.training.self_play \
   --opening-hand 7 \
   --life-values 5,10,20 \
   --hand-values 5,7 \
+  --solver-weight 0.15 \
+  --solver-seed 211 \
+  --solver-depth 7 \
+  --solver-sample-count 6 \
+  --history-weight 0.1 \
+  --history-games 10 \
   --seed 41 \
   --output-dir artifacts/training/self_play_multi
 ```
