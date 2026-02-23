@@ -91,6 +91,8 @@ PYTHONPATH=src python3 -m mtg_ai.training.self_play \
   --solver-sample-count 6 \
   --history-weight 0.1 \
   --history-games 10 \
+  --early-stop-window 6 \
+  --early-stop-threshold 0.0005 \
   --seed 41 \
   --output-dir artifacts/training/self_play_multi
 ```

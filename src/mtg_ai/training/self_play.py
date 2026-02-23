@@ -105,6 +105,8 @@ def train_self_play(
     history_games: int = 12,
     train_life_values: list[int] | None = None,
     train_hand_values: list[int] | None = None,
+    early_stop_window: int = 0,
+    early_stop_threshold: float = 0.0,
 ) -> WeightedHeuristicPolicy:
     _ = alpha
     policy = WeightedHeuristicPolicy(name="weighted_heuristic")
@@ -172,6 +174,7 @@ def train_self_play(
         ]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
+        fitness_history: list[float] = []
 
         for episode in range(1, episodes + 1):
             candidates = [policy] + [policy.mutate(rng, sigma) for _ in range(5)]
@@ -245,10 +248,18 @@ def train_self_play(
                 "sigma": f"{sigma:.4f}",
             }
             writer.writerow(row)
+            fitness_history.append(best_fitness)
             if episode % eval_interval == 0 or episode == episodes:
                 checkpoint_path = output_dir / f"checkpoint_ep{episode}.json"
                 policy.save(checkpoint_path)
                 hall_of_fame.append(copy.deepcopy(policy))
+            if early_stop_window > 0 and len(fitness_history) >= early_stop_window * 2:
+                trailing = fitness_history[-early_stop_window:]
+                previous = fitness_history[-(early_stop_window * 2) : -early_stop_window]
+                trailing_avg = sum(trailing) / len(trailing)
+                previous_avg = sum(previous) / len(previous)
+                if abs(trailing_avg - previous_avg) <= early_stop_threshold:
+                    break
 
     policy.save(output_dir / "policy_final.json")
     return policy
@@ -272,6 +283,8 @@ def main() -> None:
     parser.add_argument("--solver-sample-count", type=int, default=6)
     parser.add_argument("--history-weight", type=float, default=0.0)
     parser.add_argument("--history-games", type=int, default=12)
+    parser.add_argument("--early-stop-window", type=int, default=0)
+    parser.add_argument("--early-stop-threshold", type=float, default=0.0)
     parser.add_argument("--output-dir", default="artifacts/training/self_play")
     args = parser.parse_args()
 
@@ -295,6 +308,8 @@ def main() -> None:
         history_games=args.history_games,
         train_life_values=life_values,
         train_hand_values=hand_values,
+        early_stop_window=args.early_stop_window,
+        early_stop_threshold=args.early_stop_threshold,
     )
     print(f"Training complete: {args.output_dir}")
 
