@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+results/
+datasets/mtg/
+datasets/patreon-raw/
+datasets/manual_solutions.json
+*.egg-info/
+dist/
+build/
