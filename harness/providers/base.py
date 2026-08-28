@@ -18,7 +18,6 @@ class Provider(Protocol):
         prompt: str,
         tools: list[Tool],
         max_turns: int,
-        cache_ttl: str = "5m",
         max_token_continues: int = 0,
         resume_from: Transcript | None = None,
         progress: RolloutProgress | None = None,

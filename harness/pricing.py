@@ -45,7 +45,7 @@ def estimate_cost(
     usage: dict[str, int],
     *,
     model_id: str,
-    cache_ttl: str = "5m",
+    cache_ttl: str = "1h",
 ) -> dict[str, Any]:
     """Estimate USD cost from Anthropic usage fields."""
     if not usage:
@@ -92,3 +92,61 @@ def infer_cache_ttl(payload: dict[str, Any], *, result_path: str | None = None) 
     if result_path and "tools-rules" in result_path:
         return "5m"
     return "5m"
+
+
+def reclassify_cache_as_input(usage: dict[str, Any]) -> int:
+    """Move cache write/read tokens onto uncached input. Returns tokens moved."""
+    if not usage:
+        return 0
+    moved = 0
+    for key in ("cache_creation_input_tokens", "cache_read_input_tokens"):
+        tokens = int(usage.get(key) or 0)
+        if not tokens:
+            continue
+        usage[key] = 0
+        moved += tokens
+    nested = usage.get("cache_creation")
+    if isinstance(nested, dict):
+        for key in ("ephemeral_5m_input_tokens", "ephemeral_1h_input_tokens"):
+            if nested.get(key):
+                nested[key] = 0
+    if moved:
+        usage["input_tokens"] = int(usage.get("input_tokens") or 0) + moved
+    return moved
+
+
+def reclassify_tools_result_cache_as_input(payload: dict[str, Any]) -> int:
+    """Rewrite a tools-mode result as if nothing was cached. Returns tokens moved."""
+    transcript = payload.get("transcript")
+    if not isinstance(transcript, dict):
+        return 0
+    moved = 0
+    usage = transcript.get("usage")
+    if isinstance(usage, dict):
+        moved += reclassify_cache_as_input(usage)
+    for turn in transcript.get("turns") or []:
+        if isinstance(turn, dict) and isinstance(turn.get("usage"), dict):
+            reclassify_cache_as_input(turn["usage"])
+    model_id = payload.get("model_id")
+    if moved and isinstance(usage, dict) and model_id:
+        payload["cost"] = estimate_cost(usage, model_id=model_id)
+    return moved
+
+
+def reclassify_1h_cache_write_as_read(usage: dict[str, Any]) -> int:
+    """Move 1h cache-creation tokens onto cache-read. Returns tokens moved."""
+    if not usage:
+        return 0
+    nested = usage.get("cache_creation")
+    moved = 0
+    if isinstance(nested, dict):
+        moved = int(nested.get("ephemeral_1h_input_tokens") or 0)
+        if moved:
+            nested["ephemeral_1h_input_tokens"] = 0
+    if not moved:
+        return 0
+    usage["cache_creation_input_tokens"] = max(
+        0, int(usage.get("cache_creation_input_tokens") or 0) - moved
+    )
+    usage["cache_read_input_tokens"] = int(usage.get("cache_read_input_tokens") or 0) + moved
+    return moved

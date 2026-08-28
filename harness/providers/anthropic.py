@@ -136,61 +136,42 @@ def _strip_cache_control(content: Any) -> Any:
     return content
 
 
-def _prewarm_request(*, spec: ModelSpec, system: str, cache_ttl: str) -> dict[str, Any]:
-    """Build a cheap cache-write request: no thinking, tiny max_tokens."""
-    return {
+PROMPT_CACHE_TTL = "1h"
+
+
+def _prewarm_request(*, spec: ModelSpec, system: str) -> dict[str, Any]:
+    """Build a cheap cache-write request that matches the rollout's cache key.
+
+    Anthropic keys prompt cache by model and effort (omitting effort == default
+    high), so prewarm must send the same thinking / output_config as the run.
+    """
+    request: dict[str, Any] = {
         "model": spec.model_id,
         "max_tokens": PREWARM_MAX_TOKENS,
-        "system": [
-            {
-                "type": "text",
-                "text": system,
-                "cache_control": _cache_control(cache_ttl),
-            }
-        ],
+        "system": _system_blocks(system, cache=True),
         "messages": [{"role": "user", "content": PREWARM_USER_MESSAGE}],
     }
+    if spec.thinking:
+        request["thinking"] = spec.thinking
+    if spec.output_config:
+        request["output_config"] = spec.output_config
+    return request
 
 
-def _cache_control(ttl: str) -> dict[str, str]:
-    cache_control = {"type": "ephemeral"}
-    if ttl == "1h":
-        cache_control["ttl"] = "1h"
-    return cache_control
+def _cache_control() -> dict[str, str]:
+    return {"type": "ephemeral", "ttl": PROMPT_CACHE_TTL}
 
 
-def _apply_cache_control(
-    messages: list[dict[str, Any]],
-    *,
-    cache_ttl: str,
-    cache_first_user: bool,
-) -> list[dict[str, Any]]:
-    cleaned = _strip_cache_control(messages)
-    if not cleaned:
-        return cleaned
+def _system_blocks(system: str, *, cache: bool) -> list[dict[str, Any]]:
+    block: dict[str, Any] = {"type": "text", "text": system}
+    if cache:
+        block["cache_control"] = _cache_control()
+    return [block]
 
-    first_user = cleaned[0]
-    if cache_first_user and first_user.get("role") == "user" and isinstance(first_user.get("content"), list):
-        content = list(first_user["content"])
-        if content:
-            content[-1] = {**content[-1], "cache_control": _cache_control(cache_ttl)}
-            cleaned[0] = {**first_user, "content": content}
 
-    for idx in range(len(cleaned) - 1, -1, -1):
-        message = cleaned[idx]
-        if message.get("role") != "user":
-            continue
-        content = message.get("content")
-        if not isinstance(content, list) or not content:
-            continue
-        if content[0].get("type") != "tool_result":
-            continue
-        content = list(content)
-        content[-1] = {**content[-1], "cache_control": _cache_control(cache_ttl)}
-        cleaned[idx] = {**message, "content": content}
-        break
-
-    return cleaned
+def _apply_cache_control(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Strip leftover breakpoints. Conversation history is never cached."""
+    return _strip_cache_control(messages)
 
 
 class AnthropicProvider:
@@ -203,8 +184,8 @@ class AnthropicProvider:
             timeout=timeout,
         )
 
-    def prewarm_cache(self, *, spec: ModelSpec, system: str, cache_ttl: str) -> dict[str, int]:
-        response = self._create(**_prewarm_request(spec=spec, system=system, cache_ttl=cache_ttl))
+    def prewarm_cache(self, *, spec: ModelSpec, system: str) -> dict[str, int]:
+        response = self._create(**_prewarm_request(spec=spec, system=system))
         return _usage_dict(response)
 
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=30))
@@ -320,7 +301,6 @@ class AnthropicProvider:
         prompt: str,
         tools: list[Tool],
         max_turns: int,
-        cache_ttl: str = "5m",
         max_token_continues: int = 0,
         resume_from: Transcript | None = None,
         progress: RolloutProgress | None = None,
@@ -380,18 +360,8 @@ class AnthropicProvider:
             request: dict[str, Any] = {
                 "model": spec.model_id,
                 "max_tokens": spec.max_tokens,
-                "system": [
-                    {
-                        "type": "text",
-                        "text": system,
-                        "cache_control": _cache_control(cache_ttl),
-                    }
-                ],
-                "messages": _apply_cache_control(
-                    messages,
-                    cache_ttl=cache_ttl,
-                    cache_first_user=bool(tools),
-                ),
+                "system": _system_blocks(system, cache=not tools),
+                "messages": _apply_cache_control(messages),
             }
             if tools:
                 request["tools"] = _tool_defs(tools)

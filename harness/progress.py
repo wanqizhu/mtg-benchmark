@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Callable
 
 from harness.core import Transcript
+from harness.live import emit_live
 
 
 def atomic_write_json(path: Path, payload: dict[str, Any]) -> None:
@@ -29,13 +30,23 @@ class RolloutProgress:
         out_path: Path,
         payload_for: Callable[[Transcript, str], dict[str, Any]],
         heartbeat_seconds: float = 30.0,
+        live_seconds: float = 2.0,
         log_stream: Callable[[str], None] | None = None,
+        run_id: str = "",
+        model_id: str = "",
+        cache_ttl: str = "1h",
+        live_path: Path | None = None,
     ) -> None:
         self.model_name = model_name
         self.sample_id = sample_id
         self.out_path = out_path
         self.payload_for = payload_for
         self.heartbeat_seconds = heartbeat_seconds
+        self.live_seconds = live_seconds
+        self.run_id = run_id
+        self.model_id = model_id
+        self.cache_ttl = cache_ttl
+        self.live_path = live_path
         self._log = log_stream or (lambda msg: print(msg, file=sys.stderr, flush=True))
 
         self._api_turn = 0
@@ -50,13 +61,40 @@ class RolloutProgress:
             "cache_read_input_tokens": 0,
             "cache_creation_input_tokens": 0,
         }
-        self._stream_lock = threading.Lock()
+        self._stream_lock = threading.RLock()
+        self._last_live_emit = 0.0
 
     def _prefix(self) -> str:
         return f"[{self.model_name} {self.sample_id}]"
 
     def log(self, message: str) -> None:
         self._log(f"{self._prefix()} {message}")
+
+    def _live_event(self, event: str, *, force: bool = False) -> None:
+        now = time.monotonic()
+        if not force and now - self._last_live_emit < self.live_seconds:
+            return
+        self._last_live_emit = now
+        with self._stream_lock:
+            state = dict(self._stream_state)
+        emit_live(
+            {
+                "event": event,
+                "run_id": self.run_id,
+                "model_name": self.model_name,
+                "model_id": self.model_id,
+                "sample_id": self.sample_id,
+                "cache_ttl": self.cache_ttl,
+                "api_turn": self._api_turn,
+                "block_type": state.get("block_type"),
+                "output_chars": int(state.get("output_chars") or 0),
+                "output_tokens": int(state.get("output_tokens") or 0),
+                "input_tokens": int(state.get("input_tokens") or 0),
+                "cache_read_input_tokens": int(state.get("cache_read_input_tokens") or 0),
+                "cache_creation_input_tokens": int(state.get("cache_creation_input_tokens") or 0),
+            },
+            path=self.live_path,
+        )
 
     def write(self, transcript: Transcript, *, status: str) -> None:
         payload = self.payload_for(transcript, status)
@@ -80,6 +118,7 @@ class RolloutProgress:
             }
             self._last_heartbeat_state = None
         self.log(f"api turn {api_turn} started")
+        self._live_event("turn_start", force=True)
         self._start_heartbeat()
 
     def on_message_start(self, usage: dict[str, int]) -> None:
@@ -91,6 +130,7 @@ class RolloutProgress:
             f"cache_read={usage.get('cache_read_input_tokens', 0):,}, "
             f"cache_create={usage.get('cache_creation_input_tokens', 0):,})"
         )
+        self._live_event("message_start", force=True)
 
     def update_stream(
         self,
@@ -106,6 +146,7 @@ class RolloutProgress:
                 self._stream_state["output_chars"] = output_chars
             if output_tokens is not None:
                 self._stream_state["output_tokens"] = output_tokens
+        self._live_event("stream")
 
     def on_turn_finished(self, transcript: Transcript) -> None:
         self._stop_heartbeat()
@@ -116,6 +157,18 @@ class RolloutProgress:
             f"({transcript.tool_call_count} tool calls, "
             f"{transcript.usage.get('output_tokens', 0):,} output tokens so far)"
         )
+        last = next((turn for turn in reversed(transcript.turns) if turn.get("role") == "assistant"), None)
+        turn_usage = last.get("usage") if isinstance(last, dict) else None
+        if isinstance(turn_usage, dict):
+            with self._stream_lock:
+                self._stream_state["input_tokens"] = int(turn_usage.get("input_tokens") or 0)
+                self._stream_state["cache_read_input_tokens"] = int(
+                    turn_usage.get("cache_read_input_tokens") or 0
+                )
+                self._stream_state["cache_creation_input_tokens"] = int(
+                    turn_usage.get("cache_creation_input_tokens") or 0
+                )
+        self._live_event("turn_done", force=True)
 
     def on_rollout_complete(self, transcript: Transcript) -> None:
         self._stop_heartbeat()
@@ -124,11 +177,13 @@ class RolloutProgress:
             f"rollout complete ({transcript.tool_call_count} tool calls, "
             f"{transcript.usage.get('output_tokens', 0):,} output tokens)"
         )
+        self._live_event("complete", force=True)
 
     def on_rollout_failed(self, transcript: Transcript) -> None:
         self._stop_heartbeat()
         self.write(transcript, status="failed")
         self.log("rollout failed")
+        self._live_event("failed", force=True)
 
     def _heartbeat_loop(self) -> None:
         while not self._heartbeat_stop.wait(self.heartbeat_seconds):
@@ -156,6 +211,7 @@ class RolloutProgress:
                 f"api turn {self._api_turn} in progress "
                 f"({block}, {size}, cache_read={cache_read:,}, cache_create={cache_create:,}){suffix}"
             )
+            self._live_event("heartbeat", force=True)
 
     def _start_heartbeat(self) -> None:
         self._stop_heartbeat()

@@ -7,6 +7,7 @@ from pathlib import Path
 from harness.config import DEFAULT_JUDGE_MODEL, DEFAULT_MAX_TURNS, RESULTS_DIR
 from harness.report import print_report
 from harness.site import write_multi_run_site, write_site
+from harness.watch import DEFAULT_WATCH_WINDOW_S
 
 
 def _load_benchmark(name: str, *, rules_mode: str = "tools", judge_model: str | None = None):
@@ -24,6 +25,17 @@ def _parse_csv(value: str | None) -> list[str] | None:
 
 
 async def _async_main(args: argparse.Namespace) -> None:
+    if args.command == "watch":
+        from harness.watch import watch_loop
+
+        watch_loop(
+            Path(args.results_dir),
+            interval_s=args.interval,
+            window_s=args.window,
+            stall_after_s=args.stall_after,
+            once=args.once,
+        )
+        return
     if args.command == "report":
         run_dir = Path(args.results_dir) / (args.run_id or "")
         if not run_dir.exists():
@@ -57,7 +69,6 @@ async def _async_main(args: argparse.Namespace) -> None:
         max_turns=getattr(args, "max_turns", DEFAULT_MAX_TURNS),
         concurrency=getattr(args, "concurrency", 4),
         rules_mode=rules_mode,
-        cache_ttl=getattr(args, "cache_ttl", "auto"),
         max_tokens=getattr(args, "max_tokens", None),
         max_token_continues=getattr(args, "max_token_continues", 0),
         judge_model=judge_model,
@@ -128,12 +139,6 @@ def main() -> None:
         default="tools",
         help="tools: model retrieves rules via grep/read; inline: full rules in prompt, one-shot",
     )
-    run_parser.add_argument(
-        "--cache-ttl",
-        choices=("auto", "5m", "1h"),
-        default="auto",
-        help="prompt cache TTL; auto uses 1h for inline mode and 5m otherwise",
-    )
     run_parser.add_argument("--judge", action="store_true", help="Run judge after rollouts")
 
     judge_parser = subparsers.add_parser("judge", help="Judge existing rollouts")
@@ -151,6 +156,23 @@ def main() -> None:
         "--dataset-dir",
         help="Dataset directory for problem images; defaults to datasets/mtg or MTG_DATASET_DIR",
     )
+
+    watch_parser = subparsers.add_parser("watch", help="Live dashboard for all eval runs")
+    watch_parser.add_argument("--results-dir", default=str(RESULTS_DIR))
+    watch_parser.add_argument("--interval", type=float, default=5.0, help="Refresh seconds")
+    watch_parser.add_argument(
+        "--window",
+        type=float,
+        default=DEFAULT_WATCH_WINDOW_S,
+        help="Rate window seconds (default: 300, 5 minutes)",
+    )
+    watch_parser.add_argument(
+        "--stall-after",
+        type=float,
+        default=90.0,
+        help="Flag in-progress cells with no live events for this many seconds",
+    )
+    watch_parser.add_argument("--once", action="store_true", help="Print one snapshot and exit")
 
     args = parser.parse_args()
     asyncio.run(_async_main(args))

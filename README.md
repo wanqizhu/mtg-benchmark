@@ -29,6 +29,24 @@ Model names use the format `claude-{haiku|sonnet|opus|fable}-{version}[-thinking
 
 Results are written under `results/<run-id>/`.
 
+`--models` is comma-separated and runs those models in one process (same `--rules-mode` / `--run-id`). Tools vs inline are different modes, so they are separate commands. To run several versions at once, start one `bench run` per mode/run-id (or per model if you want isolated logs) and they share `--concurrency` within that process.
+
+```bash
+bench run --run-id tools-rules --rules-mode tools \
+  --models claude-sonnet-5-thinking-high,claude-sonnet-5-thinking-low,claude-haiku-4-5-thinking \
+  --samples 001,002,003 --concurrency 8 --judge
+```
+
+## Live monitor
+
+While evals are running (one or many processes):
+
+```bash
+bench watch
+```
+
+This scans every run under `results/` and tails `results/live.jsonl` for last-minute token/cost rates. Ctrl-C to stop. `bench watch --once` prints a single snapshot.
+
 ## Eval website
 
 Generate a static website for all runs:

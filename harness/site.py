@@ -168,6 +168,10 @@ def _dataset_problems(dataset_root: Path, site_dir: Path, *, copy_images: bool) 
 
         metadata_path = entry / "metadata.json"
         metadata = _read_json(metadata_path) if metadata_path.exists() else {}
+        # Mirrors load_puzzles(): puzzles with an unreliable reference solution are never run,
+        # so they must not show up as empty rows on the site either.
+        if metadata.get("excluded"):
+            continue
         sample_id = entry.name
         problems[sample_id] = {
             "id": sample_id,
@@ -206,6 +210,9 @@ def _model_row(name: str, entries: dict[str, dict[str, Any]]) -> dict[str, Any]:
     judge_cost = sum(_cost_usd(entry["judge"]) for entry in entries.values())
     first_result = next((entry["result"] for entry in entries.values() if entry["result"]), {})
     total = len(judged)
+    transcripts = [(entry.get("result") or {}).get("transcript") or {} for entry in entries.values()]
+    output_tokens = sum(_output_tokens(transcript) for transcript in transcripts)
+    tool_call_count = sum(_tool_call_count(transcript) for transcript in transcripts)
     return {
         "name": name,
         "model_id": first_result.get("model_id", ""),
@@ -215,11 +222,64 @@ def _model_row(name: str, entries: dict[str, dict[str, Any]]) -> dict[str, Any]:
         "passed": passed,
         "failed": total - passed,
         "unjudged": len(entries) - total,
+        "output_tokens": output_tokens,
+        "tool_call_count": tool_call_count,
         "pass_rate": passed / total if total else 0.0,
         "rollout_cost_usd": rollout_cost,
         "judge_cost_usd": judge_cost,
         "total_cost_usd": rollout_cost + judge_cost,
     }
+
+
+def _empty_attempt(
+    model_name: str,
+    sample_id: str,
+    *,
+    original_model: str | None = None,
+    version: str | None = None,
+) -> dict[str, Any]:
+    row = {
+        "model": model_name,
+        "sample_id": sample_id,
+        "status": "not_attempted",
+        "passed": None,
+        "judged": False,
+        "output_tokens": 0,
+        "tool_call_count": 0,
+        "rollout_cost_usd": 0.0,
+        "judge_cost_usd": 0.0,
+    }
+    if original_model is not None:
+        row["original_model"] = original_model
+    if version is not None:
+        row["version"] = version
+    return row
+
+
+def _align_problem_models(problems: list[dict[str, Any]], leaderboard: list[dict[str, Any]]) -> None:
+    """Keep every problem's model table in leaderboard order, including missing attempts."""
+    for problem in problems:
+        by_model = {row["model"]: row for row in problem.get("models", [])}
+        aligned = []
+        for model in leaderboard:
+            name = str(model["name"])
+            existing = by_model.get(name)
+            if existing is not None:
+                aligned.append(existing)
+            else:
+                aligned.append(
+                    _empty_attempt(
+                        name,
+                        str(problem["id"]),
+                        original_model=model.get("original_model"),
+                        version=model.get("version"),
+                    )
+                )
+        problem["models"] = aligned
+        judged = [row for row in aligned if row["passed"] is not None]
+        problem["judged"] = len(judged)
+        problem["passed"] = sum(1 for row in judged if row["passed"])
+        problem["attempted"] = sum(1 for row in aligned if row.get("status") != "not_attempted")
 
 
 def collect_site_data(
@@ -307,13 +367,9 @@ def collect_site_data(
 
     problem_rows = []
     for problem in problems.values():
-        problem["models"] = sorted(problem["models"], key=lambda row: row["model"])
-        judged = [row for row in problem["models"] if row["passed"] is not None]
-        problem["judged"] = len(judged)
-        problem["passed"] = sum(1 for row in judged if row["passed"])
-        problem["attempted"] = len(problem["models"])
         problem_rows.append(problem)
     problem_rows.sort(key=lambda row: _sample_sort_key(row["id"]))
+    _align_problem_models(problem_rows, leaderboard)
 
     model_rows = []
     for model in leaderboard:
@@ -415,13 +471,9 @@ def _combined_site_data(runs: list[dict[str, Any]], *, results_dir: Path, datase
 
     problem_rows = []
     for problem in problems_by_id.values():
-        problem["models"] = sorted(problem["models"], key=lambda row: (row["version"], row["model"]))
-        judged = [row for row in problem["models"] if row["passed"] is not None]
-        problem["judged"] = len(judged)
-        problem["passed"] = sum(1 for row in judged if row["passed"])
-        problem["attempted"] = len(problem["models"])
         problem_rows.append(problem)
     problem_rows.sort(key=lambda row: _sample_sort_key(row["id"]))
+    _align_problem_models(problem_rows, leaderboard)
 
     return {
         "run_id": "all-versions",
@@ -1090,11 +1142,15 @@ function renderStats() {
 }
 
 function renderLeaderboard() {
+  const tools = DATA.leaderboard.some((row) => showToolCalls(row));
   app.innerHTML = `${renderStats()}
     <section class="card">
       <h2>Leaderboard</h2>
       <table>
-        <thead><tr><th>Rank</th><th>Model</th><th>Version</th><th>Pass Rate</th><th>Passed</th><th>Attempted</th><th>Unjudged</th><th>Cost</th></tr></thead>
+        <thead><tr>
+          <th>Rank</th><th>Model</th><th>Version</th><th>Pass Rate</th><th>Passed</th>
+          <th>Tokens</th>${tools ? "<th>Tools</th>" : ""}<th>Cost</th>
+        </tr></thead>
         <tbody>
           ${DATA.leaderboard.map((row) => `<tr class="clickable" data-model="${esc(row.name)}">
             <td>${row.rank}</td>
@@ -1102,8 +1158,8 @@ function renderLeaderboard() {
             <td>${esc(row.version || DATA.run_id)}</td>
             <td>${pct(row.pass_rate)}</td>
             <td>${row.passed}/${row.judged}</td>
-            <td>${row.attempted}</td>
-            <td>${row.unjudged}</td>
+            <td>${formatCount(row.output_tokens)}</td>
+            ${tools ? `<td>${showToolCalls(row) ? formatCount(row.tool_call_count) : "—"}</td>` : ""}
             <td>${money(row.total_cost_usd)}</td>
           </tr>`).join("")}
         </tbody>
@@ -1192,14 +1248,27 @@ function renderProblemDetail(problem) {
   <article class="card">
     <h3>Model Outcomes</h3>
     <table><thead><tr><th>Model</th><th>Status</th><th>Usage</th><th>Cost</th></tr></thead><tbody>
-      ${problem.models.map((row) => `<tr>
-        <td><button class="link-button" data-pair="${esc(row.model)}|||${esc(row.sample_id)}">${esc(row.original_model || row.model)}${row.version ? ` · ${esc(row.version)}` : ""}</button></td>
-        <td>${statusPill(row.passed, row.judged)}</td>
-        <td>${esc(rolloutUsage(row))}</td>
-        <td>${money((row.rollout_cost_usd || 0) + (row.judge_cost_usd || 0))}</td>
-      </tr>`).join("")}
+      ${problem.models.map((row) => renderOutcomeRow(row)).join("")}
     </tbody></table>
   </article>`;
+}
+
+function renderOutcomeRow(row) {
+  const label = `${esc(row.original_model || row.model)}${row.version ? ` · ${esc(row.version)}` : ""}`;
+  if (row.status === "not_attempted") {
+    return `<tr>
+      <td><span class="muted">${label}</span></td>
+      <td><span class="muted">Not attempted</span></td>
+      <td class="muted">—</td>
+      <td class="muted">—</td>
+    </tr>`;
+  }
+  return `<tr>
+    <td><button class="link-button" data-pair="${esc(row.model)}|||${esc(row.sample_id)}">${label}</button></td>
+    <td>${statusPill(row.passed, row.judged)}</td>
+    <td>${esc(rolloutUsage(row))}</td>
+    <td>${money((row.rollout_cost_usd || 0) + (row.judge_cost_usd || 0))}</td>
+  </tr>`;
 }
 
 function renderModels(selectedName = DATA.models[0]?.name) {

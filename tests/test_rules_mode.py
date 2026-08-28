@@ -5,8 +5,8 @@ from harness.providers.anthropic import (
     _apply_cache_control,
     _cache_control,
     _prewarm_request,
+    _system_blocks,
 )
-from harness.runner import Runner
 
 
 def test_inline_samples_have_no_tools():
@@ -49,37 +49,55 @@ def test_inline_allows_sonnet_5():
     bench.validate_model(spec)
 
 
-def test_inline_runner_auto_uses_one_hour_cache():
-    bench = MTGBenchmark(rules_mode="inline")
-    runner = Runner(bench, run_id="test", rules_mode="inline")
-    assert runner.cache_ttl == "1h"
+def test_prompt_cache_is_one_hour():
+    assert _cache_control() == {"type": "ephemeral", "ttl": "1h"}
 
 
-def test_tools_runner_auto_uses_five_minute_cache():
-    bench = MTGBenchmark(rules_mode="tools")
-    runner = Runner(bench, run_id="test", rules_mode="tools")
-    assert runner.cache_ttl == "5m"
+def test_prewarm_request_matches_rollout_cache_key():
+    high = parse_model_name("claude-sonnet-5-thinking-high")
+    low = parse_model_name("claude-sonnet-5-thinking-low")
+    high_req = _prewarm_request(spec=high, system="rules")
+    low_req = _prewarm_request(spec=low, system="rules")
+    assert high_req["max_tokens"] == PREWARM_MAX_TOKENS
+    assert high_req["max_tokens"] < high.max_tokens
+    assert high_req["thinking"] == high.thinking
+    assert high_req["output_config"] == {"effort": "high"}
+    assert low_req["output_config"] == {"effort": "low"}
+    assert high_req["thinking"] == low_req["thinking"]
+    assert high_req["output_config"] != low_req["output_config"]
+    assert high_req["system"][0]["cache_control"]["ttl"] == "1h"
 
 
-def test_one_hour_cache_control():
-    assert _cache_control("1h") == {"type": "ephemeral", "ttl": "1h"}
-    assert _cache_control("5m") == {"type": "ephemeral"}
-
-
-def test_prewarm_request_is_cheap():
-    spec = parse_model_name("claude-sonnet-5-thinking-high")
-    request = _prewarm_request(spec=spec, system="rules", cache_ttl="1h")
-    assert request["max_tokens"] == PREWARM_MAX_TOKENS
-    assert request["max_tokens"] < spec.max_tokens
+def test_prewarm_request_omits_thinking_when_disabled():
+    spec = parse_model_name("claude-sonnet-5")
+    request = _prewarm_request(spec=spec, system="rules")
     assert "thinking" not in request
     assert "output_config" not in request
-    assert request["system"][0]["cache_control"]["ttl"] == "1h"
 
 
 def test_inline_one_shot_does_not_cache_user_prompt():
     messages = [{"role": "user", "content": [{"type": "text", "text": "puzzle"}]}]
-    cached = _apply_cache_control(messages, cache_ttl="1h", cache_first_user=False)
+    cached = _apply_cache_control(messages)
     assert "cache_control" not in cached[0]["content"][0]
+
+
+def test_tools_does_not_cache_messages():
+    messages = [
+        {"role": "user", "content": [{"type": "text", "text": "puzzle"}]},
+        {"role": "assistant", "content": [{"type": "text", "text": "thinking"}]},
+        {
+            "role": "user",
+            "content": [{"type": "tool_result", "tool_use_id": "1", "content": "rules"}],
+        },
+    ]
+    cached = _apply_cache_control(messages)
+    assert "cache_control" not in cached[0]["content"][0]
+    assert "cache_control" not in cached[2]["content"][0]
+
+
+def test_tools_does_not_cache_system_prompt():
+    assert "cache_control" not in _system_blocks("tools system", cache=False)[0]
+    assert _system_blocks("inline rules", cache=True)[0]["cache_control"]["ttl"] == "1h"
 
 
 def test_default_judge_model_is_sonnet():

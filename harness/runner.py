@@ -13,7 +13,7 @@ from harness.model_names import ModelSpec, safe_result_dir_name
 from harness.core import Benchmark, Sample, Transcript
 from harness.pricing import estimate_cost
 from harness.progress import RolloutProgress
-from harness.providers.anthropic import AnthropicProvider
+from harness.providers.anthropic import PROMPT_CACHE_TTL, AnthropicProvider
 from harness.providers.base import Provider
 
 
@@ -23,6 +23,22 @@ def _result_path(run_dir: Path, model_name: str, sample_id: str) -> Path:
 
 def _judge_path(run_dir: Path, model_name: str, sample_id: str) -> Path:
     return run_dir / safe_result_dir_name(model_name) / f"{sample_id}.judge.json"
+
+
+def _progress_summary(transcript: Transcript) -> dict[str, Any]:
+    assistant = [turn for turn in transcript.turns if turn.get("role") == "assistant"]
+    continues = sum(
+        1
+        for turn in transcript.turns
+        if turn.get("role") == "user" and turn.get("reason") == "continue_after_max_tokens"
+    )
+    last_stop = assistant[-1].get("stop_reason") if assistant else None
+    return {
+        "assistant_turns": len(assistant),
+        "continues": continues,
+        "last_stop_reason": last_stop,
+        "tool_call_count": transcript.tool_call_count,
+    }
 
 
 def _transcript_to_dict(transcript: Transcript) -> dict[str, Any]:
@@ -65,21 +81,17 @@ class Runner:
         max_turns: int = DEFAULT_MAX_TURNS,
         concurrency: int = DEFAULT_CONCURRENCY,
         rules_mode: str = "tools",
-        cache_ttl: str = "auto",
         max_tokens: int | None = None,
         max_token_continues: int = 0,
         judge_model: str | None = None,
     ) -> None:
         self.benchmark = benchmark
         self.run_id = run_id or datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        self.results_dir = results_dir
         self.run_dir = results_dir / self.run_id
         self.max_turns = max_turns
         self.concurrency = concurrency
         self.rules_mode = rules_mode
-        if cache_ttl == "auto":
-            self.cache_ttl = "1h" if rules_mode == "inline" else "5m"
-        else:
-            self.cache_ttl = cache_ttl
         self.max_tokens = max_tokens
         self.max_token_continues = max_token_continues
         self.judge_model = judge_model or getattr(benchmark, "judge_model", None) or DEFAULT_JUDGE_MODEL
@@ -121,7 +133,7 @@ class Runner:
                     else force or not _result_path(self.run_dir, model_name, sample.id).exists()
                 )
             ]
-            if pending and self.cache_ttl == "1h":
+            if pending and self.rules_mode == "inline":
                 prewarm_cache = getattr(provider, "prewarm_cache", None)
                 if prewarm_cache is not None:
                     sample, _ = pending[0]
@@ -129,7 +141,6 @@ class Runner:
                         prewarm_cache,
                         spec=spec,
                         system=sample.system,
-                        cache_ttl=self.cache_ttl,
                     )
                     print(
                         f"[{model_name}] prewarmed cache "
@@ -145,17 +156,20 @@ class Runner:
                             "run_id": self.run_id,
                             "model_name": model_name,
                             "model_id": spec.model_id,
-                            "cache_ttl": self.cache_ttl,
+                            "cache_ttl": PROMPT_CACHE_TTL,
+                            "thinking": spec.thinking,
+                            "output_config": spec.output_config,
                             "usage": usage,
                             "cost": estimate_cost(
                                 usage,
                                 model_id=spec.model_id,
-                                cache_ttl=self.cache_ttl,
+                                cache_ttl=PROMPT_CACHE_TTL,
                             ),
                             "updated_at": datetime.now(timezone.utc).isoformat(),
                         }
                         self.run_dir.mkdir(parents=True, exist_ok=True)
-                        (self.run_dir / "prewarm.json").write_text(
+                        prewarm_path = self.run_dir / f"prewarm.{model_name}.json"
+                        prewarm_path.write_text(
                             json.dumps(prewarm_payload, indent=2) + "\n",
                             encoding="utf-8",
                         )
@@ -194,25 +208,27 @@ class Runner:
                     "run_id": self.run_id,
                     "status": status,
                     "rules_mode": self.rules_mode,
-                    "cache_ttl": self.cache_ttl,
+                    "cache_ttl": PROMPT_CACHE_TTL,
                     "model_name": model_name,
                     "model_id": spec.model_id,
+                    "sample_id": sample.id,
                     "model_config": {
                         "thinking": spec.thinking,
                         "output_config": spec.output_config,
                         "max_tokens": spec.max_tokens,
+                        "max_turns": max_turns,
                         "max_token_continues": self.max_token_continues,
                     },
-                    "sample_id": sample.id,
-                    "reference": sample.reference,
-                    "transcript": _transcript_to_dict(transcript),
+                    "progress": _progress_summary(transcript),
                 }
                 if transcript.usage:
                     payload["cost"] = estimate_cost(
                         transcript.usage,
                         model_id=spec.model_id,
-                        cache_ttl=self.cache_ttl,
+                        cache_ttl=PROMPT_CACHE_TTL,
                     )
+                payload["reference"] = sample.reference
+                payload["transcript"] = _transcript_to_dict(transcript)
                 return payload
 
             progress = RolloutProgress(
@@ -220,6 +236,10 @@ class Runner:
                 sample_id=sample.id,
                 out_path=out_path,
                 payload_for=payload_for,
+                run_id=self.run_id,
+                model_id=spec.model_id,
+                cache_ttl=PROMPT_CACHE_TTL,
+                live_path=self.results_dir / "live.jsonl",
             )
             try:
                 transcript = await asyncio.to_thread(
@@ -229,7 +249,6 @@ class Runner:
                     prompt=sample.prompt,
                     tools=sample.tools,
                     max_turns=max_turns,
-                    cache_ttl=self.cache_ttl,
                     max_token_continues=self.max_token_continues,
                     progress=progress,
                 )
@@ -279,26 +298,32 @@ class Runner:
             transcript = Transcript(**existing["transcript"])
 
             def payload_for(next_transcript: Transcript, status: str) -> dict[str, Any]:
-                payload = dict(existing)
-                payload.update(
-                    {
-                        "status": status,
-                        "model_config": {
-                            "thinking": spec.thinking,
-                            "output_config": spec.output_config,
-                            "max_tokens": spec.max_tokens,
-                            "max_token_continues": self.max_token_continues,
-                        },
-                        "transcript": _transcript_to_dict(next_transcript),
-                    }
-                )
+                payload = {
+                    "benchmark": existing.get("benchmark", self.benchmark.name),
+                    "run_id": existing.get("run_id", self.run_id),
+                    "status": status,
+                    "rules_mode": existing.get("rules_mode", self.rules_mode),
+                    "cache_ttl": existing.get("cache_ttl", PROMPT_CACHE_TTL),
+                    "model_name": model_name,
+                    "model_id": spec.model_id,
+                    "sample_id": sample.id,
+                    "model_config": {
+                        "thinking": spec.thinking,
+                        "output_config": spec.output_config,
+                        "max_tokens": spec.max_tokens,
+                        "max_turns": max_turns,
+                        "max_token_continues": self.max_token_continues,
+                    },
+                    "progress": _progress_summary(next_transcript),
+                }
                 if next_transcript.usage:
                     payload["cost"] = estimate_cost(
                         next_transcript.usage,
                         model_id=spec.model_id,
-                        cache_ttl=self.cache_ttl,
+                        cache_ttl=PROMPT_CACHE_TTL,
                     )
-                payload.pop("error", None)
+                payload["reference"] = existing.get("reference", sample.reference)
+                payload["transcript"] = _transcript_to_dict(next_transcript)
                 return payload
 
             progress = RolloutProgress(
@@ -306,6 +331,10 @@ class Runner:
                 sample_id=sample.id,
                 out_path=out_path,
                 payload_for=payload_for,
+                run_id=self.run_id,
+                model_id=spec.model_id,
+                cache_ttl=PROMPT_CACHE_TTL,
+                live_path=self.results_dir / "live.jsonl",
             )
             try:
                 resumed = await asyncio.to_thread(
@@ -315,7 +344,6 @@ class Runner:
                     prompt=sample.prompt,
                     tools=sample.tools,
                     max_turns=max_turns,
-                    cache_ttl=self.cache_ttl,
                     max_token_continues=self.max_token_continues,
                     resume_from=transcript,
                     progress=progress,

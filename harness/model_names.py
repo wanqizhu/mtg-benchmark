@@ -47,6 +47,21 @@ EFFORT_MODELS = frozenset(
 
 DEFAULT_THINKING_BUDGET = 10_000
 
+# Synchronous Messages API max output tokens per model.
+# https://platform.claude.com/docs/en/about-claude/models/overview
+MODEL_MAX_OUTPUT_TOKENS: dict[str, int] = {
+    "claude-fable-5": 128_000,
+    "claude-sonnet-5": 128_000,
+    "claude-sonnet-4-6": 128_000,
+    "claude-opus-4-8": 128_000,
+    "claude-opus-4-7": 128_000,
+    "claude-opus-4-6": 128_000,
+    "claude-sonnet-4-5-20250929": 64_000,
+    "claude-opus-4-5-20251101": 64_000,
+    "claude-haiku-4-5-20251001": 64_000,
+}
+FALLBACK_MAX_OUTPUT_TOKENS = 64_000
+
 
 @dataclass(frozen=True)
 class ModelSpec:
@@ -55,7 +70,7 @@ class ModelSpec:
     model_id: str
     thinking: dict | None = None
     output_config: dict | None = None
-    max_tokens: int = 4096
+    max_tokens: int = FALLBACK_MAX_OUTPUT_TOKENS
 
 
 def _resolve_api_id(family: str, version: str) -> str:
@@ -70,12 +85,8 @@ def _thinking_config(model_id: str) -> dict:
     return {"type": "enabled", "budget_tokens": DEFAULT_THINKING_BUDGET, "display": "summarized"}
 
 
-def _default_max_tokens(*, thinking: bool, effort: str | None) -> int:
-    if thinking or effort in {"xhigh", "max"}:
-        return 64_000
-    if effort in {"high", "medium"}:
-        return 16_000
-    return 4096
+def _max_output_tokens(model_id: str) -> int:
+    return MODEL_MAX_OUTPUT_TOKENS.get(model_id, FALLBACK_MAX_OUTPUT_TOKENS)
 
 
 def parse_model_name(name: str) -> ModelSpec:
@@ -124,7 +135,7 @@ def parse_model_name(name: str) -> ModelSpec:
         model_id=model_id,
         thinking=thinking_config,
         output_config=output_config,
-        max_tokens=_default_max_tokens(thinking=thinking, effort=effort),
+        max_tokens=_max_output_tokens(model_id),
     )
 
 

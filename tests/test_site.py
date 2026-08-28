@@ -8,14 +8,22 @@ def _write_json(path, payload):
     path.write_text(json.dumps(payload), encoding="utf-8")
 
 
-def _write_problem(dataset_dir, sample_id, *, difficulty="Common", solution_text="1. Win the game."):
+def _write_problem(
+    dataset_dir,
+    sample_id,
+    *,
+    difficulty="Common",
+    solution_text="1. Win the game.",
+    excluded=False,
+):
     sample_dir = dataset_dir / sample_id
     sample_dir.mkdir(parents=True)
     (sample_dir / "problem_gold.md").write_text(f"# Puzzle {sample_id}", encoding="utf-8")
-    (sample_dir / "metadata.json").write_text(
-        json.dumps({"difficulty": difficulty, "solution_text": solution_text}),
-        encoding="utf-8",
-    )
+    metadata = {"difficulty": difficulty, "solution_text": solution_text}
+    if excluded:
+        metadata["excluded"] = True
+        metadata["excluded_reason"] = "unreliable reference solution"
+    (sample_dir / "metadata.json").write_text(json.dumps(metadata), encoding="utf-8")
 
 
 def _result(model_name, sample_id, *, status="complete"):
@@ -76,16 +84,37 @@ def test_collect_site_data_normalizes_models_problems_and_details(tmp_path):
     assert [row["name"] for row in data["leaderboard"]] == ["model-a", "model-b"]
     assert data["leaderboard"][0]["passed"] == 1
     assert data["leaderboard"][1]["unjudged"] == 1
+    assert data["leaderboard"][0]["output_tokens"] == 2
+    assert data["leaderboard"][0]["tool_call_count"] == 0
+    assert data["leaderboard"][1]["output_tokens"] == 2
     assert data["problems"][0]["image"].endswith("001/puzzle.png")
     assert data["problems"][0]["attempted"] == 2
     assert len(data["problems"][0]["models"]) == 2
     assert data["problems"][1]["id"] == "002"
     assert data["problems"][1]["attempted"] == 0
     assert data["problems"][1]["difficulty"] == "Rare"
+    assert [row["model"] for row in data["problems"][0]["models"]] == ["model-a", "model-b"]
+    assert [row["model"] for row in data["problems"][1]["models"]] == ["model-a", "model-b"]
+    assert data["problems"][1]["models"][0]["status"] == "not_attempted"
+    assert data["problems"][1]["models"][1]["status"] == "not_attempted"
     assert data["details"]["model-a"]["001"]["model_solution"] == "1. Win."
     assert data["details"]["model-b"]["001"]["passed"] is None
     assert data["problems"][0]["models"][0]["output_tokens"] == 2
     assert data["problems"][0]["models"][0]["tool_call_count"] == 0
+
+
+def test_collect_site_data_skips_excluded_problems(tmp_path):
+    run_dir = tmp_path / "results" / "run"
+    dataset_dir = tmp_path / "dataset"
+    _write_problem(dataset_dir, "001")
+    _write_problem(dataset_dir, "018", difficulty="Special", excluded=True)
+    (dataset_dir / "001" / "puzzle.png").write_bytes(b"png")
+    (dataset_dir / "018" / "puzzle.jpg").write_bytes(b"jpg")
+    _write_json(run_dir / "model-a" / "001.json", _result("model-a", "001"))
+
+    data = collect_site_data(run_dir, dataset_root=dataset_dir)
+
+    assert [problem["id"] for problem in data["problems"]] == ["001"]
 
 
 def test_collect_site_data_uses_output_tokens_and_tool_calls(tmp_path):
@@ -103,6 +132,8 @@ def test_collect_site_data_uses_output_tokens_and_tool_calls(tmp_path):
     row = data["problems"][0]["models"][0]
     assert row["output_tokens"] == 12345
     assert row["tool_call_count"] == 4
+    assert data["leaderboard"][0]["output_tokens"] == 12345
+    assert data["leaderboard"][0]["tool_call_count"] == 4
 
 
 def test_write_site_emits_static_assets_and_copies_images(tmp_path):
@@ -130,6 +161,9 @@ def test_write_site_emits_static_assets_and_copies_images(tmp_path):
     assert "overflow: hidden" in css
     assert "output tokens" in js
     assert "tool calls" in js
+    assert "<th>Tokens</th>" in js
+    assert "<th>Attempted</th>" not in js
+    assert "<th>Unjudged</th>" not in js
 
 
 def test_collect_multi_run_site_data_includes_all_result_runs(tmp_path):
@@ -153,6 +187,9 @@ def test_collect_multi_run_site_data_includes_all_result_runs(tmp_path):
     assert data["runs"][0]["leaderboard"][0]["version"] == "inline-rules"
     assert data["runs"][0]["leaderboard"][0]["original_model"] == "model-a"
     assert data["runs"][2]["leaderboard"][0]["unjudged"] == 1
+    combined = data["runs"][0]
+    order = [row["name"] for row in combined["leaderboard"]]
+    assert order == [row["model"] for row in combined["problems"][0]["models"]]
 
 
 def test_write_multi_run_site_emits_dropdown_data_shape(tmp_path):
