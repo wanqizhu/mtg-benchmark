@@ -26,6 +26,23 @@ def _judge_path(run_dir: Path, model_name: str, sample_id: str) -> Path:
     return run_dir / safe_result_dir_name(model_name) / f"{sample_id}.judge.json"
 
 
+def complete_result_ready_for_judge(
+    result_path: Path,
+    judge_path: Path,
+    *,
+    force: bool = False,
+) -> bool:
+    if not result_path.exists():
+        return False
+    if judge_path.exists() and not force:
+        return False
+    try:
+        payload = json.loads(result_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return False
+    return payload.get("status") == "complete"
+
+
 def _progress_summary(transcript: Transcript) -> dict[str, Any]:
     assistant = [turn for turn in transcript.turns if turn.get("role") == "assistant"]
     continues = sum(
@@ -104,6 +121,7 @@ class Runner:
         self.max_tokens = max_tokens
         self.max_token_continues = max_token_continues
         self.judge_model = judge_model or getattr(benchmark, "judge_model", None) or DEFAULT_JUDGE_MODEL
+        self.last_judge_paths: list[Path] = []
 
     def _samples_for(self, sample_ids: list[str] | None) -> list[Sample]:
         samples = self.benchmark.samples()
@@ -123,10 +141,14 @@ class Runner:
         sample_ids: list[str] | None = None,
         force: bool = False,
         resume: bool = False,
+        judge: bool = False,
     ) -> list[Path]:
         samples = self._samples_for(sample_ids)
         semaphore = asyncio.Semaphore(self.concurrency)
+        judge_semaphore = asyncio.Semaphore(self.concurrency)
         tasks: list[asyncio.Task[Path | None]] = []
+        judge_tasks: list[asyncio.Task[Path | None]] = []
+        self.last_judge_paths: list[Path] = []
 
         for model_name in model_names:
             spec = get_model(model_name)
@@ -183,17 +205,92 @@ class Runner:
                             encoding="utf-8",
                         )
 
+            pending_ids = {sample.id for sample, _ in pending}
+            if judge:
+                for sample in samples:
+                    if sample.id in pending_ids:
+                        continue
+                    judge_tasks.append(
+                        asyncio.create_task(
+                            self._judge_if_ready(
+                                model_name,
+                                sample,
+                                _result_path(self.run_dir, model_name, sample.id),
+                                judge_semaphore,
+                                force=force,
+                            )
+                        )
+                    )
+
             for sample, out_path in pending:
                 tasks.append(
                     asyncio.create_task(
-                        self._run_one(provider, spec, model_name, sample, out_path, semaphore)
-                        if not resume
-                        else self._resume_one(provider, spec, model_name, sample, out_path, semaphore)
+                        self._run_then_maybe_judge(
+                            provider,
+                            spec,
+                            model_name,
+                            sample,
+                            out_path,
+                            semaphore,
+                            judge_semaphore,
+                            resume=resume,
+                            judge=judge,
+                            force=force,
+                        )
                     )
                 )
 
         results = await asyncio.gather(*tasks)
+        if judge_tasks:
+            judged = await asyncio.gather(*judge_tasks)
+            self.last_judge_paths.extend(path for path in judged if path is not None)
         return [path for path in results if path is not None]
+
+    async def _run_then_maybe_judge(
+        self,
+        provider: Provider,
+        spec: ModelSpec,
+        model_name: str,
+        sample: Sample,
+        out_path: Path,
+        semaphore: asyncio.Semaphore,
+        judge_semaphore: asyncio.Semaphore,
+        *,
+        resume: bool,
+        judge: bool,
+        force: bool,
+    ) -> Path | None:
+        if resume:
+            path = await self._resume_one(provider, spec, model_name, sample, out_path, semaphore)
+        else:
+            path = await self._run_one(provider, spec, model_name, sample, out_path, semaphore)
+        if judge:
+            judged = await self._judge_if_ready(
+                model_name, sample, path, judge_semaphore, force=force
+            )
+            if judged is not None:
+                self.last_judge_paths.append(judged)
+        return path
+
+    async def _judge_if_ready(
+        self,
+        model_name: str,
+        sample: Sample,
+        result_path: Path,
+        semaphore: asyncio.Semaphore,
+        *,
+        force: bool = False,
+    ) -> Path | None:
+        judge_path = _judge_path(self.run_dir, model_name, sample.id)
+        if not complete_result_ready_for_judge(result_path, judge_path, force=force):
+            return None
+        path = await self._judge_one(sample, result_path, judge_path, semaphore)
+        print(
+            f"[{model_name} {sample.id}] judged",
+            file=sys.stderr,
+            flush=True,
+        )
+        return path
 
     async def _run_one(
         self,
@@ -396,12 +493,7 @@ class Runner:
             for sample_id, sample in samples.items():
                 result_path = _result_path(self.run_dir, model_name, sample_id)
                 judge_path = _judge_path(self.run_dir, model_name, sample_id)
-                if not result_path.exists():
-                    continue
-                if judge_path.exists() and not force:
-                    continue
-                result_payload = json.loads(result_path.read_text(encoding="utf-8"))
-                if result_payload.get("status") != "complete":
+                if not complete_result_ready_for_judge(result_path, judge_path, force=force):
                     continue
                 tasks.append(
                     asyncio.create_task(

@@ -80,14 +80,11 @@ async def _async_main(args: argparse.Namespace) -> None:
             sample_ids=_parse_csv(args.samples),
             force=args.force,
             resume=args.resume,
+            judge=args.judge,
         )
         print(f"Wrote {len(paths)} rollout result(s) to {runner.run_dir}")
         if args.judge:
-            judge_paths = await runner.run_judges(
-                _parse_csv(args.models) or [],
-                sample_ids=_parse_csv(args.samples),
-                force=args.force,
-            )
+            judge_paths = getattr(runner, "last_judge_paths", [])
             print(f"Wrote {len(judge_paths)} judge result(s) to {runner.run_dir}")
             print_report(runner.run_dir)
     elif args.command == "judge":
@@ -142,10 +139,15 @@ def main() -> None:
         default="tools",
         help="tools: model retrieves rules via grep/read; inline: full rules in prompt, one-shot",
     )
-    run_parser.add_argument("--judge", action="store_true", help="Run judge after rollouts")
+    run_parser.add_argument(
+        "--judge",
+        action="store_true",
+        help="Judge each complete rollout as soon as it finishes (and any already-complete results)",
+    )
 
     judge_parser = subparsers.add_parser("judge", help="Judge existing rollouts")
     add_common(judge_parser)
+    judge_parser.add_argument("--concurrency", type=int, default=4)
 
     report_parser = subparsers.add_parser("report", help="Print report for a run")
     report_parser.add_argument("--run-id", required=True)
