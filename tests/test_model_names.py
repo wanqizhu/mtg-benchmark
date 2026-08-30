@@ -46,3 +46,33 @@ def test_parse_effort_order_independent():
 def test_older_sonnet_and_opus_use_64k_output_limit():
     assert parse_model_name("claude-sonnet-4-5-thinking").max_tokens == 64_000
     assert parse_model_name("claude-opus-4-5-thinking-high").max_tokens == 64_000
+
+
+def test_parse_grok_4_6_high():
+    spec = parse_model_name("grok-4.6-high")
+    assert spec.provider == "xai"
+    assert spec.model_id == "grok-4.6"
+    assert spec.thinking is None
+    assert spec.output_config == {"effort": "high"}
+    assert spec.max_tokens == 128_000
+
+
+def test_parse_grok_hyphen_version_and_default_effort():
+    spec = parse_model_name("grok-4-6")
+    assert spec.model_id == "grok-4.6"
+    assert spec.output_config == {"effort": "high"}
+
+
+def test_parse_grok_thinking_suffix_ignored():
+    spec = parse_model_name("grok-4.6-thinking-xhigh")
+    assert spec.model_id == "grok-4.6"
+    assert spec.output_config == {"effort": "xhigh"}
+
+
+def test_parse_grok_rejects_max_effort():
+    try:
+        parse_model_name("grok-4.6-max")
+        raised = False
+    except ValueError:
+        raised = True
+    assert raised

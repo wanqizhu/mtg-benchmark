@@ -11,10 +11,11 @@ from typing import Any
 from harness.config import DEFAULT_CONCURRENCY, DEFAULT_JUDGE_MODEL, DEFAULT_MAX_TURNS, RESULTS_DIR, get_model
 from harness.model_names import ModelSpec, safe_result_dir_name
 from harness.core import Benchmark, Sample, Transcript
-from harness.pricing import estimate_cost
+from harness.pricing import estimate_cost, estimate_rollout_cost
 from harness.progress import RolloutProgress
 from harness.providers.anthropic import PROMPT_CACHE_TTL, AnthropicProvider
 from harness.providers.base import Provider
+from harness.providers.xai import CACHE_TTL as XAI_CACHE_TTL, XAIProvider
 
 
 def _result_path(run_dir: Path, model_name: str, sample_id: str) -> Path:
@@ -65,9 +66,17 @@ def _error_payload(exc: BaseException) -> dict[str, Any]:
     return payload
 
 
+def cache_ttl_for(spec: ModelSpec) -> str:
+    if spec.provider == "xai":
+        return XAI_CACHE_TTL
+    return PROMPT_CACHE_TTL
+
+
 def get_provider(spec: ModelSpec) -> Provider:
     if spec.provider == "anthropic":
         return AnthropicProvider()
+    if spec.provider == "xai":
+        return XAIProvider()
     raise NotImplementedError(f"Provider not implemented: {spec.provider}")
 
 
@@ -202,13 +211,15 @@ class Runner:
 
             max_turns = 1 if not sample.tools else self.max_turns
 
+            cache_ttl = cache_ttl_for(spec)
+
             def payload_for(transcript: Transcript, status: str) -> dict[str, Any]:
                 payload = {
                     "benchmark": self.benchmark.name,
                     "run_id": self.run_id,
                     "status": status,
                     "rules_mode": self.rules_mode,
-                    "cache_ttl": PROMPT_CACHE_TTL,
+                    "cache_ttl": cache_ttl,
                     "model_name": model_name,
                     "model_id": spec.model_id,
                     "sample_id": sample.id,
@@ -222,10 +233,11 @@ class Runner:
                     "progress": _progress_summary(transcript),
                 }
                 if transcript.usage:
-                    payload["cost"] = estimate_cost(
-                        transcript.usage,
+                    payload["cost"] = estimate_rollout_cost(
+                        usage=transcript.usage,
+                        turns=transcript.turns,
                         model_id=spec.model_id,
-                        cache_ttl=PROMPT_CACHE_TTL,
+                        cache_ttl=cache_ttl,
                     )
                 payload["reference"] = sample.reference
                 payload["transcript"] = _transcript_to_dict(transcript)
@@ -238,7 +250,7 @@ class Runner:
                 payload_for=payload_for,
                 run_id=self.run_id,
                 model_id=spec.model_id,
-                cache_ttl=PROMPT_CACHE_TTL,
+                cache_ttl=cache_ttl,
                 live_path=self.results_dir / "live.jsonl",
             )
             try:
@@ -297,13 +309,15 @@ class Runner:
             existing = json.loads(out_path.read_text(encoding="utf-8"))
             transcript = Transcript(**existing["transcript"])
 
+            cache_ttl = existing.get("cache_ttl") or cache_ttl_for(spec)
+
             def payload_for(next_transcript: Transcript, status: str) -> dict[str, Any]:
                 payload = {
                     "benchmark": existing.get("benchmark", self.benchmark.name),
                     "run_id": existing.get("run_id", self.run_id),
                     "status": status,
                     "rules_mode": existing.get("rules_mode", self.rules_mode),
-                    "cache_ttl": existing.get("cache_ttl", PROMPT_CACHE_TTL),
+                    "cache_ttl": cache_ttl,
                     "model_name": model_name,
                     "model_id": spec.model_id,
                     "sample_id": sample.id,
@@ -317,10 +331,11 @@ class Runner:
                     "progress": _progress_summary(next_transcript),
                 }
                 if next_transcript.usage:
-                    payload["cost"] = estimate_cost(
-                        next_transcript.usage,
+                    payload["cost"] = estimate_rollout_cost(
+                        usage=next_transcript.usage,
+                        turns=next_transcript.turns,
                         model_id=spec.model_id,
-                        cache_ttl=PROMPT_CACHE_TTL,
+                        cache_ttl=cache_ttl,
                     )
                 payload["reference"] = existing.get("reference", sample.reference)
                 payload["transcript"] = _transcript_to_dict(next_transcript)
@@ -333,7 +348,7 @@ class Runner:
                 payload_for=payload_for,
                 run_id=self.run_id,
                 model_id=spec.model_id,
-                cache_ttl=PROMPT_CACHE_TTL,
+                cache_ttl=cache_ttl,
                 live_path=self.results_dir / "live.jsonl",
             )
             try:

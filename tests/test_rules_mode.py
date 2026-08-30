@@ -49,6 +49,12 @@ def test_inline_allows_sonnet_5():
     bench.validate_model(spec)
 
 
+def test_inline_allows_grok_46():
+    bench = MTGBenchmark(rules_mode="inline")
+    spec = parse_model_name("grok-4.6-high")
+    bench.validate_model(spec)
+
+
 def test_prompt_cache_is_one_hour():
     assert _cache_control() == {"type": "ephemeral", "ttl": "1h"}
 

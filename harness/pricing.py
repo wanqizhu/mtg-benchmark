@@ -6,6 +6,7 @@ from typing import Any
 # Anthropic API list prices (USD per million tokens).
 # Source: https://platform.claude.com/docs/en/about-claude/pricing
 PRICING_SOURCE = "https://platform.claude.com/docs/en/about-claude/pricing"
+XAI_PRICING_SOURCE = "https://docs.x.ai/developers/pricing"
 
 
 @dataclass(frozen=True)
@@ -15,6 +16,9 @@ class ModelPricing:
     cache_read_per_mtok: float
     cache_write_5m_per_mtok: float
     cache_write_1h_per_mtok: float
+    long_context_threshold: int | None = None
+    long_context_multiplier: float = 1.0
+    pricing_source: str = PRICING_SOURCE
 
 
 MODEL_PRICING: dict[str, ModelPricing] = {
@@ -27,6 +31,28 @@ MODEL_PRICING: dict[str, ModelPricing] = {
     "claude-sonnet-4-6": ModelPricing(3, 15, 0.3, 3.75, 6),
     "claude-sonnet-4-5-20250929": ModelPricing(3, 15, 0.3, 3.75, 6),
     "claude-haiku-4-5-20251001": ModelPricing(1, 5, 0.1, 1.25, 2),
+    # Cached input is billed at cache_read; xAI has no separate cache-write fee.
+    # Rates double when a request's prompt (including cached tokens) is >= 200k.
+    "grok-4.6": ModelPricing(
+        2,
+        6,
+        0.5,
+        0,
+        0,
+        long_context_threshold=200_000,
+        long_context_multiplier=2.0,
+        pricing_source=XAI_PRICING_SOURCE,
+    ),
+    "grok-4.5": ModelPricing(
+        2,
+        6,
+        0.3,
+        0,
+        0,
+        long_context_threshold=200_000,
+        long_context_multiplier=2.0,
+        pricing_source=XAI_PRICING_SOURCE,
+    ),
 }
 
 
@@ -41,29 +67,49 @@ def get_model_pricing(model_id: str) -> ModelPricing:
     return pricing
 
 
+def prompt_token_count(usage: dict[str, Any] | None) -> int:
+    """Uncached + cached input tokens for one request."""
+    if not usage:
+        return 0
+    if usage.get("prompt_tokens"):
+        return int(usage["prompt_tokens"])
+    return (
+        int(usage.get("input_tokens") or 0)
+        + int(usage.get("cache_read_input_tokens") or 0)
+        + int(usage.get("cache_creation_input_tokens") or 0)
+    )
+
+
 def estimate_cost(
     usage: dict[str, int],
     *,
     model_id: str,
     cache_ttl: str = "1h",
 ) -> dict[str, Any]:
-    """Estimate USD cost from Anthropic usage fields."""
+    """Estimate USD cost from normalized usage fields (Anthropic-shaped)."""
     if not usage:
         return {"usd": 0.0, "breakdown_usd": {}}
 
     pricing = get_model_pricing(model_id)
-    cache_write_rate = (
-        pricing.cache_write_1h_per_mtok if cache_ttl == "1h" else pricing.cache_write_5m_per_mtok
-    )
+    multiplier = 1.0
+    if pricing.long_context_threshold and prompt_token_count(usage) >= pricing.long_context_threshold:
+        multiplier = pricing.long_context_multiplier
+    if cache_ttl == "1h":
+        cache_write_rate = pricing.cache_write_1h_per_mtok
+    elif cache_ttl in {"5m", "auto"}:
+        cache_write_rate = pricing.cache_write_5m_per_mtok
+    else:
+        cache_write_rate = pricing.cache_write_5m_per_mtok
+    cache_write_rate *= multiplier
 
     breakdown = {
-        "input": _mtok_cost(usage.get("input_tokens", 0), pricing.input_per_mtok),
-        "output": _mtok_cost(usage.get("output_tokens", 0), pricing.output_per_mtok),
+        "input": _mtok_cost(usage.get("input_tokens", 0), pricing.input_per_mtok * multiplier),
+        "output": _mtok_cost(usage.get("output_tokens", 0), pricing.output_per_mtok * multiplier),
         "cache_creation": _mtok_cost(
             usage.get("cache_creation_input_tokens", 0), cache_write_rate
         ),
         "cache_read": _mtok_cost(
-            usage.get("cache_read_input_tokens", 0), pricing.cache_read_per_mtok
+            usage.get("cache_read_input_tokens", 0), pricing.cache_read_per_mtok * multiplier
         ),
     }
     total = sum(breakdown.values())
@@ -72,7 +118,47 @@ def estimate_cost(
         "breakdown_usd": {key: round(value, 6) for key, value in breakdown.items()},
         "model_id": model_id,
         "cache_ttl": cache_ttl if usage.get("cache_creation_input_tokens") else None,
-        "pricing_source": PRICING_SOURCE,
+        "pricing_source": pricing.pricing_source,
+        "long_context": multiplier > 1,
+    }
+
+
+def estimate_rollout_cost(
+    *,
+    usage: dict[str, Any] | None,
+    turns: list[dict[str, Any]] | None = None,
+    model_id: str,
+    cache_ttl: str = "1h",
+) -> dict[str, Any]:
+    """Sum per-turn cost when turn usage exists (needed for grok long-context tiers)."""
+    turn_usages = [
+        turn["usage"]
+        for turn in turns or []
+        if isinstance(turn, dict)
+        and turn.get("role") == "assistant"
+        and isinstance(turn.get("usage"), dict)
+        and turn["usage"]
+    ]
+    if len(turn_usages) <= 1:
+        return estimate_cost(usage or {}, model_id=model_id, cache_ttl=cache_ttl)
+
+    breakdown = {"input": 0.0, "output": 0.0, "cache_creation": 0.0, "cache_read": 0.0}
+    total = 0.0
+    last: dict[str, Any] = {}
+    long_context = False
+    for turn_usage in turn_usages:
+        last = estimate_cost(turn_usage, model_id=model_id, cache_ttl=cache_ttl)
+        total += float(last["usd"])
+        long_context = long_context or bool(last.get("long_context"))
+        for key, value in last.get("breakdown_usd", {}).items():
+            breakdown[key] = breakdown.get(key, 0.0) + float(value)
+    return {
+        "usd": round(total, 6),
+        "breakdown_usd": {key: round(value, 6) for key, value in breakdown.items()},
+        "model_id": model_id,
+        "cache_ttl": last.get("cache_ttl"),
+        "pricing_source": last.get("pricing_source", PRICING_SOURCE),
+        "long_context": long_context,
     }
 
 
@@ -129,7 +215,11 @@ def reclassify_tools_result_cache_as_input(payload: dict[str, Any]) -> int:
             reclassify_cache_as_input(turn["usage"])
     model_id = payload.get("model_id")
     if moved and isinstance(usage, dict) and model_id:
-        payload["cost"] = estimate_cost(usage, model_id=model_id)
+        payload["cost"] = estimate_rollout_cost(
+            usage=usage,
+            turns=transcript.get("turns"),
+            model_id=model_id,
+        )
     return moved
 
 

@@ -108,7 +108,10 @@ def main() -> None:
         p.add_argument("--benchmark", default="mtg")
         p.add_argument("--run-id", required=True)
         p.add_argument("--results-dir", default=str(RESULTS_DIR))
-        p.add_argument("--models", help="Comma-separated model names, e.g. claude-sonnet-4-6-thinking-high")
+        p.add_argument(
+            "--models",
+            help="Comma-separated model names, e.g. claude-sonnet-4-6-thinking-high or grok-4.6-high",
+        )
         p.add_argument("--samples", help="Comma-separated sample ids, e.g. 001,002")
         p.add_argument("--force", action="store_true")
         p.add_argument(

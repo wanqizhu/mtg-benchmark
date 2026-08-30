@@ -24,6 +24,7 @@ def get_api_key(provider: str) -> str:
         "anthropic": "ANTHROPIC_API_KEY",
         "openai": "OPENAI_API_KEY",
         "gemini": "GEMINI_API_KEY",
+        "xai": "XAI_API_KEY",
     }
     env_name = env_map.get(provider)
     if not env_name:

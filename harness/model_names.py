@@ -5,6 +5,7 @@ from dataclasses import dataclass
 
 FAMILIES = frozenset({"haiku", "sonnet", "opus", "fable"})
 EFFORT_LEVELS = frozenset({"low", "medium", "high", "xhigh", "max"})
+GROK_EFFORT_LEVELS = frozenset({"low", "medium", "high", "xhigh"})
 
 # (family, version) -> Anthropic API model id
 API_MODEL_IDS: dict[tuple[str, str], str] = {
@@ -62,6 +63,16 @@ MODEL_MAX_OUTPUT_TOKENS: dict[str, int] = {
 }
 FALLBACK_MAX_OUTPUT_TOKENS = 64_000
 
+# (version) -> xAI API model id. Friendly names use grok-{version}[-{effort}].
+GROK_API_MODEL_IDS: dict[str, str] = {
+    "4.6": "grok-4.6",
+    "4.5": "grok-4.5",
+}
+
+# Grok has no documented output cap; keep a large safety limit.
+GROK_MAX_OUTPUT_TOKENS = 128_000
+GROK_DEFAULT_EFFORT = "high"
+
 
 @dataclass(frozen=True)
 class ModelSpec:
@@ -89,10 +100,59 @@ def _max_output_tokens(model_id: str) -> int:
     return MODEL_MAX_OUTPUT_TOKENS.get(model_id, FALLBACK_MAX_OUTPUT_TOKENS)
 
 
+def _parse_grok_model_name(name: str) -> ModelSpec:
+    """Parse grok-{version}[-{effort}] into API settings.
+
+    Version may be dotted (`4.6`) or hyphenated (`4-6`). Grok always reasons;
+    `-thinking` is accepted and ignored. Effort defaults to high.
+    """
+    parts = name.split("-")
+    if len(parts) < 2 or parts[0] != "grok":
+        raise ValueError(f"Invalid model name: {name!r}")
+
+    rest = parts[1:]
+    effort: str | None = None
+    while rest:
+        token = rest[-1]
+        if token in GROK_EFFORT_LEVELS:
+            effort = token
+            rest = rest[:-1]
+        elif token == "thinking":
+            rest = rest[:-1]
+        elif token == "max":
+            raise ValueError(f"Model {name!r} does not support effort 'max'")
+        else:
+            break
+    if not rest:
+        raise ValueError(f"Missing version in model name: {name!r}")
+
+    version_raw = "-".join(rest)
+    if re.fullmatch(r"\d+-\d+", version_raw):
+        version = version_raw.replace("-", ".", 1)
+    else:
+        version = version_raw
+    model_id = GROK_API_MODEL_IDS.get(version, f"grok-{version}")
+    effort = effort or GROK_DEFAULT_EFFORT
+    return ModelSpec(
+        name=name,
+        provider="xai",
+        model_id=model_id,
+        thinking=None,
+        output_config={"effort": effort},
+        max_tokens=GROK_MAX_OUTPUT_TOKENS,
+    )
+
+
 def parse_model_name(name: str) -> ModelSpec:
-    """Parse claude-{family}-{version}[-thinking][-{effort}] into API settings."""
+    """Parse a friendly model name into API settings.
+
+    Claude: claude-{family}-{version}[-thinking][-{effort}]
+    Grok: grok-{version}[-thinking][-{effort}]
+    """
+    if name.startswith("grok-"):
+        return _parse_grok_model_name(name)
     if not name.startswith("claude-"):
-        raise ValueError(f"Model name must start with 'claude-': {name!r}")
+        raise ValueError(f"Model name must start with 'claude-' or 'grok-': {name!r}")
 
     parts = name.split("-")
     if len(parts) < 3 or parts[0] != "claude":
