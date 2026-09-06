@@ -5,7 +5,6 @@ from datetime import datetime, timezone
 from typing import Any
 
 import anthropic
-import httpx
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 from harness.config import get_api_key
@@ -14,7 +13,7 @@ from harness.model_names import ModelSpec
 from harness.progress import RolloutProgress, snapshot_output_size
 from harness.prompt_log import log_tools
 
-STREAM_STALL_TIMEOUT_SECONDS = 300
+STREAM_STALL_TIMEOUT_SECONDS = 600
 PREWARM_MAX_TOKENS = 32
 PREWARM_USER_MESSAGE = "Prewarm the cached prompt prefix. Reply OK."
 
@@ -178,10 +177,12 @@ class AnthropicProvider:
     provider_name = "anthropic"
 
     def __init__(self, api_key: str | None = None) -> None:
-        timeout = httpx.Timeout(connect=10.0, read=STREAM_STALL_TIMEOUT_SECONDS, write=30.0, pool=10.0)
+        # anthropic 1.x talks HTTP via httpx2. Passing an httpx 0.x Timeout
+        # object makes socket.settimeout() raise TypeError ("Timeout object
+        # cannot be interpreted as an integer"), wrapped as APIConnectionError.
         self._client = anthropic.Anthropic(
             api_key=api_key or get_api_key("anthropic"),
-            timeout=timeout,
+            timeout=float(STREAM_STALL_TIMEOUT_SECONDS),
         )
 
     def prewarm_cache(self, *, spec: ModelSpec, system: str) -> dict[str, int]:
@@ -192,6 +193,7 @@ class AnthropicProvider:
     def _create_non_streaming(self, **kwargs: Any) -> Any:
         return self._client.messages.create(**kwargs)
 
+    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=2, max=30))
     def _create(
         self,
         *,

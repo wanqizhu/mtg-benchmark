@@ -7,6 +7,7 @@ from typing import Any
 # Source: https://platform.claude.com/docs/en/about-claude/pricing
 PRICING_SOURCE = "https://platform.claude.com/docs/en/about-claude/pricing"
 XAI_PRICING_SOURCE = "https://docs.x.ai/developers/pricing"
+OPENAI_PRICING_SOURCE = "https://developers.openai.com/api/docs/models/gpt-5.6-sol"
 
 
 @dataclass(frozen=True)
@@ -18,10 +19,12 @@ class ModelPricing:
     cache_write_1h_per_mtok: float
     long_context_threshold: int | None = None
     long_context_multiplier: float = 1.0
+    long_context_output_multiplier: float | None = None
     pricing_source: str = PRICING_SOURCE
 
 
 MODEL_PRICING: dict[str, ModelPricing] = {
+    "claude-fable-5-1": ModelPricing(10, 50, 0.25, 12.5, 20),
     "claude-fable-5": ModelPricing(10, 50, 1, 12.5, 20),
     "claude-opus-4-8": ModelPricing(5, 25, 0.5, 6.25, 10),
     "claude-opus-4-7": ModelPricing(5, 25, 0.5, 6.25, 10),
@@ -31,6 +34,31 @@ MODEL_PRICING: dict[str, ModelPricing] = {
     "claude-sonnet-4-6": ModelPricing(3, 15, 0.3, 3.75, 6),
     "claude-sonnet-4-5-20250929": ModelPricing(3, 15, 0.3, 3.75, 6),
     "claude-haiku-4-5-20251001": ModelPricing(1, 5, 0.1, 1.25, 2),
+    # OpenAI output_tokens includes reasoning_tokens. Cache writes are billed
+    # at 1.25x input. Above 272K prompt tokens, input/cache rates double while
+    # output is 1.5x for the entire request.
+    "gpt-5.6-sol": ModelPricing(
+        4,
+        20,
+        0.4,
+        5,
+        5,
+        long_context_threshold=272_001,
+        long_context_multiplier=2.0,
+        long_context_output_multiplier=1.5,
+        pricing_source=OPENAI_PRICING_SOURCE,
+    ),
+    "gpt-6-astra": ModelPricing(
+        10,
+        50,
+        1,
+        12.5,
+        12.5,
+        long_context_threshold=272_001,
+        long_context_multiplier=2.0,
+        long_context_output_multiplier=1.5,
+        pricing_source="https://developers.openai.com/api/docs/models/gpt-6-astra",
+    ),
     # Cached input is billed at cache_read; xAI has no separate cache-write fee.
     # Rates double when a request's prompt (including cached tokens) is >= 200k.
     "grok-4.6": ModelPricing(
@@ -94,6 +122,11 @@ def estimate_cost(
     multiplier = 1.0
     if pricing.long_context_threshold and prompt_token_count(usage) >= pricing.long_context_threshold:
         multiplier = pricing.long_context_multiplier
+    output_multiplier = (
+        pricing.long_context_output_multiplier
+        if multiplier > 1 and pricing.long_context_output_multiplier is not None
+        else multiplier
+    )
     if cache_ttl == "1h":
         cache_write_rate = pricing.cache_write_1h_per_mtok
     elif cache_ttl in {"5m", "auto"}:
@@ -104,7 +137,10 @@ def estimate_cost(
 
     breakdown = {
         "input": _mtok_cost(usage.get("input_tokens", 0), pricing.input_per_mtok * multiplier),
-        "output": _mtok_cost(usage.get("output_tokens", 0), pricing.output_per_mtok * multiplier),
+        "output": _mtok_cost(
+            usage.get("output_tokens", 0),
+            pricing.output_per_mtok * output_multiplier,
+        ),
         "cache_creation": _mtok_cost(
             usage.get("cache_creation_input_tokens", 0), cache_write_rate
         ),

@@ -17,6 +17,28 @@ def test_parse_thinking_and_effort():
     assert spec.max_tokens == 128_000
 
 
+def test_parse_fable_5_1_thinking_high():
+    spec = parse_model_name("claude-fable-5-1-thinking-high")
+    assert spec.model_id == "claude-fable-5-1"
+    assert spec.thinking == {"type": "adaptive", "display": "summarized"}
+    assert spec.output_config == {"effort": "high"}
+    assert spec.max_tokens == 128_000
+
+
+def test_parse_fable_5_1_dotted_version():
+    spec = parse_model_name("claude-fable-5.1-thinking-high")
+    assert spec.model_id == "claude-fable-5-1"
+    assert spec.thinking == {"type": "adaptive", "display": "summarized"}
+    assert spec.max_tokens == 128_000
+
+
+def test_parse_fable_5_still_maps_without_point_release():
+    spec = parse_model_name("claude-fable-5-thinking-high")
+    assert spec.model_id == "claude-fable-5"
+    assert spec.thinking == {"type": "adaptive", "display": "summarized"}
+    assert spec.output_config == {"effort": "high"}
+
+
 def test_parse_sonnet_5_thinking_high():
     spec = parse_model_name("claude-sonnet-5-thinking-high")
     assert spec.model_id == "claude-sonnet-5"
@@ -76,3 +98,28 @@ def test_parse_grok_rejects_max_effort():
     except ValueError:
         raised = True
     assert raised
+
+
+def test_parse_gpt_5_6_sol_thinking_high():
+    spec = parse_model_name("gpt-5.6-sol-thinking-high")
+    assert spec.provider == "openai"
+    assert spec.model_id == "gpt-5.6-sol"
+    assert spec.thinking == {"summary": "auto", "context": "all_turns"}
+    assert spec.output_config == {"effort": "high"}
+    assert spec.max_tokens == 128_000
+
+
+def test_parse_gpt_defaults_to_medium_without_summary():
+    spec = parse_model_name("gpt-5.6-sol")
+    assert spec.provider == "openai"
+    assert spec.thinking is None
+    assert spec.output_config == {"effort": "medium"}
+
+
+def test_parse_gpt_6_astra_thinking_high():
+    spec = parse_model_name("gpt-6-astra-thinking-high")
+    assert spec.provider == "openai"
+    assert spec.model_id == "gpt-6-astra"
+    assert spec.thinking == {"summary": "auto", "context": "all_turns"}
+    assert spec.output_config == {"effort": "high"}
+    assert spec.max_tokens == 128_000

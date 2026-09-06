@@ -47,6 +47,19 @@ def test_sonnet_5_pricing():
     assert cost["breakdown_usd"]["output"] == 10.0
 
 
+def test_fable_5_1_cache_read_is_quarter_of_fable_5():
+    usage = {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 1_000_000,
+    }
+    fable_51 = estimate_cost(usage, model_id="claude-fable-5-1", cache_ttl="1h")
+    fable_5 = estimate_cost(usage, model_id="claude-fable-5", cache_ttl="1h")
+    assert fable_51["breakdown_usd"]["cache_read"] == 0.25
+    assert fable_5["breakdown_usd"]["cache_read"] == 1.0
+
+
 def test_empty_usage_is_zero():
     assert estimate_cost({}, model_id="claude-sonnet-4-6")["usd"] == 0.0
 
@@ -206,3 +219,47 @@ def test_grok_rollout_cost_applies_long_context_per_turn():
     assert cost["long_context"] is True
     assert cost["usd"] == 0.241
     assert cost["breakdown_usd"]["cache_read"] == 0.199
+
+
+def test_gpt_5_6_sol_pricing_includes_cached_input():
+    usage = {
+        "input_tokens": 100_000,
+        "output_tokens": 20_000,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 50_000,
+    }
+    cost = estimate_cost(usage, model_id="gpt-5.6-sol", cache_ttl="auto")
+    assert cost["breakdown_usd"]["input"] == 0.4
+    assert cost["breakdown_usd"]["cache_read"] == 0.02
+    assert cost["breakdown_usd"]["output"] == 0.4
+    assert cost["usd"] == 0.82
+
+
+def test_gpt_cache_writes_and_astra_long_context_pricing():
+    short = estimate_cost(
+        {
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "cache_creation_input_tokens": 100_000,
+            "cache_read_input_tokens": 0,
+        },
+        model_id="gpt-6-astra",
+        cache_ttl="auto",
+    )
+    assert short["breakdown_usd"]["cache_creation"] == 1.25
+
+    long = estimate_cost(
+        {
+            "input_tokens": 273_000,
+            "output_tokens": 100_000,
+            "cache_creation_input_tokens": 0,
+            "cache_read_input_tokens": 0,
+            "prompt_tokens": 273_000,
+        },
+        model_id="gpt-6-astra",
+        cache_ttl="auto",
+    )
+    assert long["long_context"] is True
+    assert long["breakdown_usd"]["input"] == 5.46
+    assert long["breakdown_usd"]["output"] == 7.5
+    assert long["usd"] == 12.96

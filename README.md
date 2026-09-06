@@ -21,11 +21,13 @@ Put the puzzles dataset at `datasets/mtg/` (gitignored; never commit it).
 bench run --run-id smoke-001 --models claude-haiku-4-5 --samples 001 --judge
 ```
 
-Claude names use `claude-{haiku|sonnet|opus|fable}-{version}[-thinking][-{low|medium|high|xhigh|max}]`. Grok names use `grok-{version}[-{low|medium|high|xhigh}]` (always reasons; default effort is high):
+Claude names use `claude-{haiku|sonnet|opus|fable}-{version}[-thinking][-{low|medium|high|xhigh|max}]`. OpenAI names use `gpt-{version}[-{tier}][-thinking][-{none|low|medium|high|xhigh|max}]`. Grok names use `grok-{version}[-{low|medium|high|xhigh}]` (always reasons; default effort is high):
 
 - `claude-haiku-4-5`
 - `claude-sonnet-4-6-thinking-medium`
 - `claude-opus-4-8-thinking-xhigh`
+- `claude-fable-5-1-thinking-high`
+- `gpt-5.6-sol-thinking-high`
 - `grok-4.6-high`
 
 Results are written under `results/<run-id>/`.

@@ -6,6 +6,7 @@ from dataclasses import dataclass
 FAMILIES = frozenset({"haiku", "sonnet", "opus", "fable"})
 EFFORT_LEVELS = frozenset({"low", "medium", "high", "xhigh", "max"})
 GROK_EFFORT_LEVELS = frozenset({"low", "medium", "high", "xhigh"})
+OPENAI_EFFORT_LEVELS = frozenset({"none", "low", "medium", "high", "xhigh", "max"})
 
 # (family, version) -> Anthropic API model id
 API_MODEL_IDS: dict[tuple[str, str], str] = {
@@ -18,11 +19,13 @@ API_MODEL_IDS: dict[tuple[str, str], str] = {
     ("opus", "4-6"): "claude-opus-4-6",
     ("opus", "4-5"): "claude-opus-4-5-20251101",
     ("fable", "5"): "claude-fable-5",
+    ("fable", "5-1"): "claude-fable-5-1",
 }
 
 # Models that use adaptive thinking when -thinking is set.
 ADAPTIVE_THINKING_MODELS = frozenset(
     {
+        "claude-fable-5-1",
         "claude-fable-5",
         "claude-sonnet-5",
         "claude-sonnet-4-6",
@@ -35,6 +38,7 @@ ADAPTIVE_THINKING_MODELS = frozenset(
 # Models that support output_config.effort.
 EFFORT_MODELS = frozenset(
     {
+        "claude-fable-5-1",
         "claude-fable-5",
         "claude-sonnet-5",
         "claude-sonnet-4-6",
@@ -51,6 +55,7 @@ DEFAULT_THINKING_BUDGET = 10_000
 # Synchronous Messages API max output tokens per model.
 # https://platform.claude.com/docs/en/about-claude/models/overview
 MODEL_MAX_OUTPUT_TOKENS: dict[str, int] = {
+    "claude-fable-5-1": 128_000,
     "claude-fable-5": 128_000,
     "claude-sonnet-5": 128_000,
     "claude-sonnet-4-6": 128_000,
@@ -73,6 +78,11 @@ GROK_API_MODEL_IDS: dict[str, str] = {
 GROK_MAX_OUTPUT_TOKENS = 128_000
 GROK_DEFAULT_EFFORT = "high"
 
+# OpenAI Responses API friendly names use
+# gpt-{version}[-{tier}][-thinking][-{effort}].
+OPENAI_MAX_OUTPUT_TOKENS = 128_000
+OPENAI_DEFAULT_EFFORT = "medium"
+
 
 @dataclass(frozen=True)
 class ModelSpec:
@@ -84,7 +94,14 @@ class ModelSpec:
     max_tokens: int = FALLBACK_MAX_OUTPUT_TOKENS
 
 
+def _normalize_claude_version(version: str) -> str:
+    if re.fullmatch(r"\d+\.\d+", version):
+        return version.replace(".", "-", 1)
+    return version
+
+
 def _resolve_api_id(family: str, version: str) -> str:
+    version = _normalize_claude_version(version)
     return API_MODEL_IDS.get((family, version), f"claude-{family}-{version}")
 
 
@@ -143,16 +160,56 @@ def _parse_grok_model_name(name: str) -> ModelSpec:
     )
 
 
+def _parse_openai_model_name(name: str) -> ModelSpec:
+    """Parse GPT Responses API model names and reasoning settings."""
+    parts = name.split("-")
+    if len(parts) < 2 or parts[0] != "gpt":
+        raise ValueError(f"Invalid model name: {name!r}")
+
+    rest = parts[1:]
+    effort: str | None = None
+    thinking = False
+    while rest:
+        token = rest[-1]
+        if token in OPENAI_EFFORT_LEVELS:
+            effort = token
+            rest = rest[:-1]
+        elif token == "thinking":
+            thinking = True
+            rest = rest[:-1]
+        else:
+            break
+    if not rest:
+        raise ValueError(f"Missing version in model name: {name!r}")
+
+    model_id = f"gpt-{'-'.join(rest)}"
+    return ModelSpec(
+        name=name,
+        provider="openai",
+        model_id=model_id,
+        # OpenAI does not expose raw chain-of-thought. `summary=auto`
+        # requests the most detailed reasoning summary the model supports.
+        thinking={"summary": "auto", "context": "all_turns"} if thinking else None,
+        output_config={"effort": effort or OPENAI_DEFAULT_EFFORT},
+        max_tokens=OPENAI_MAX_OUTPUT_TOKENS,
+    )
+
+
 def parse_model_name(name: str) -> ModelSpec:
     """Parse a friendly model name into API settings.
 
     Claude: claude-{family}-{version}[-thinking][-{effort}]
     Grok: grok-{version}[-thinking][-{effort}]
+    OpenAI: gpt-{version}[-{tier}][-thinking][-{effort}]
     """
     if name.startswith("grok-"):
         return _parse_grok_model_name(name)
+    if name.startswith("gpt-"):
+        return _parse_openai_model_name(name)
     if not name.startswith("claude-"):
-        raise ValueError(f"Model name must start with 'claude-' or 'grok-': {name!r}")
+        raise ValueError(
+            f"Model name must start with 'claude-', 'grok-', or 'gpt-': {name!r}"
+        )
 
     parts = name.split("-")
     if len(parts) < 3 or parts[0] != "claude":

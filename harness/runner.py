@@ -15,6 +15,7 @@ from harness.pricing import estimate_cost, estimate_rollout_cost
 from harness.progress import RolloutProgress
 from harness.providers.anthropic import PROMPT_CACHE_TTL, AnthropicProvider
 from harness.providers.base import Provider
+from harness.providers.openai import CACHE_TTL as OPENAI_CACHE_TTL, OpenAIProvider
 from harness.providers.xai import CACHE_TTL as XAI_CACHE_TTL, XAIProvider
 
 
@@ -86,6 +87,8 @@ def _error_payload(exc: BaseException) -> dict[str, Any]:
 def cache_ttl_for(spec: ModelSpec) -> str:
     if spec.provider == "xai":
         return XAI_CACHE_TTL
+    if spec.provider == "openai":
+        return OPENAI_CACHE_TTL
     return PROMPT_CACHE_TTL
 
 
@@ -94,6 +97,8 @@ def get_provider(spec: ModelSpec) -> Provider:
         return AnthropicProvider()
     if spec.provider == "xai":
         return XAIProvider()
+    if spec.provider == "openai":
+        return OpenAIProvider()
     raise NotImplementedError(f"Provider not implemented: {spec.provider}")
 
 

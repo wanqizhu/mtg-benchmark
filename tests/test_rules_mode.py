@@ -49,6 +49,12 @@ def test_inline_allows_sonnet_5():
     bench.validate_model(spec)
 
 
+def test_inline_allows_fable_51():
+    bench = MTGBenchmark(rules_mode="inline")
+    spec = parse_model_name("claude-fable-5-1-thinking-high")
+    bench.validate_model(spec)
+
+
 def test_inline_allows_grok_46():
     bench = MTGBenchmark(rules_mode="inline")
     spec = parse_model_name("grok-4.6-high")

@@ -32,7 +32,10 @@ MODEL_CONTEXT_TOKENS: dict[str, int] = {
     "claude-opus-4-7": 1_000_000,
     "claude-opus-4-6": 1_000_000,
     "claude-opus-4-5-20251101": 200_000,
+    "claude-fable-5-1": 1_000_000,
     "claude-fable-5": 1_000_000,
+    "gpt-5.6-sol": 1_050_000,
+    "gpt-6-astra": 1_050_000,
     "grok-4.6": 500_000,
     "grok-4.5": 500_000,
 }
@@ -61,7 +64,8 @@ class MTGBenchmark:
                 f"rules_mode=inline requires a model with at least "
                 f"{INLINE_MIN_CONTEXT_TOKENS:,} tokens of context; "
                 f"{spec.name} ({spec.model_id}) has {context:,}. "
-                f"Use Sonnet 5 / 4.6+, Opus 4.6+, Fable 5, or Grok 4.5+."
+                f"Use Sonnet 5 / 4.6+, Opus 4.6+, Fable 5.1 / 5, "
+                f"GPT-5.6 Sol, or Grok 4.5+."
             )
 
     def samples(self) -> list[Sample]:
