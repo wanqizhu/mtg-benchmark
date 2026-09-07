@@ -209,9 +209,9 @@ def infer_cache_ttl(payload: dict[str, Any], *, result_path: str | None = None) 
     if rules_mode == "tools":
         return "5m"
 
-    if result_path and "inline-rules" in result_path:
+    if result_path and ("full-rules-in-context" in result_path or "inline-rules" in result_path):
         return "1h"
-    if result_path and "tools-rules" in result_path:
+    if result_path and ("grep-rules" in result_path or "tools-rules" in result_path):
         return "5m"
     return "5m"
 

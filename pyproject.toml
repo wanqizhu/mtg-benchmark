@@ -3,7 +3,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "mtg-ai"
+name = "mtg-benchmark"
 version = "0.1.0"
 description = "LLM benchmark harness for MTG puzzles"
 readme = "README.md"
@@ -22,3 +22,6 @@ bench = "harness.cli:main"
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["harness*", "benchmarks*"]
+
+[tool.setuptools.package-data]
+harness = ["site_static/*"]

@@ -6,7 +6,7 @@ from pathlib import Path
 
 from harness.config import DEFAULT_JUDGE_MODEL, DEFAULT_MAX_TURNS, RESULTS_DIR
 from harness.report import print_report
-from harness.site import write_multi_run_site, write_site
+from harness.site import expand_problem_ids, write_multi_run_site, write_site
 from harness.watch import DEFAULT_WATCH_WINDOW_S
 
 
@@ -45,15 +45,19 @@ async def _async_main(args: argparse.Namespace) -> None:
     if args.command == "site":
         output_dir = Path(args.output_dir) if args.output_dir else None
         dataset_dir = Path(args.dataset_dir) if args.dataset_dir else None
+        problem_ids = expand_problem_ids(args.problems)
+        detail_ids = expand_problem_ids(args.detail_problems)
+        kwargs = {
+            "output_dir": output_dir,
+            "dataset_root": dataset_dir,
+            "problem_ids": problem_ids,
+            "detail_ids": detail_ids,
+        }
         if args.run_id:
             run_dir = Path(args.results_dir) / args.run_id
-            site_dir = write_site(run_dir, output_dir=output_dir, dataset_root=dataset_dir)
+            site_dir = write_site(run_dir, **kwargs)
         else:
-            site_dir = write_multi_run_site(
-                Path(args.results_dir),
-                output_dir=output_dir,
-                dataset_root=dataset_dir,
-            )
+            site_dir = write_multi_run_site(Path(args.results_dir), **kwargs)
         print(f"Wrote eval site to {site_dir}")
         return
 
@@ -164,6 +168,14 @@ def main() -> None:
     site_parser.add_argument(
         "--dataset-dir",
         help="Dataset directory for problem images; defaults to datasets/mtg or MTG_DATASET_DIR",
+    )
+    site_parser.add_argument(
+        "--problems",
+        help="Problem ids to include on the leaderboard, comma-separated or ranges, e.g. 1-39,050 (default: all transcribed problems)",
+    )
+    site_parser.add_argument(
+        "--detail-problems",
+        help="Problem ids that publish images, gold text, solutions, and attempt pages, e.g. 1-20 (default: all included problems)",
     )
 
     watch_parser = subparsers.add_parser("watch", help="Live dashboard for all eval runs")

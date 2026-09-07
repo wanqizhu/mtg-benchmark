@@ -68,6 +68,8 @@ def test_infer_cache_ttl_from_rules_mode():
     assert infer_cache_ttl({"rules_mode": "inline"}) == "1h"
     assert infer_cache_ttl({"rules_mode": "tools"}) == "5m"
     assert infer_cache_ttl({}, result_path="results/inline-rules/foo.json") == "1h"
+    assert infer_cache_ttl({}, result_path="results/full-rules-in-context/foo.json") == "1h"
+    assert infer_cache_ttl({}, result_path="results/grep-rules/foo.json") == "5m"
 
 
 def test_reclassify_cache_as_input():

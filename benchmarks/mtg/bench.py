@@ -4,7 +4,7 @@ from typing import Literal
 
 from harness.config import DEFAULT_JUDGE_MODEL, get_model
 from harness.core import Sample, Transcript, Verdict
-from harness.judge import AnthropicJudge
+from harness.judge import Judge, make_judge
 from harness.model_names import ModelSpec
 from harness.tools import FileTools
 
@@ -53,7 +53,7 @@ class MTGBenchmark:
         self._clarifications = clarifications_path().read_text(encoding="utf-8")
         self._rules_text = load_rules_text() if rules_mode == "inline" else ""
         self._file_tools = FileTools([self._rules_path])
-        self._judge = AnthropicJudge(get_model(self.judge_model))
+        self._judge: Judge | None = None
 
     def validate_model(self, spec: ModelSpec) -> None:
         if self.rules_mode != "inline":
@@ -97,6 +97,11 @@ class MTGBenchmark:
             )
         return samples
 
+    def _get_judge(self) -> Judge:
+        if self._judge is None:
+            self._judge = make_judge(get_model(self.judge_model))
+        return self._judge
+
     def judge(self, sample: Sample, transcript: Transcript) -> Verdict:
         model_answer = extract_model_answer(transcript)
         if not model_answer:
@@ -111,7 +116,7 @@ class MTGBenchmark:
             model_answer=model_answer,
             official_solution=sample.reference.get("solution_text", ""),
         )
-        response_text, usage = self._judge.judge(
+        response_text, usage = self._get_judge().judge(
             system=JUDGE_SYSTEM,
             user=user_prompt,
         )

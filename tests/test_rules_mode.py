@@ -112,7 +112,7 @@ def test_tools_does_not_cache_system_prompt():
     assert _system_blocks("inline rules", cache=True)[0]["cache_control"]["ttl"] == "1h"
 
 
-def test_default_judge_model_is_sonnet():
+def test_default_judge_model_is_sol():
     from harness.config import DEFAULT_JUDGE_MODEL
 
-    assert DEFAULT_JUDGE_MODEL.startswith("claude-sonnet-5")
+    assert DEFAULT_JUDGE_MODEL == "gpt-5.6-sol-thinking-high"

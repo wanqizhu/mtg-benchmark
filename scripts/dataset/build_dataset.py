@@ -5,6 +5,10 @@ Puzzle images and catalog come from the public WordPress API.
 Solution text is behind Patreon; gallery-dl reads your existing browser session
 (--cookies-from-browser) rather than a username/password.
 
+Difficulty in metadata.json is copied from the WordPress category. Those categories
+are often leftover from the previous post — after each pull, read DIFFICULTY on the
+new puzzle.jpg footer and correct metadata.json before transcribing.
+
 Requires: curl, gallery-dl, and a logged-in Patreon session in the chosen browser.
 """
 
@@ -123,8 +127,18 @@ def parse_post_links(content_html: str) -> tuple[str | None, str | None]:
             content_html,
             re.I,
         )
-    pat_match = re.search(r'href="(https://www\.patreon\.com/posts/[^"]+)"', content_html, re.I)
+    pat_match = re.search(
+        r'href="(https://www\.patreon\.com/(?:c/)?(?:[\w.-]+/)?posts/[^"]+)"',
+        content_html,
+        re.I,
+    )
     solution_url = pat_match.group(1).rstrip("/") if pat_match else None
+    if solution_url:
+        # gallery-dl's post extractor accepts /posts/<id>; creator-scoped
+        # /mtgpuzzles/posts/<id> links are equivalent.
+        m = re.search(r"/posts/(\d+)", solution_url)
+        if m:
+            solution_url = f"https://www.patreon.com/posts/{m.group(1)}"
     image_url = img_match.group(1) if img_match else None
     if image_url:
         image_url = re.sub(r"\?w=\d+.*", "", image_url)
@@ -141,8 +155,33 @@ def parse_puzzle_number(title: str) -> str | None:
     return num.rstrip("0").rstrip(".") if "." in num else num
 
 
+def season_from_title(title: str) -> str | None:
+    """Prefer the set name in the title; WP tags are often leftover from the previous post.
+
+    Examples: '302: Marvel Super Heroes #1' -> 'Marvel Super Heroes'
+              '306: The Hobbit #1' -> 'The Hobbit'
+    """
+    m = re.match(r"\s*\d+(?:\.\d+)?\s*[:.]\s*(.+?)\s+#\s*\d+\s*$", title.strip())
+    if m:
+        return m.group(1).strip() or None
+    return None
+
+
 def folder_name_for(puzzle_id: str) -> str:
     return puzzle_id.replace(".", "_")
+
+
+def public_page_url(post: dict) -> str | None:
+    link = str(post.get("link") or "").strip()
+    return link or None
+
+
+def persist_source_url(meta_path: Path, meta: dict, post: dict) -> None:
+    url = public_page_url(post)
+    if not url or meta.get("source_url") == url:
+        return
+    meta["source_url"] = url
+    meta_path.write_text(json.dumps(meta, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
 def image_extension(url: str) -> str:
@@ -226,11 +265,19 @@ def build_dataset(*, out_root: Path, browser: str) -> dict:
         "missing_solution": 0,
         "missing_patreon": 0,
     }
+    # WP categories are often stale; remind after writing new metadata.
+    check_difficulty: list[str] = []
 
     for post in sorted(posts, key=lambda p: float(parse_puzzle_number(p["title"]["rendered"]) or 0)):
         title = html.unescape(post["title"]["rendered"])
         puzzle_id = parse_puzzle_number(title)
         if puzzle_id is None:
+            continue
+        # "2017: A Year of Puzzling in Review" matches the number parser.
+        try:
+            if float(puzzle_id.replace("_", ".")) >= 1000:
+                continue
+        except ValueError:
             continue
 
         folder_name = folder_name_for(puzzle_id)
@@ -248,17 +295,20 @@ def build_dataset(*, out_root: Path, browser: str) -> dict:
                 existing_meta = None
 
         if existing_meta and existing_meta.get("solution_text", "").strip():
+            persist_source_url(meta_path, existing_meta, post)
             stats["skipped"] += 1
             print(f"[{folder_name}] {title[:50]}  skip=ok")
             continue
 
         if existing_meta and is_complete(folder) and not solution_url:
+            persist_source_url(meta_path, existing_meta, post)
             stats["skipped"] += 1
             print(f"[{folder_name}] {title[:50]}  skip=ok (no patreon link)")
             continue
 
         difficulty = [categories[cid] for cid in post.get("categories", []) if cid in categories]
-        seasons = [tags[tid] for tid in post.get("tags", []) if tid in tags]
+        title_season = season_from_title(title)
+        seasons = [title_season] if title_season else [tags[tid] for tid in post.get("tags", []) if tid in tags]
         folder.mkdir(parents=True, exist_ok=True)
 
         if existing_meta and any(folder.glob("puzzle.*")):
@@ -274,6 +324,7 @@ def build_dataset(*, out_root: Path, browser: str) -> dict:
 
             meta = {
                 **existing_meta,
+                "source_url": public_page_url(post) or existing_meta.get("source_url"),
                 "solution_url": solution_url or existing_meta.get("solution_url"),
                 "solution_text": solution_text or existing_meta.get("solution_text", ""),
             }
@@ -283,6 +334,8 @@ def build_dataset(*, out_root: Path, browser: str) -> dict:
             continue
 
         if is_complete(folder):
+            if existing_meta:
+                persist_source_url(meta_path, existing_meta, post)
             stats["skipped"] += 1
             print(f"[{folder_name}] {title[:50]}  skip=ok")
             continue
@@ -312,17 +365,24 @@ def build_dataset(*, out_root: Path, browser: str) -> dict:
             stats["missing_patreon"] += 1
             stats["missing_solution"] += 1
 
+        wp_difficulty = difficulty[0] if len(difficulty) == 1 else difficulty
         meta = {
             "puzzle_id": puzzle_id,
-            "difficulty": difficulty[0] if len(difficulty) == 1 else difficulty,
+            "difficulty": wp_difficulty,
             "seasons": seasons,
             "image_url": image_url,
+            "source_url": public_page_url(post),
             "solution_url": solution_url,
             "solution_text": solution_text,
         }
         meta_path.write_text(json.dumps(meta, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
         stats["downloaded"] += 1
-        print(f"[{folder_name}] {title[:50]}  img={'ok' if image_file else 'MISS'}  sol={'ok' if solution_text else 'MISS'}")
+        check_difficulty.append(folder_name)
+        print(
+            f"[{folder_name}] {title[:50]}  img={'ok' if image_file else 'MISS'}  "
+            f"sol={'ok' if solution_text else 'MISS'}  "
+            f"difficulty={wp_difficulty} (WP category — check image footer)"
+        )
 
     index = rebuild_index(out_root)
     manifest = {"puzzle_count": len(index), "stats": stats, "puzzles": index}
@@ -330,7 +390,7 @@ def build_dataset(*, out_root: Path, browser: str) -> dict:
         json.dumps(manifest, indent=2, ensure_ascii=False) + "\n",
         encoding="utf-8",
     )
-    return manifest
+    return {**manifest, "check_difficulty": check_difficulty}
 
 
 def main() -> None:
@@ -349,6 +409,14 @@ def main() -> None:
     args = parser.parse_args()
     manifest = build_dataset(out_root=args.out, browser=args.browser)
     print(json.dumps(manifest["stats"], indent=2))
+    check = manifest.get("check_difficulty") or []
+    if check:
+        print(
+            "\nCheck difficulty on the image footer (WP categories are often leftover "
+            "from the previous post). Fix metadata.json for: "
+            + ", ".join(check)
+            + "\nThen transcribe problem_gold.md: datasets/TRANSCRIBING.md"
+        )
 
 
 if __name__ == "__main__":

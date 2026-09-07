@@ -9,7 +9,7 @@ from harness.model_names import ModelSpec, parse_model_name
 
 load_dotenv()
 
-DEFAULT_JUDGE_MODEL = "claude-sonnet-5-thinking-high"
+DEFAULT_JUDGE_MODEL = "gpt-5.6-sol-thinking-high"
 DEFAULT_MAX_TURNS = 20
 DEFAULT_CONCURRENCY = 4
 RESULTS_DIR = Path("results")

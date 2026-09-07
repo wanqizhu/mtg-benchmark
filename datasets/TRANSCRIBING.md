@@ -199,6 +199,9 @@ Rules:
 ## 7. Workflow
 
 ```bash
+# 0. After a dataset pull: read DIFFICULTY on puzzle.jpg and fix metadata.json.
+#    WordPress categories are often leftover from the previous post.
+
 # 1. Look at the whole image, then crop it to pieces. Never work from the thumbnail alone.
 python scripts/dataset/scaffold_puzzle.py crop 021
 

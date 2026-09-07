@@ -1,4 +1,4 @@
-# mtg-ai
+# mtg-benchmark
 
 LLM benchmark harness for MTG puzzles.
 
@@ -30,12 +30,12 @@ Claude names use `claude-{haiku|sonnet|opus|fable}-{version}[-thinking][-{low|me
 - `gpt-5.6-sol-thinking-high`
 - `grok-4.6-high`
 
-Results are written under `results/<run-id>/`.
+Results are written under `results/<run-id>/`. The two published versions use `--run-id grep-rules` (`--rules-mode tools`) and `--run-id full-rules-in-context` (`--rules-mode inline`).
 
 `--models` is comma-separated and runs those models in one process (same `--rules-mode` / `--run-id`). Tools vs inline are different modes, so they are separate commands. To run several versions at once, start one `bench run` per mode/run-id (or per model if you want isolated logs) and they share `--concurrency` within that process.
 
 ```bash
-bench run --run-id tools-rules --rules-mode tools \
+bench run --run-id grep-rules --rules-mode tools \
   --models claude-sonnet-5-thinking-high,claude-sonnet-5-thinking-low,claude-haiku-4-5-thinking \
   --samples 001,002,003 --concurrency 8 --judge
 ```
@@ -52,19 +52,26 @@ This scans every run under `results/` and tails `results/live.jsonl` for last-mi
 
 ## Eval website
 
-Generate a static website for all runs:
+The published site lives in a sibling repo (`../mtg-benchmark-site` by default). Generate split JSON (no transcripts) plus copied frontend files:
+
+```bash
+bench site --output-dir ../mtg-benchmark-site
+```
+
+Local preview without the public repo:
 
 ```bash
 bench site
-```
-
-The site is written to `results/site/` and includes a version dropdown for each run directory. Open it from a local web server:
-
-```bash
 python -m http.server 8000 --directory results/site
 ```
 
-Then visit `http://localhost:8000`. Re-run `bench site` after adding more model rollouts, judge files, or problems to refresh the leaderboard and detail pages.
+Then visit `http://localhost:8000`. The generator writes `data/manifest.json`, per-run `summary.json` files, per-attempt detail JSON, and `data/problems/{id}.json`. Re-run `bench site` after adding rollouts, judges, or problems.
+
+Include a range of transcribed problems, with full pages only for a subset:
+
+```bash
+bench site --output-dir ../mtg-benchmark-site --problems 1-39 --detail-problems 1-20
+```
 
 To generate a standalone site for one run instead:
 

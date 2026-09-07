@@ -97,6 +97,8 @@ def cmd_crop(args: argparse.Namespace) -> None:
         crop.resize((int(cw * scale), int(ch * scale)), Image.LANCZOS).save(out / f"{name}.png")
 
     save("00-full", (0, 0, w, h), 1.0)
+    # Footer strip: DIFFICULTY / set name. WP metadata is often stale — read this.
+    save("05-footer", (0, int(h * 0.88), w, h), 2.0)
 
     # Possibility Storm layout: opponent row on top, your board in the middle,
     # your hand along the bottom. Bands overlap so nothing falls in a seam.
@@ -119,6 +121,7 @@ def cmd_crop(args: argparse.Namespace) -> None:
     print(f"wrote {len(list(out.glob('*.png')))} crops to {out}")
     print(textwrap.dedent("""
         Now actually look at them. Specifically:
+          - 05-footer: DIFFICULTY on the image; fix metadata.json if WP was stale
           - every permanent: is there a die on it? (counters)
           - every land stack: read the `Nx` badge AND count card edges
           - every creature: is a card tucked behind it? (aura/equipment)
@@ -147,6 +150,7 @@ def cmd_show(args: argparse.Namespace) -> None:
 
     print(textwrap.dedent("""
         === verify (datasets/TRANSCRIBING.md §8) ===
+          The solution is a check, not a source. Do not populate zones from it.
           1. sum every mana cost paid -> must equal your lands, colors included
           2. sum damage dealt -> must equal opponent life exactly
           3. every P/T the solution names -> base + your modifications

@@ -17,6 +17,10 @@ python scripts/dataset/build_dataset.py --browser chrome
 
 `gallery-dl --cookies-from-browser chrome` reads the `session_id` cookie from the local browser profile. `--user-agent browser` sends a real browser UA. Close Chrome if cookie unlock fails.
 
+After a pull, **check difficulty on each new `puzzle.jpg` footer** (`DIFFICULTY: UNCOMMON/RARE/MYTHIC`) and fix `metadata.json` if the WordPress category is leftover from the previous post. Season is taken from the title when it looks like `302: Marvel Super Heroes #1`; otherwise from WP tags, which can also be stale.
+
+Then transcribe `problem_gold.md` from the image (not from the solution). See `datasets/TRANSCRIBING.md`.
+
 The older bulk dump (every Patreon post, not just numbered puzzles) is:
 
 ```bash
