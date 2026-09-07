@@ -85,6 +85,7 @@ function esc(value) {
 
 function inlineMarkdown(text) {
   return esc(text)
+    .replace(/\[([^\]]+)\]\((https?:[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
     .replace(/`([^`]+)`/g, "<code>$1</code>")
     .replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>")
     .replace(/\*([^*]+)\*/g, "<em>$1</em>");
@@ -417,12 +418,18 @@ async function loadDetail(modelName, sampleId) {
   }
 }
 
+function hasMultipleRuns() {
+  return (MANIFEST?.runs || []).length > 1;
+}
+
 function initRunSelector() {
   const selector = document.querySelector("#run-select");
+  const picker = document.querySelector(".run-picker");
   selector.innerHTML = (MANIFEST.runs || [])
     .map((run) => `<option value="${esc(run.run_id)}">${esc(run.label || run.run_id)}</option>`)
     .join("");
-  selector.disabled = (MANIFEST.runs || []).length <= 1;
+  selector.disabled = !hasMultipleRuns();
+  if (picker) picker.hidden = !hasMultipleRuns();
   selector.addEventListener("change", () => navigate({ runId: selector.value }));
 }
 
@@ -451,7 +458,7 @@ async function applyRoute(route = parseHash()) {
   });
   app.classList.toggle("split", view === "problems" || view === "models");
   const picker = document.querySelector(".run-picker");
-  if (picker) picker.hidden = view === "methodology";
+  if (picker) picker.hidden = view === "methodology" || !hasMultipleRuns();
 
   if (view === "methodology") {
     await renderMethodology(seq);
@@ -509,10 +516,134 @@ function showVersionColumn() {
   return DATA.run_id === "all-versions";
 }
 
+function chartLabel(row) {
+  return String(row.original_model || row.name || "")
+    .replace(/-thinking-(high|low)$/, " ($1)")
+    .replace(/-thinking$/, "");
+}
+
+function providerHue(name) {
+  const value = String(name || "").toLowerCase();
+  if (/(claude|fable|haiku|sonnet|opus)/.test(value)) return "anthropic";
+  if (/(gpt|astra|openai)/.test(value)) return "openai";
+  if (value.includes("grok")) return "xai";
+  if (value.includes("gemini")) return "google";
+  return "other";
+}
+
+function niceCeiling(value) {
+  if (!(value > 0)) return 1;
+  const exp = 10 ** Math.floor(Math.log10(value));
+  const n = value / exp;
+  const nice = n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : n <= 8 ? 8 : 10;
+  return nice * exp;
+}
+
+function axisMoney(value) {
+  if (value === 0) return "$0";
+  if (value >= 10) return `$${Math.round(value)}`;
+  if (value >= 1) return `$${Number(value).toFixed(1)}`;
+  return `$${Number(value).toFixed(2)}`;
+}
+
+function renderCostScoreChart(rows) {
+  const points = rows.filter((row) => (row.judged || 0) > 0);
+  if (!points.length) return "";
+
+  const width = 840;
+  const height = 420;
+  const pad = { top: 18, right: 168, bottom: 52, left: 56 };
+  const plotW = width - pad.left - pad.right;
+  const plotH = height - pad.top - pad.bottom;
+  const costMax = niceCeiling(Math.max(...points.map((row) => Number(row.total_cost_usd) || 0), 1));
+  const xTicks = 5;
+  const yTicks = [0, 25, 50, 75, 100];
+
+  const placed = points.map((row) => {
+    const cost = Number(row.total_cost_usd) || 0;
+    const score = (Number(row.pass_rate) || 0) * 100;
+    return {
+      row,
+      x: pad.left + (cost / costMax) * plotW,
+      y: pad.top + (1 - score / 100) * plotH,
+      score,
+      cost,
+      label: chartLabel(row),
+      hue: providerHue(row.original_model || row.name),
+    };
+  });
+  placed.sort((a, b) => a.y - b.y);
+  for (const point of placed) {
+    point.labelY = point.y;
+    point.labelOnRight = point.x < pad.left + plotW * 0.62;
+  }
+  for (let i = 1; i < placed.length; i++) {
+    const prev = placed[i - 1];
+    const cur = placed[i];
+    if (Math.abs(cur.x - prev.x) < 110 && cur.labelY - prev.labelY < 14) {
+      cur.labelY = prev.labelY + 14;
+    }
+  }
+
+  const grid = [];
+  for (const score of yTicks) {
+    const y = pad.top + (1 - score / 100) * plotH;
+    grid.push(`<line class="chart-grid" x1="${pad.left}" y1="${y}" x2="${pad.left + plotW}" y2="${y}"></line>`);
+    grid.push(`<text class="chart-tick" x="${pad.left - 8}" y="${y + 4}" text-anchor="end">${score}</text>`);
+  }
+  for (let i = 0; i < xTicks; i++) {
+    const value = (costMax / (xTicks - 1)) * i;
+    const x = pad.left + (i / (xTicks - 1)) * plotW;
+    grid.push(`<line class="chart-grid" x1="${x}" y1="${pad.top}" x2="${x}" y2="${pad.top + plotH}"></line>`);
+    grid.push(`<text class="chart-tick" x="${x}" y="${pad.top + plotH + 18}" text-anchor="middle">${esc(axisMoney(value))}</text>`);
+  }
+
+  const dots = placed.map((point) => {
+    const anchor = point.labelOnRight ? "start" : "end";
+    const labelX = point.x + (point.labelOnRight ? 10 : -10);
+    return `<g class="chart-point hue-${point.hue}" data-model="${esc(point.row.name)}" tabindex="0" role="button" aria-label="${esc(`${point.label}, ${pct(point.row.pass_rate)}, ${money(point.cost)}`)}">
+      <circle cx="${point.x.toFixed(1)}" cy="${point.y.toFixed(1)}" r="6"></circle>
+      <text x="${labelX.toFixed(1)}" y="${(point.labelY + 4).toFixed(1)}" text-anchor="${anchor}">${esc(point.label)}</text>
+    </g>`;
+  }).join("");
+
+  return `<section class="card chart-card">
+    <h2>Cost vs Score</h2>
+    <div class="chart-wrap">
+      <svg class="cost-score-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="Cost versus pass rate">
+        ${grid.join("")}
+        <text class="chart-axis" x="${pad.left - 40}" y="${pad.top + plotH / 2}" text-anchor="middle" transform="rotate(-90 ${pad.left - 40} ${pad.top + plotH / 2})">Score</text>
+        <text class="chart-axis" x="${pad.left + plotW / 2}" y="${height - 8}" text-anchor="middle">Total cost (USD)</text>
+        ${dots}
+      </svg>
+    </div>
+  </section>`;
+}
+
+function bindChartPoints(root) {
+  root.querySelectorAll(".chart-point").forEach((point) => {
+    const open = () => navigate({
+      view: "models",
+      modelName: point.dataset.model,
+      problemId: null,
+      sampleId: null,
+    });
+    point.addEventListener("click", open);
+    point.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        open();
+      }
+    });
+  });
+}
+
 function renderLeaderboard() {
   const tools = DATA.leaderboard.some((row) => showToolCalls(row));
   const versions = showVersionColumn();
-  app.innerHTML = `<section class="card">
+  app.innerHTML = `<div class="grid">
+    ${renderCostScoreChart(DATA.leaderboard)}
+    <section class="card">
       <h2>Leaderboard</h2>
       <table>
         <thead><tr>
@@ -532,8 +663,10 @@ function renderLeaderboard() {
           </tr>`).join("")}
         </tbody>
       </table>
-    </section>`;
-  app.querySelectorAll("[data-model]").forEach((row) => {
+    </section>
+  </div>`;
+  bindChartPoints(app);
+  app.querySelectorAll("tr[data-model]").forEach((row) => {
     row.addEventListener("click", () => navigate({
       view: "models",
       modelName: row.dataset.model,
@@ -733,6 +866,7 @@ async function renderRunDetail(modelName, sampleId, seq = routeSeq) {
         <h3>Model Proposed Solution</h3>
         <pre>${esc(detail.model_solution || "No final solution found.")}</pre>
       </article>
+      ${renderTranscript(detail.transcript)}
       ${renderJudge(detail)}
     </section>`;
   document.querySelector("#back-button").addEventListener("click", () => {
@@ -742,6 +876,77 @@ async function renderRunDetail(modelName, sampleId, seq = routeSeq) {
       navigate({ view: "problems", problemId: sampleId, modelName: null, sampleId: null });
     }
   });
+}
+
+function prettyJson(value) {
+  try {
+    return JSON.stringify(value, null, 2);
+  } catch {
+    return String(value ?? "");
+  }
+}
+
+function renderCollapsible(title, body, { open = false, extraClass = "" } = {}) {
+  if (!body) return "";
+  const startOpen = open && body.length < 800;
+  return `<details class="turn-block ${extraClass}"${startOpen ? " open" : ""}><summary>${esc(title)}</summary><pre>${esc(body)}</pre></details>`;
+}
+
+function renderLabeled(title, body, extraClass = "") {
+  if (!body) return "";
+  if (body.length > 800) return renderCollapsible(title, body, { extraClass });
+  return `<div class="turn-block ${extraClass}"><div class="turn-label">${title}</div><pre>${esc(body)}</pre></div>`;
+}
+
+function renderContentBlock(block) {
+  const type = block?.type;
+  if (type === "thinking") {
+    return renderCollapsible("Thinking", block.thinking || "", { extraClass: "thinking" });
+  }
+  if (type === "text") {
+    return renderLabeled("Output", block.text || "", "output");
+  }
+  if (type === "tool_use") {
+    return renderLabeled(`Tool · ${block.name || "call"}`, prettyJson(block.input || {}), "tool");
+  }
+  if (type === "tool_result") {
+    return renderCollapsible("Tool result", String(block.content || ""), { extraClass: "tool-result" });
+  }
+  return "";
+}
+
+function renderTurn(turn) {
+  const role = turn?.role;
+  if (!role || role === "config") return "";
+  if (role === "tools") {
+    const names = (turn.tools || []).map((tool) => tool.name).filter(Boolean).join(", ");
+    return renderCollapsible(names ? `Tools · ${names}` : "Tools", prettyJson(turn.tools || []), { extraClass: "role-tools" });
+  }
+  if (role === "system") {
+    return renderCollapsible("System prompt", turn.text || "", { extraClass: "role-system" });
+  }
+  const parts = [];
+  if (role === "user" && turn.text) {
+    parts.push(renderLabeled("User", turn.text, "prompt"));
+  }
+  if (Array.isArray(turn.content)) {
+    parts.push(...turn.content.map(renderContentBlock));
+  } else if (role === "assistant" && turn.text) {
+    parts.push(renderLabeled("Output", turn.text, "output"));
+  }
+  if (!parts.filter(Boolean).length) return "";
+  return `<section class="turn role-${esc(role)}">${parts.join("")}</section>`;
+}
+
+function renderTranscript(transcript) {
+  const turns = transcript?.turns || [];
+  if (!turns.length) {
+    return `<article class="card"><h3>Rollout Transcript</h3><p class="muted">No transcript published for this attempt.</p></article>`;
+  }
+  return `<article class="card">
+    <h3>Rollout Transcript</h3>
+    <div class="transcript">${turns.map(renderTurn).join("")}</div>
+  </article>`;
 }
 
 function renderJudge(detail) {

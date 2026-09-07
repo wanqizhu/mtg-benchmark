@@ -52,7 +52,7 @@ This scans every run under `results/` and tails `results/live.jsonl` for last-mi
 
 ## Eval website
 
-The published site is [mtg-benchmark-site](https://github.com/wanqizhu/mtg-benchmark-site) ([live](https://wanqizhu.github.io/mtg-benchmark-site/)). Generate it into the sibling checkout with:
+The published site is [mtg-benchmark-site](https://github.com/wanqizhu/mtg-benchmark-site) ([live](https://wanqizhu.github.io/mtg-benchmark-site/)). By default this publishes the **grep-rules** run and includes rollout transcripts on visible problem pages. Generate it into the sibling checkout with:
 
 ```bash
 bench site --output-dir ../mtg-benchmark-site
@@ -73,7 +73,7 @@ Include a range of transcribed problems, with full pages only for a subset:
 bench site --output-dir ../mtg-benchmark-site --problems 1-39 --detail-problems 1-20
 ```
 
-To generate a standalone site for one run instead:
+`--runs all` publishes every result run (and an All versions view). Incomplete `claude-sonnet-5-thinking-low` is omitted by default; `--exclude-models none` puts it back. `--run-id` still generates a standalone site for one folder:
 
 ```bash
 bench site --run-id smoke-001

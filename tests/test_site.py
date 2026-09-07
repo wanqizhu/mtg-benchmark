@@ -8,6 +8,7 @@ from harness.site import (
     run_label,
     write_multi_run_site,
     write_site,
+    _public_transcript,
 )
 
 
@@ -137,6 +138,56 @@ def test_collect_site_data_normalizes_models_problems_and_details(tmp_path):
     assert data["problems"][0]["models"][0]["tool_call_count"] == 0
 
 
+def test_public_transcript_strips_paths_and_provider_payloads():
+    transcript = _public_transcript(
+        {
+            "model": "demo",
+            "provider": "anthropic",
+            "tool_call_count": 1,
+            "usage": {"output_tokens": 9},
+            "turns": [
+                {
+                    "role": "tools",
+                    "tools": [
+                        {
+                            "name": "grep",
+                            "description": "Allowed paths: /Users/wanqi/Desktop/Academics/projects/mtg-ai/datasets/mtg/common/comp_rules.txt",
+                        }
+                    ],
+                },
+                {
+                    "role": "system",
+                    "text": "Rules at /Users/wanqi/Downloads/mtgpuzzles-dataset/common/comp_rules.txt",
+                },
+                {
+                    "role": "assistant",
+                    "content": [
+                        {"type": "thinking", "thinking": "plan", "signature": "secret"},
+                        {
+                            "type": "tool_use",
+                            "id": "tool-1",
+                            "name": "grep",
+                            "input": {
+                                "path": "/Users/wanqi/Downloads/mtgpuzzles-dataset/common/comp_rules.txt",
+                                "pattern": "Madness",
+                            },
+                        },
+                    ],
+                    "api_output": {"huge": True},
+                },
+            ],
+        }
+    )
+
+    assert transcript["turns"][0]["tools"][0]["description"] == "Allowed paths: comp_rules.txt"
+    assert transcript["turns"][1]["text"] == "Rules at comp_rules.txt"
+    thinking, tool = transcript["turns"][2]["content"]
+    assert thinking == {"type": "thinking", "thinking": "plan"}
+    assert tool["input"]["path"] == "comp_rules.txt"
+    assert "signature" not in thinking
+    assert "api_output" not in transcript["turns"][2]
+
+
 def test_collect_site_data_skips_excluded_problems(tmp_path):
     run_dir = tmp_path / "results" / "run"
     dataset_dir = tmp_path / "dataset"
@@ -170,6 +221,27 @@ def test_collect_site_data_uses_output_tokens_and_tool_calls(tmp_path):
     assert data["leaderboard"][0]["tool_call_count"] == 4
 
 
+def test_collect_site_data_excludes_incomplete_models_by_default(tmp_path):
+    run_dir = tmp_path / "results" / "run"
+    dataset_dir = tmp_path / "dataset"
+    _write_problem(dataset_dir, "001")
+    (dataset_dir / "001" / "puzzle.png").write_bytes(b"png")
+    _write_json(run_dir / "model-a" / "001.json", _result("model-a", "001"))
+    _write_json(
+        run_dir / "claude-sonnet-5-thinking-low" / "001.json",
+        _result("claude-sonnet-5-thinking-low", "001"),
+    )
+
+    data = collect_site_data(run_dir, dataset_root=dataset_dir)
+    included = collect_site_data(run_dir, dataset_root=dataset_dir, exclude_models=["none"])
+
+    assert [row["name"] for row in data["leaderboard"]] == ["model-a"]
+    assert [row["name"] for row in included["leaderboard"]] == [
+        "claude-sonnet-5-thinking-low",
+        "model-a",
+    ]
+
+
 def test_collect_site_data_can_hide_problem_details(tmp_path):
     run_dir = tmp_path / "results" / "run"
     dataset_dir = tmp_path / "dataset"
@@ -193,7 +265,7 @@ def test_collect_site_data_can_hide_problem_details(tmp_path):
     assert data["details"]["model-a"]["001"]["summary"]["detail_path"] == "data/runs/run/model-a/001.json"
 
 
-def test_write_site_emits_split_data_without_transcripts(tmp_path):
+def test_write_site_emits_split_data_with_public_transcripts(tmp_path):
     run_dir = tmp_path / "results" / "run"
     dataset_dir = tmp_path / "dataset"
     _write_problem(dataset_dir, "001", source_url="https://www.possibilitystorm.com/aer1/")
@@ -221,8 +293,10 @@ def test_write_site_emits_split_data_without_transcripts(tmp_path):
     assert "problem_gold_md" not in summary["problems"][0]
     detail = json.loads((site_dir / "data" / "runs" / "run" / "model-a" / "001.json").read_text(encoding="utf-8"))
     assert detail["model_solution"] == "1. Win."
-    assert "transcript" not in detail
+    assert detail["transcript"]["turns"][0]["text"] == "Solve it."
+    assert detail["transcript"]["turns"][1]["text"] == "<solution>\n1. Win.\n</solution>"
     assert "result" not in detail
+    assert "prompt" not in detail
     js = (site_dir / "app.js").read_text(encoding="utf-8")
     css = (site_dir / "styles.css").read_text(encoding="utf-8")
     assert "data/manifest.json" in js
@@ -230,21 +304,27 @@ def test_write_site_emits_split_data_without_transcripts(tmp_path):
     assert "Original problem page" in js
     assert "split-layout" in js
     assert "split-pane" in css
+    assert ".run-picker[hidden]" in css
     assert "overflow: hidden" in css
     assert "output tokens" in js
     assert "tool calls" in js
     assert "<th>Tokens</th>" in js
+    assert "Cost vs Score" in js
+    assert "cost-score-chart" in css
     assert "showVersionColumn" in js
     assert "grep-rules" in js
     assert "runLabel" in js
     assert "methodology.md" in js
+    assert "https?:[^)\\s]+" in js
+    assert "renderTranscript" in js
+    assert "Rollout Transcript" in js
     assert 'data-view="methodology"' in (site_dir / "index.html").read_text(encoding="utf-8")
     assert "<th>Attempted</th>" not in js
     assert "<th>Unjudged</th>" not in js
     assert "unjudged" not in js
 
 
-def test_collect_multi_run_site_data_includes_all_result_runs(tmp_path):
+def test_collect_multi_run_site_data_defaults_to_grep_rules(tmp_path):
     results_dir = tmp_path / "results"
     dataset_dir = tmp_path / "dataset"
     _write_problem(dataset_dir, "001")
@@ -259,16 +339,34 @@ def test_collect_multi_run_site_data_includes_all_result_runs(tmp_path):
 
     data = collect_multi_run_site_data(results_dir, dataset_root=dataset_dir)
 
-    assert [run["run_id"] for run in data["runs"]] == ["full-rules-in-context", "grep-rules"]
-    assert [run["label"] for run in data["runs"]] == ["full rules in context", "grep rules"]
-    assert data["default_run_id"] == "all-versions"
+    assert [run["run_id"] for run in data["runs"]] == ["grep-rules"]
+    assert data["default_run_id"] == "grep-rules"
     assert data["problems"] == ["001"]
+    assert data["runs"][0]["leaderboard"][0]["name"] == "model-b"
+    assert data["runs"][0]["leaderboard"][0]["unjudged"] == 1
+
+
+def test_collect_multi_run_site_data_can_include_all_runs(tmp_path):
+    results_dir = tmp_path / "results"
+    dataset_dir = tmp_path / "dataset"
+    _write_problem(dataset_dir, "001")
+    (dataset_dir / "001" / "puzzle.png").write_bytes(b"png")
+    _write_json(results_dir / "full-rules-in-context" / "model-a" / "001.json", _result("model-a", "001"))
+    _write_json(
+        results_dir / "full-rules-in-context" / "model-a" / "001.judge.json",
+        _judge("model-a", "001", True),
+    )
+    _write_json(results_dir / "grep-rules" / "model-b" / "001.json", _result("model-b", "001"))
+
+    data = collect_multi_run_site_data(results_dir, dataset_root=dataset_dir, run_ids=["all"])
+
+    assert [run["run_id"] for run in data["runs"]] == ["full-rules-in-context", "grep-rules"]
+    assert data["default_run_id"] == "all-versions"
     combined = combine_run_summaries(data["runs"])
     assert combined["run_id"] == "all-versions"
     assert combined["leaderboard"][0]["version"] == "full-rules-in-context"
     assert combined["leaderboard"][0]["original_model"] == "model-a"
     assert combined["leaderboard"][0]["name"] == "model-a @ full rules in context"
-    assert data["runs"][1]["leaderboard"][0]["unjudged"] == 1
     order = [row["name"] for row in combined["leaderboard"]]
     assert order == [row["model"] for row in combined["problems"][0]["models"]]
 

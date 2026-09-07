@@ -2,21 +2,16 @@
 
 ## Puzzles
 
-Problems come from [Possibility Storm](https://www.patreon.com/mtgpuzzles) (public puzzle pages on [possibilitystorm.com](https://www.possibilitystorm.com/)). Each published problem page shows the original image, a structured transcription of the board state, and a link to the public source page. Transcriptions are done with a combination of models and cross-verified manually, though it's possible there are mistakes. Official solutions are taken from patreon and used for grading.
+Problems come from [Possibility Storm](https://www.patreon.com/mtgpuzzles). We transcribe the original image with a combination of models and cross-verified manually, though it's possible there are mistakes. Official solutions are taken from patreon and used for grading.
 
-## How the agent sees a problem
+## Eval
 
-Every attempt gets the same transcribed puzzle in a `<puzzle>` block and must return a numbered line in `<solution>` tags.
+Models get a stock system prompt describing general puzzle assumptions (win this turn, assum no extra cards, etc), the transcribed puzzle, and must return detailed steps in `<solution>` tags. All cards in the puzzle have full oracle text included.
 
-The two **versions** on this site differ only in how the Comprehensive Rules are provided:
+To make sure models have full information available, we provide the full comprehensive rules. This is over 200k tokens, so we give the model ability to `grep` and `read` a local copy. (A second mode, full rules in context, pastes the entire rules document into the system prompt. I found it did not have a meaningful effect on model performance and costs significantly more, as frontier models mostly memorize the rules.)
 
-- **grep rules**: the model can `grep` and `read` a local copy of the Comprehensive Rules. The full document is not in the prompt.
-- **full rules in context**: the entire Comprehensive Rules text is included in the system prompt. There are no search tools. This needs a long-context model.
-
-Puzzle conventions (what the image assumes about life totals, empty zones, blocking, and so on) are included in the system prompt in both modes.
+Full rollout transcripts are provided, see problems detail page.
 
 ## Grading
 
-A separate judge model (currently GPT-5.6 Sol, high reasoning) sees the puzzle, the official solution, and the model's `<solution>` text. It does not see the solver's chain of thought or tool traces.
-
-A solution **passes** if it is rules-legal and achieves the objective for possible opponent responses and blocks. It does not need to match the official line step for step. Alternate correct lines can still pass; the judge is asked to be extra careful when the line differs.
+A separate judge model (currently GPT-5.6 Sol, high reasoning) sees the puzzle, the official solution, and the model's `<solution>` text, and grades based on correctness. I found the judge model does not matter too much after a baseline intelligence.

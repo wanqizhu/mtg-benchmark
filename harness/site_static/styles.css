@@ -90,6 +90,7 @@ nav, .topbar-controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: e
   letter-spacing: .08em;
   text-transform: uppercase;
 }
+.run-picker[hidden] { display: none; }
 .run-picker select {
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -162,6 +163,41 @@ button:hover, .link-button:hover, button.active { border-color: var(--accent); c
   padding: 18px;
   box-shadow: 0 1px 0 rgba(0,0,0,.03);
 }
+
+.chart-card { overflow: hidden; }
+.chart-wrap { width: 100%; }
+.cost-score-chart {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 460px;
+}
+.chart-grid {
+  stroke: var(--line);
+  stroke-width: 1;
+}
+.chart-tick, .chart-axis {
+  fill: var(--muted);
+  font-size: 12px;
+}
+.chart-axis { font-weight: 700; letter-spacing: .04em; }
+.chart-point { cursor: pointer; outline: none; }
+.chart-point circle {
+  stroke: var(--panel);
+  stroke-width: 2;
+}
+.chart-point text {
+  fill: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+}
+.chart-point:hover circle, .chart-point:focus circle { stroke-width: 3; }
+.chart-point:hover text, .chart-point:focus text { fill: var(--accent); }
+.chart-point.hue-openai circle { fill: #3d9a6a; }
+.chart-point.hue-anthropic circle { fill: #d4783a; }
+.chart-point.hue-xai circle { fill: #8b7cd6; }
+.chart-point.hue-google circle { fill: #5aa0d6; }
+.chart-point.hue-other circle { fill: var(--accent); }
 
 table { width: 100%; border-collapse: collapse; }
 th, td { border-bottom: 1px solid var(--line); padding: 10px 8px; text-align: left; vertical-align: top; }
@@ -290,3 +326,25 @@ details {
 details + details { margin-top: 10px; }
 summary { cursor: pointer; font-weight: 700; }
 details pre { border: 0; padding: 10px 0 0; background: transparent; }
+
+.transcript { display: grid; gap: 12px; }
+.turn { display: grid; gap: 10px; }
+.turn-block {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--panel-strong);
+  padding: 10px 12px;
+}
+.turn-label {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.turn-block.thinking { border-color: color-mix(in srgb, var(--warn) 40%, var(--line)); }
+.turn-block.tool, .turn-block.tool-result { border-color: color-mix(in srgb, var(--accent) 35%, var(--line)); }
+.turn-block.output { border-color: color-mix(in srgb, var(--pass) 35%, var(--line)); }
+.turn-block.prompt, .turn-block.role-system { border-color: var(--line); }
+.turn-block pre { border: 0; padding: 0; background: transparent; }

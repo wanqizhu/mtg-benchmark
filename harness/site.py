@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import shutil
 from copy import deepcopy
 from datetime import datetime, timezone
@@ -13,12 +14,15 @@ from benchmarks.mtg.solution import parse_solution
 SITE_ASSET_DIR = "assets/problems"
 SITE_STATIC_DIR = Path(__file__).resolve().parent / "site_static"
 ALL_VERSIONS_ID = "all-versions"
+DEFAULT_SITE_RUNS = ("grep-rules", "tools-rules")
+DEFAULT_EXCLUDED_MODELS = ("claude-sonnet-5-thinking-low",)
 RUN_LABELS = {
     "grep-rules": "grep rules",
     "full-rules-in-context": "full rules in context",
     "tools-rules": "grep rules",
     "inline-rules": "full rules in context",
 }
+_ABS_PATH_RE = re.compile(r"(?:[A-Za-z]:)?/(?:Users|home|private|opt|var|tmp)/[^\s\"'<>]+")
 
 
 def run_label(run_id: str) -> str:
@@ -90,6 +94,12 @@ def expand_problem_ids(ids: list[str] | str | None) -> list[str] | None:
                     seen.add(value)
                     expanded.append(value)
     return expanded
+
+
+def _excluded_models(model_names: list[str] | None) -> set[str]:
+    if model_names is None:
+        return set(DEFAULT_EXCLUDED_MODELS)
+    return {name for name in model_names if name and name.lower() != "none"}
 
 
 def _id_set(ids: list[str] | None) -> set[str] | None:
@@ -299,11 +309,18 @@ def _has_results(run_dir: Path) -> bool:
     return bool(_result_paths(run_dir))
 
 
-def _available_run_dirs(results_dir: Path) -> list[Path]:
-    return sorted(
+def _available_run_dirs(results_dir: Path, run_ids: list[str] | None = None) -> list[Path]:
+    available = sorted(
         (path for path in results_dir.iterdir() if path.is_dir() and path.name != "site" and _has_results(path)),
         key=lambda path: path.name,
     )
+    if run_ids:
+        if any(token.lower() == "all" for token in run_ids):
+            return available
+        wanted = set(run_ids)
+        return [path for path in available if path.name in wanted]
+    preferred = [path for path in available if path.name in DEFAULT_SITE_RUNS]
+    return preferred or available
 
 
 def _model_version_name(model_name: str, run_id: str) -> str:
@@ -397,6 +414,94 @@ def _align_problem_models(problems: list[dict[str, Any]], leaderboard: list[dict
         problem["attempted"] = sum(1 for row in aligned if row.get("status") != "not_attempted")
 
 
+def _sanitize_text(value: Any) -> str:
+    text = str(value or "")
+    return _ABS_PATH_RE.sub(lambda match: Path(match.group(0)).name, text)
+
+
+def _public_tool_input(value: Any) -> Any:
+    if not isinstance(value, dict):
+        return value
+    payload = dict(value)
+    path = payload.get("path")
+    if isinstance(path, str) and path.strip():
+        payload["path"] = Path(path).name
+    return payload
+
+
+def _public_block(block: Any) -> dict[str, Any] | None:
+    if not isinstance(block, dict):
+        return None
+    kind = str(block.get("type") or "")
+    if kind == "thinking":
+        return {"type": "thinking", "thinking": _sanitize_text(block.get("thinking") or block.get("text") or "")}
+    if kind == "text":
+        return {"type": "text", "text": _sanitize_text(block.get("text") or "")}
+    if kind == "tool_use":
+        return {
+            "type": "tool_use",
+            "id": block.get("id"),
+            "name": block.get("name"),
+            "input": _public_tool_input(block.get("input")),
+        }
+    if kind == "tool_result":
+        content = block.get("content")
+        if not isinstance(content, str):
+            content = json.dumps(content, indent=2) if content is not None else ""
+        return {
+            "type": "tool_result",
+            "tool_use_id": block.get("tool_use_id"),
+            "content": _sanitize_text(content),
+        }
+    return None
+
+
+def _public_turn(turn: dict[str, Any]) -> dict[str, Any] | None:
+    role = turn.get("role")
+    if role == "config":
+        return {
+            key: turn[key]
+            for key in ("role", "model", "model_id", "thinking", "output_config", "max_tokens")
+            if key in turn
+        }
+    if role == "tools":
+        tools = []
+        for tool in turn.get("tools") or []:
+            if isinstance(tool, dict):
+                public_tool = {key: tool[key] for key in ("name", "description") if key in tool}
+                if "description" in public_tool:
+                    public_tool["description"] = _sanitize_text(public_tool["description"])
+                tools.append(public_tool)
+        return {"role": "tools", "tools": tools}
+    if role not in {"system", "user", "assistant"}:
+        return None
+    payload: dict[str, Any] = {"role": role}
+    if turn.get("text"):
+        payload["text"] = _sanitize_text(turn.get("text"))
+    content = turn.get("content")
+    if isinstance(content, list):
+        blocks = [block for block in (_public_block(item) for item in content) if block]
+        if blocks:
+            payload["content"] = blocks
+    return payload
+
+
+def _public_transcript(transcript: dict[str, Any] | None) -> dict[str, Any] | None:
+    if not isinstance(transcript, dict) or not transcript:
+        return None
+    turns = [turn for turn in (_public_turn(item) for item in transcript.get("turns") or []) if turn]
+    if not turns:
+        return None
+    usage = transcript.get("usage")
+    return {
+        "turns": turns,
+        "tool_call_count": transcript.get("tool_call_count"),
+        "usage": usage if isinstance(usage, dict) else {},
+        "model": transcript.get("model"),
+        "provider": transcript.get("provider"),
+    }
+
+
 def _public_detail(entry: dict[str, Any]) -> dict[str, Any]:
     summary = entry.get("summary") or {}
     result = entry.get("result") or {}
@@ -414,6 +519,7 @@ def _public_detail(entry: dict[str, Any]) -> dict[str, Any]:
         "judge_cost_usd": summary.get("judge_cost_usd", 0.0),
         "model_solution": entry.get("model_solution"),
         "judge_reasoning": entry.get("judge_reasoning") or "",
+        "transcript": _public_transcript(result.get("transcript") or {}),
         "model_id": result.get("model_id", ""),
         "model_config": result.get("model_config") or {},
         "updated_at": result.get("updated_at"),
@@ -452,6 +558,7 @@ def collect_site_data(
     copy_images: bool = False,
     problem_ids: list[str] | None = None,
     detail_ids: list[str] | None = None,
+    exclude_models: list[str] | None = None,
 ) -> dict[str, Any]:
     if not run_dir.exists():
         raise FileNotFoundError(f"Run directory not found: {run_dir}")
@@ -460,6 +567,7 @@ def collect_site_data(
     site_dir = site_dir or run_dir / "site"
     wanted = _id_set(problem_ids)
     details_wanted = _id_set(detail_ids)
+    skipped_models = _excluded_models(exclude_models)
 
     entries_by_model: dict[str, dict[str, dict[str, Any]]] = {}
     problems = _dataset_problems(
@@ -477,6 +585,8 @@ def collect_site_data(
         judge = _read_json(judge_path) if judge_path.exists() else None
         sample_id = str(result.get("sample_id") or result_path.stem)
         model_name = str(result.get("model_name") or result_path.parent.name)
+        if model_name in skipped_models:
+            continue
         if wanted is not None and sample_id not in wanted:
             continue
         reference = result.get("reference", {})
@@ -656,6 +766,8 @@ def collect_multi_run_site_data(
     copy_images: bool = False,
     problem_ids: list[str] | None = None,
     detail_ids: list[str] | None = None,
+    run_ids: list[str] | None = None,
+    exclude_models: list[str] | None = None,
 ) -> dict[str, Any]:
     if not results_dir.exists():
         raise FileNotFoundError(f"Results directory not found: {results_dir}")
@@ -670,8 +782,9 @@ def collect_multi_run_site_data(
             copy_images=copy_images,
             problem_ids=problem_ids,
             detail_ids=detail_ids,
+            exclude_models=exclude_models,
         )
-        for run_dir in _available_run_dirs(results_dir)
+        for run_dir in _available_run_dirs(results_dir, run_ids)
     ]
     default_run_id = ALL_VERSIONS_ID if len(runs) >= 2 else (runs[0]["run_id"] if runs else "")
     problem_list = sorted({problem["id"] for run in runs for problem in run["problems"]}, key=_sample_sort_key)
@@ -749,6 +862,7 @@ def write_site(
     dataset_root: Path | None = None,
     problem_ids: list[str] | None = None,
     detail_ids: list[str] | None = None,
+    exclude_models: list[str] | None = None,
 ) -> Path:
     site_dir = output_dir or run_dir / "site"
     site_dir.mkdir(parents=True, exist_ok=True)
@@ -762,6 +876,7 @@ def write_site(
         copy_images=True,
         problem_ids=problem_ids,
         detail_ids=detail_ids,
+        exclude_models=exclude_models,
     )
     _replace_dir(site_dir / "data" / "runs")
     _write_run_files(site_dir, data)
@@ -786,6 +901,8 @@ def write_multi_run_site(
     dataset_root: Path | None = None,
     problem_ids: list[str] | None = None,
     detail_ids: list[str] | None = None,
+    run_ids: list[str] | None = None,
+    exclude_models: list[str] | None = None,
 ) -> Path:
     site_dir = output_dir or results_dir / "site"
     site_dir.mkdir(parents=True, exist_ok=True)
@@ -799,6 +916,8 @@ def write_multi_run_site(
         copy_images=True,
         problem_ids=problem_ids,
         detail_ids=detail_ids,
+        run_ids=run_ids,
+        exclude_models=exclude_models,
     )
     _replace_dir(site_dir / "data" / "runs")
     for run in data["runs"]:

@@ -52,12 +52,17 @@ async def _async_main(args: argparse.Namespace) -> None:
             "dataset_root": dataset_dir,
             "problem_ids": problem_ids,
             "detail_ids": detail_ids,
+            "exclude_models": _parse_csv(args.exclude_models),
         }
         if args.run_id:
             run_dir = Path(args.results_dir) / args.run_id
             site_dir = write_site(run_dir, **kwargs)
         else:
-            site_dir = write_multi_run_site(Path(args.results_dir), **kwargs)
+            site_dir = write_multi_run_site(
+                Path(args.results_dir),
+                **kwargs,
+                run_ids=_parse_csv(args.runs),
+            )
         print(f"Wrote eval site to {site_dir}")
         return
 
@@ -175,7 +180,15 @@ def main() -> None:
     )
     site_parser.add_argument(
         "--detail-problems",
-        help="Problem ids that publish images, gold text, solutions, and attempt pages, e.g. 1-20 (default: all included problems)",
+        help="Problem ids that publish images, gold text, solutions, transcripts, and attempt pages, e.g. 1-20 (default: all included problems)",
+    )
+    site_parser.add_argument(
+        "--runs",
+        help="Run ids to publish, comma-separated, or 'all'. Default: grep-rules (tools-rules) if present",
+    )
+    site_parser.add_argument(
+        "--exclude-models",
+        help="Model names to omit from the site, comma-separated, or 'none'. Default: claude-sonnet-5-thinking-low",
     )
 
     watch_parser = subparsers.add_parser("watch", help="Live dashboard for all eval runs")
