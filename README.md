@@ -1,6 +1,15 @@
 # mtg-benchmark
 
-LLM benchmark harness for MTG puzzles.
+LLM benchmark harness for MTG puzzles, sourced from [Possibility Storm](https://www.patreon.com/mtgpuzzles). Web leaderboard: [mtg-benchmark-site](https://github.com/wanqizhu/mtg-benchmark-site) ([live](https://wanqizhu.github.io/mtg-benchmark-site/)).
+
+![Possibility Storm puzzle 001](docs/example-puzzle.png)
+
+The puzzles are self-contained, but I don't want this to be a test of model's ability to memorize the rules. We do not give agent internet or code access. There are two ways to give the agent the Comprehensive Rules:
+
+- **grep rules** (`--rules-mode tools`, published as `--run-id grep-rules`): the prompt has the transcribed puzzle plus `grep` / `read` tools pointed at the rules file. The full rules document is not in context; the model searches when it wants a citation.
+- **full rules in context** (`--rules-mode inline`, published as `--run-id full-rules-in-context`): the same puzzle text, but the entire rules document is pasted into the system prompt. No search tools. Needs a long-context model and wastes a lot of input tokens.
+
+I tested both modes and do not see a clear difference in performance. Frontier models can solve some puzzles really fast and mostly know the rules, so I'm going with grep rules for simplicity and cost.
 
 ## Setup
 
@@ -9,30 +18,21 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -e .
 cp .env.example .env
-# set ANTHROPIC_API_KEY (and optionally OPENAI_API_KEY / XAI_API_KEY) in .env
+# set ANTHROPIC_API_KEY / OPENAI_API_KEY / XAI_API_KEY in .env
 
-Put the puzzles dataset at `datasets/mtg/` (gitignored; never commit it).
+Put the puzzles dataset at `datasets/mtg/` (gitignored).
 `results/` is also gitignored, so rollout transcripts stay local.
 ```
 
-## Smoke test (puzzle 001, Haiku)
+## Run Eval
 
 ```bash
 bench run --run-id smoke-001 --models claude-haiku-4-5 --samples 001 --judge
 ```
 
-Claude names use `claude-{haiku|sonnet|opus|fable}-{version}[-thinking][-{low|medium|high|xhigh|max}]`. OpenAI names use `gpt-{version}[-{tier}][-thinking][-{none|low|medium|high|xhigh|max}]`. Grok names use `grok-{version}[-{low|medium|high|xhigh}]` (always reasons; default effort is high):
+Results are written under `results/<run-id>/`.
 
-- `claude-haiku-4-5`
-- `claude-sonnet-4-6-thinking-medium`
-- `claude-opus-4-8-thinking-xhigh`
-- `claude-fable-5-1-thinking-high`
-- `gpt-5.6-sol-thinking-high`
-- `grok-4.6-high`
-
-Results are written under `results/<run-id>/`. The two published versions use `--run-id grep-rules` (`--rules-mode tools`) and `--run-id full-rules-in-context` (`--rules-mode inline`).
-
-`--models` is comma-separated and runs those models in one process (same `--rules-mode` / `--run-id`). Tools vs inline are different modes, so they are separate commands. To run several versions at once, start one `bench run` per mode/run-id (or per model if you want isolated logs) and they share `--concurrency` within that process.
+`--models` is comma-separated and runs those models in one process (same `--rules-mode` / `--run-id`). To run several versions at once, start one `bench run` per mode/run-id (or per model if you want isolated logs) and they share `--concurrency` within that process.
 
 ```bash
 bench run --run-id grep-rules --rules-mode tools \
@@ -52,7 +52,7 @@ This scans every run under `results/` and tails `results/live.jsonl` for last-mi
 
 ## Eval website
 
-The published site lives in a sibling repo (`../mtg-benchmark-site` by default). Generate split JSON (no transcripts) plus copied frontend files:
+The published site is [mtg-benchmark-site](https://github.com/wanqizhu/mtg-benchmark-site) ([live](https://wanqizhu.github.io/mtg-benchmark-site/)). Generate it into the sibling checkout with:
 
 ```bash
 bench site --output-dir ../mtg-benchmark-site
@@ -78,3 +78,4 @@ To generate a standalone site for one run instead:
 ```bash
 bench site --run-id smoke-001
 ```
+

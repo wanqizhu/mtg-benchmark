@@ -209,6 +209,15 @@ tr.clickable:hover { background: color-mix(in srgb, var(--accent) 8%, transparen
   margin: 10px 0 0;
   font-size: 14px;
 }
+.methodology-card {
+  max-width: 760px;
+}
+.methodology-md h1 { font-size: 1.6rem; margin: 0 0 .6em; }
+.methodology-md h2 { font-size: 1.2rem; margin: 1.4em 0 .5em; }
+.methodology-md p { line-height: 1.55; color: var(--code); }
+.methodology-md ul { padding-left: 1.2em; color: var(--code); }
+.methodology-md a { color: inherit; }
+.methodology-md a:hover { color: var(--accent); }
 .scroll-md {
   max-height: 720px;
   overflow: auto;

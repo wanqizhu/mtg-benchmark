@@ -206,6 +206,7 @@ def test_write_site_emits_split_data_without_transcripts(tmp_path):
     assert (site_dir / "index.html").exists()
     assert (site_dir / "app.js").exists()
     assert (site_dir / "styles.css").exists()
+    assert (site_dir / "methodology.md").exists()
     assert (site_dir / ".nojekyll").exists()
     assert not (site_dir / "data.json").exists()
     assert (site_dir / "assets" / "problems" / "001.jpg").exists()
@@ -236,6 +237,8 @@ def test_write_site_emits_split_data_without_transcripts(tmp_path):
     assert "showVersionColumn" in js
     assert "grep-rules" in js
     assert "runLabel" in js
+    assert "methodology.md" in js
+    assert 'data-view="methodology"' in (site_dir / "index.html").read_text(encoding="utf-8")
     assert "<th>Attempted</th>" not in js
     assert "<th>Unjudged</th>" not in js
     assert "unjudged" not in js

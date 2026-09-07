@@ -5,7 +5,8 @@ let lastListView = "leaderboard";
 let routeSeq = 0;
 
 const app = document.querySelector("#app");
-const VALID_VIEWS = new Set(["leaderboard", "problems", "models", "detail"]);
+const VALID_VIEWS = new Set(["leaderboard", "problems", "models", "methodology", "detail"]);
+const methodologyCache = { text: null, promise: null };
 const runCache = new Map();
 const problemCache = new Map();
 const detailCache = new Map();
@@ -54,6 +55,7 @@ function routeHash(route) {
       ? `#/${runId}/models/${encodeURIComponent(route.modelName)}`
       : `#/${runId}/models`;
   }
+  if (route.view === "methodology") return `#/${runId}/methodology`;
   return `#/${runId}/leaderboard`;
 }
 
@@ -318,6 +320,20 @@ function assetUrl(path) {
   return `${path}${path.includes("?") ? "&" : "?"}v=${encodeURIComponent(stamp)}`;
 }
 
+async function loadMethodology() {
+  if (methodologyCache.text != null) return methodologyCache.text;
+  if (!methodologyCache.promise) {
+    methodologyCache.promise = fetch(assetUrl("methodology.md")).then((response) => {
+      if (!response.ok) throw new Error(`methodology.md (${response.status})`);
+      return response.text();
+    }).then((text) => {
+      methodologyCache.text = text;
+      return text;
+    });
+  }
+  return methodologyCache.promise;
+}
+
 async function fetchJson(path) {
   const response = await fetch(assetUrl(path));
   if (!response.ok) {
@@ -434,7 +450,13 @@ async function applyRoute(route = parseHash()) {
     button.classList.toggle("active", button.dataset.view === (view === "detail" ? lastListView : view));
   });
   app.classList.toggle("split", view === "problems" || view === "models");
+  const picker = document.querySelector(".run-picker");
+  if (picker) picker.hidden = view === "methodology";
 
+  if (view === "methodology") {
+    await renderMethodology(seq);
+    return;
+  }
   if (!DATA) {
     app.innerHTML = `<section class="card"><h2>No Runs</h2><p class="muted">No result runs were found.</p></section>`;
     return;
@@ -461,9 +483,26 @@ function setView(view) {
       sampleId: null,
       modelName: route.modelName,
     });
+  } else if (view === "methodology") {
+    navigate({ view: "methodology", problemId: null, modelName: null, sampleId: null });
   } else {
     navigate({ view: "leaderboard", problemId: null, modelName: null, sampleId: null });
   }
+}
+
+async function renderMethodology(seq = routeSeq) {
+  let markdown = "";
+  try {
+    markdown = await loadMethodology();
+  } catch (error) {
+    if (seq !== routeSeq) return;
+    app.innerHTML = `<section class="card"><h2>Methodology</h2><p class="muted">Could not load methodology.md.</p><pre>${esc(error.message || error)}</pre></section>`;
+    return;
+  }
+  if (seq !== routeSeq) return;
+  app.innerHTML = `<section class="card methodology-card">
+      <div class="methodology-md">${renderMarkdown(markdown)}</div>
+    </section>`;
 }
 
 function showVersionColumn() {

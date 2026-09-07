@@ -685,7 +685,7 @@ def collect_multi_run_site_data(
 def _copy_static(site_dir: Path) -> None:
     if not SITE_STATIC_DIR.exists():
         raise FileNotFoundError(f"Site static directory not found: {SITE_STATIC_DIR}")
-    for name in ("index.html", "app.js", "styles.css"):
+    for name in ("index.html", "app.js", "styles.css", "methodology.md"):
         shutil.copy2(SITE_STATIC_DIR / name, site_dir / name)
     (site_dir / ".nojekyll").write_text("", encoding="utf-8")
 
