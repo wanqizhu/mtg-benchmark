@@ -137,6 +137,20 @@ def _strip_cache_control(content: Any) -> Any:
 
 PROMPT_CACHE_TTL = "1h"
 
+# Models whose tools-mode rollouts cache the growing conversation prefix.
+#
+# Without a breakpoint the whole history is re-sent at full price every turn, so
+# a rollout costs sum(prompt_i); with a rolling one it costs write*prompt_n +
+# read*sum(prompt_i for i < n), because each token pays the write premium only
+# once, when it first enters the cache. That is a win only when rollouts run
+# long: replaying results/grep-rules, models averaging <=4 assistant turns break
+# even at best, and Haiku 4.5 cannot cache this prefix at all (its 4096-token
+# minimum exceeds the ~1.8k system+tools prefix, so a breakpoint is a silent
+# no-op). 1h rather than 5m because turn durations are long -- p50 164s, p90
+# 745s -- so a 5m entry expires mid-rollout ~40% of the time, and a miss
+# re-writes the whole prefix at the write rate instead of reading it at 0.1x.
+CONVERSATION_CACHE_MODELS = frozenset({"claude-sonnet-5", "claude-opus-5"})
+
 
 def _prewarm_request(*, spec: ModelSpec, system: str) -> dict[str, Any]:
     """Build a cheap cache-write request that matches the rollout's cache key.
@@ -168,9 +182,23 @@ def _system_blocks(system: str, *, cache: bool) -> list[dict[str, Any]]:
     return [block]
 
 
-def _apply_cache_control(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Strip leftover breakpoints. Conversation history is never cached."""
-    return _strip_cache_control(messages)
+def _apply_cache_control(
+    messages: list[dict[str, Any]], *, cache: bool
+) -> list[dict[str, Any]]:
+    """Move the conversation breakpoint to the end of the latest turn.
+
+    Old breakpoints are stripped first: only the trailing one is kept, so each
+    request reads the prefix cached by the previous turn and writes just the
+    delta. Anthropic allows 4 breakpoints per request and this uses 1 (the
+    system block holds the other).
+    """
+    cleaned = _strip_cache_control(messages)
+    if not cache or not cleaned:
+        return cleaned
+    content = cleaned[-1].get("content")
+    if isinstance(content, list) and content and isinstance(content[-1], dict):
+        content[-1]["cache_control"] = _cache_control()
+    return cleaned
 
 
 class AnthropicProvider:
@@ -308,6 +336,10 @@ class AnthropicProvider:
         progress: RolloutProgress | None = None,
     ) -> Transcript:
         tool_by_name = _tool_map(tools)
+        # Inline mode caches the rules-laden system prompt on every model. Tools
+        # mode additionally caches the conversation, but only where it pays off.
+        cache_conversation = bool(tools) and spec.model_id in CONVERSATION_CACHE_MODELS
+        cache_system = not tools or cache_conversation
 
         if resume_from is None:
             transcript_turns: list[dict[str, Any]] = [
@@ -362,8 +394,8 @@ class AnthropicProvider:
             request: dict[str, Any] = {
                 "model": spec.model_id,
                 "max_tokens": spec.max_tokens,
-                "system": _system_blocks(system, cache=not tools),
-                "messages": _apply_cache_control(messages),
+                "system": _system_blocks(system, cache=cache_system),
+                "messages": _apply_cache_control(messages, cache=cache_conversation),
             }
             if tools:
                 request["tools"] = _tool_defs(tools)

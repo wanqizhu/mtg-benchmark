@@ -44,6 +44,7 @@ def _write_problem(
     solution_text="1. Win the game.",
     excluded=False,
     source_url=None,
+    solution_url=None,
 ):
     sample_dir = dataset_dir / sample_id
     sample_dir.mkdir(parents=True)
@@ -54,6 +55,8 @@ def _write_problem(
         metadata["excluded_reason"] = "unreliable reference solution"
     if source_url:
         metadata["source_url"] = source_url
+    if solution_url:
+        metadata["solution_url"] = solution_url
     (sample_dir / "metadata.json").write_text(json.dumps(metadata), encoding="utf-8")
 
 
@@ -258,6 +261,7 @@ def test_collect_site_data_can_hide_problem_details(tmp_path):
     assert by_id["001"]["has_detail"] is True
     assert by_id["001"]["problem_gold_md"].startswith("# Puzzle 001")
     assert by_id["001"]["source_url"] is None
+    assert by_id["001"]["solution_url"] is None
     assert by_id["002"]["has_detail"] is False
     assert by_id["002"]["problem_gold_md"] == ""
     assert by_id["002"]["image"] is None
@@ -268,7 +272,12 @@ def test_collect_site_data_can_hide_problem_details(tmp_path):
 def test_write_site_emits_split_data_with_public_transcripts(tmp_path):
     run_dir = tmp_path / "results" / "run"
     dataset_dir = tmp_path / "dataset"
-    _write_problem(dataset_dir, "001", source_url="https://www.possibilitystorm.com/aer1/")
+    _write_problem(
+        dataset_dir,
+        "001",
+        source_url="https://www.possibilitystorm.com/aer1/",
+        solution_url="https://www.patreon.com/posts/march-1-solution-8357030",
+    )
     (dataset_dir / "001" / "puzzle.jpg").write_bytes(b"jpg")
     _write_json(run_dir / "model-a" / "001.json", _result("model-a", "001"))
     _write_json(run_dir / "model-a" / "001.judge.json", _judge("model-a", "001", True))
@@ -288,6 +297,7 @@ def test_write_site_emits_split_data_with_public_transcripts(tmp_path):
     problem = json.loads((site_dir / "data" / "problems" / "001.json").read_text(encoding="utf-8"))
     assert problem["image"] == "assets/problems/001.jpg"
     assert problem["source_url"] == "https://www.possibilitystorm.com/aer1/"
+    assert problem["solution_url"] == "https://www.patreon.com/posts/march-1-solution-8357030"
     summary = json.loads((site_dir / "data" / "runs" / "run" / "summary.json").read_text(encoding="utf-8"))
     assert "details" not in summary
     assert "problem_gold_md" not in summary["problems"][0]
@@ -302,13 +312,16 @@ def test_write_site_emits_split_data_with_public_transcripts(tmp_path):
     assert "data/manifest.json" in js
     assert "cache: \"no-store\"" in js
     assert "Original problem page" in js
+    assert "Official solution" in js
+    assert "View on Patreon" not in js
     assert "split-layout" in js
     assert "split-pane" in css
     assert ".run-picker[hidden]" in css
     assert "overflow: hidden" in css
     assert "output tokens" in js
     assert "tool calls" in js
-    assert "<th>Tokens</th>" in js
+    assert "<th>Tokens / task</th>" in js
+    assert "perTask" in js
     assert "Cost vs Score" in js
     assert "cost-score-chart" in css
     assert "showVersionColumn" in js
@@ -318,7 +331,19 @@ def test_write_site_emits_split_data_with_public_transcripts(tmp_path):
     assert "https?:[^)\\s]+" in js
     assert "renderTranscript" in js
     assert "Rollout Transcript" in js
-    assert 'data-view="methodology"' in (site_dir / "index.html").read_text(encoding="utf-8")
+    assert "data-open-problem" in js
+    assert "listedProblems" in js
+    assert "friendlyModelName" in js
+    assert "thinking effort high" in js
+    assert ".footnote" in css
+    assert "thinking effort high" in (site_dir / "methodology.md").read_text(encoding="utf-8")
+    html = (site_dir / "index.html").read_text(encoding="utf-8")
+    assert "noindex" in html
+    assert (site_dir / "robots.txt").exists()
+    assert "Disallow: /" in (site_dir / "robots.txt").read_text(encoding="utf-8")
+    assert 'data-view="methodology"' in html
+    assert "Selected Problems" in html
+    assert "Selected Problems" in js
     assert "<th>Attempted</th>" not in js
     assert "<th>Unjudged</th>" not in js
     assert "unjudged" not in js

@@ -16,6 +16,7 @@ SITE_STATIC_DIR = Path(__file__).resolve().parent / "site_static"
 ALL_VERSIONS_ID = "all-versions"
 DEFAULT_SITE_RUNS = ("grep-rules", "tools-rules")
 DEFAULT_EXCLUDED_MODELS = ("claude-sonnet-5-thinking-low",)
+SKIP_RUN_DIRS = frozenset({"site", "logs", "_archive", "_live"})
 RUN_LABELS = {
     "grep-rules": "grep rules",
     "full-rules-in-context": "full rules in context",
@@ -286,6 +287,7 @@ def _dataset_problems(
             continue
         has_detail = detail_ids is None or sample_id in detail_ids
         source_url = str(metadata.get("source_url") or metadata.get("page_url") or "").strip()
+        solution_url = str(metadata.get("solution_url") or "").strip()
         problems[sample_id] = {
             "id": sample_id,
             "difficulty": metadata.get("difficulty", "Unknown"),
@@ -299,6 +301,7 @@ def _dataset_problems(
                 publish_detail=has_detail,
             ),
             "source_url": source_url or None,
+            "solution_url": solution_url or None,
             "has_detail": has_detail,
             "models": [],
         }
@@ -311,7 +314,11 @@ def _has_results(run_dir: Path) -> bool:
 
 def _available_run_dirs(results_dir: Path, run_ids: list[str] | None = None) -> list[Path]:
     available = sorted(
-        (path for path in results_dir.iterdir() if path.is_dir() and path.name != "site" and _has_results(path)),
+        (
+            path
+            for path in results_dir.iterdir()
+            if path.is_dir() and path.name not in SKIP_RUN_DIRS and _has_results(path)
+        ),
         key=lambda path: path.name,
     )
     if run_ids:
@@ -798,7 +805,7 @@ def collect_multi_run_site_data(
 def _copy_static(site_dir: Path) -> None:
     if not SITE_STATIC_DIR.exists():
         raise FileNotFoundError(f"Site static directory not found: {SITE_STATIC_DIR}")
-    for name in ("index.html", "app.js", "styles.css", "methodology.md"):
+    for name in ("index.html", "app.js", "styles.css", "methodology.md", "robots.txt"):
         shutil.copy2(SITE_STATIC_DIR / name, site_dir / name)
     (site_dir / ".nojekyll").write_text("", encoding="utf-8")
 
@@ -824,6 +831,7 @@ def _write_problem_files(site_dir: Path, problems: list[dict[str, Any]]) -> None
                 "solution_text": problem.get("solution_text", ""),
                 "image": problem.get("image"),
                 "source_url": problem.get("source_url"),
+                "solution_url": problem.get("solution_url"),
             },
         )
 

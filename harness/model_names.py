@@ -14,6 +14,7 @@ API_MODEL_IDS: dict[tuple[str, str], str] = {
     ("sonnet", "5"): "claude-sonnet-5",
     ("sonnet", "4-6"): "claude-sonnet-4-6",
     ("sonnet", "4-5"): "claude-sonnet-4-5-20250929",
+    ("opus", "5"): "claude-opus-5",
     ("opus", "4-8"): "claude-opus-4-8",
     ("opus", "4-7"): "claude-opus-4-7",
     ("opus", "4-6"): "claude-opus-4-6",
@@ -29,6 +30,7 @@ ADAPTIVE_THINKING_MODELS = frozenset(
         "claude-fable-5",
         "claude-sonnet-5",
         "claude-sonnet-4-6",
+        "claude-opus-5",
         "claude-opus-4-6",
         "claude-opus-4-7",
         "claude-opus-4-8",
@@ -43,6 +45,7 @@ EFFORT_MODELS = frozenset(
         "claude-sonnet-5",
         "claude-sonnet-4-6",
         "claude-sonnet-4-5-20250929",
+        "claude-opus-5",
         "claude-opus-4-6",
         "claude-opus-4-7",
         "claude-opus-4-8",
@@ -59,6 +62,7 @@ MODEL_MAX_OUTPUT_TOKENS: dict[str, int] = {
     "claude-fable-5": 128_000,
     "claude-sonnet-5": 128_000,
     "claude-sonnet-4-6": 128_000,
+    "claude-opus-5": 128_000,
     "claude-opus-4-8": 128_000,
     "claude-opus-4-7": 128_000,
     "claude-opus-4-6": 128_000,
@@ -258,3 +262,58 @@ def parse_model_name(name: str) -> ModelSpec:
 
 def safe_result_dir_name(name: str) -> str:
     return re.sub(r"[^\w.-]+", "_", name)
+
+
+_DISPLAY_EFFORTS = EFFORT_LEVELS | GROK_EFFORT_LEVELS | OPENAI_EFFORT_LEVELS
+_VERSION_TOKEN = re.compile(r"\d+(?:\.\d+)?")
+
+
+def _title_token(token: str) -> str:
+    if token.lower() == "gpt":
+        return "GPT"
+    if not token:
+        return token
+    return token[:1].upper() + token[1:]
+
+
+def friendly_model_name(name: str) -> str:
+    """Short site label: 'Fable 5.1', dropping default thinking/high suffixes."""
+    text = str(name or "").strip()
+    if " @ " in text:
+        left, _, right = text.partition(" @ ")
+        return f"{friendly_model_name(left)} @ {right}"
+
+    parts = text.split("-")
+    effort: str | None = None
+    while parts:
+        token = parts[-1]
+        if token in _DISPLAY_EFFORTS:
+            effort = token
+            parts.pop()
+        elif token == "thinking":
+            parts.pop()
+        else:
+            break
+
+    if parts and parts[0] == "claude":
+        parts = parts[1:]
+
+    tokens: list[str] = []
+    index = 0
+    while index < len(parts):
+        part = parts[index]
+        if _VERSION_TOKEN.fullmatch(part):
+            nums = [part]
+            index += 1
+            while index < len(parts) and parts[index].isdigit():
+                nums.append(parts[index])
+                index += 1
+            tokens.append(".".join(nums))
+        else:
+            tokens.append(_title_token(part))
+            index += 1
+
+    label = " ".join(tokens) if tokens else text
+    if effort and effort != "high":
+        label = f"{label} {_title_token(effort)}".strip()
+    return label

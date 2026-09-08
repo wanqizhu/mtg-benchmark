@@ -21,7 +21,7 @@ def _sum_costs(paths: list[Path]) -> tuple[float, float]:
     judge_total = 0.0
     for path in paths:
         payload = json.loads(path.read_text(encoding="utf-8"))
-        cost = payload.get("cost", {}).get("usd")
+        cost = (payload.get("cost") or {}).get("usd")
         if cost is None:
             continue
         if path.name.endswith(".judge.json"):

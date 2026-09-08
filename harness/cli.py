@@ -2,9 +2,15 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-from harness.config import DEFAULT_JUDGE_MODEL, DEFAULT_MAX_TURNS, RESULTS_DIR
+from harness.config import (
+    DEFAULT_CONCURRENCY,
+    DEFAULT_JUDGE_MODEL,
+    DEFAULT_MAX_TURNS,
+    RESULTS_DIR,
+)
 from harness.report import print_report
 from harness.site import expand_problem_ids, write_multi_run_site, write_site
 from harness.watch import DEFAULT_WATCH_WINDOW_S
@@ -22,6 +28,23 @@ def _parse_csv(value: str | None) -> list[str] | None:
     if not value:
         return None
     return [part.strip() for part in value.split(",") if part.strip()]
+
+
+def _rollout_executor(concurrency: int) -> ThreadPoolExecutor:
+    """Thread pool big enough for the semaphores the Runner actually opens.
+
+    Rollouts and judges both run through asyncio.to_thread, which dispatches to
+    the loop's *default* executor -- sized min(32, cpu_count + 4), i.e. 12 on an
+    8-core box. Without this, --concurrency only sizes a semaphore in front of
+    that pool: anything above 12 was silently clamped, and judges competed with
+    rollouts for the same slots. Runner opens two semaphores of `concurrency`
+    each (rollouts and judges), so 2x is the real ceiling; the slack keeps loop
+    internals such as getaddrinfo off the critical path.
+    """
+    return ThreadPoolExecutor(
+        max_workers=concurrency * 2 + 4,
+        thread_name_prefix="harness",
+    )
 
 
 async def _async_main(args: argparse.Namespace) -> None:
@@ -68,6 +91,8 @@ async def _async_main(args: argparse.Namespace) -> None:
 
     rules_mode = getattr(args, "rules_mode", "tools")
     judge_model = getattr(args, "judge_model", None)
+    concurrency = getattr(args, "concurrency", DEFAULT_CONCURRENCY)
+    asyncio.get_running_loop().set_default_executor(_rollout_executor(concurrency))
     benchmark = _load_benchmark(args.benchmark, rules_mode=rules_mode, judge_model=judge_model)
     from harness.runner import Runner
 
@@ -76,7 +101,7 @@ async def _async_main(args: argparse.Namespace) -> None:
         run_id=args.run_id,
         results_dir=Path(args.results_dir),
         max_turns=getattr(args, "max_turns", DEFAULT_MAX_TURNS),
-        concurrency=getattr(args, "concurrency", 4),
+        concurrency=concurrency,
         rules_mode=rules_mode,
         max_tokens=getattr(args, "max_tokens", None),
         max_token_continues=getattr(args, "max_token_continues", 0),

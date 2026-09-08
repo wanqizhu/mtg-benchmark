@@ -1,4 +1,4 @@
-from harness.model_names import parse_model_name
+from harness.model_names import friendly_model_name, parse_model_name
 
 
 def test_parse_basic():
@@ -116,6 +116,24 @@ def test_parse_gpt_defaults_to_medium_without_summary():
     assert spec.output_config == {"effort": "medium"}
 
 
+def test_parse_gpt_5_6_terra_thinking_high():
+    spec = parse_model_name("gpt-5.6-terra-thinking-high")
+    assert spec.provider == "openai"
+    assert spec.model_id == "gpt-5.6-terra"
+    assert spec.thinking == {"summary": "auto", "context": "all_turns"}
+    assert spec.output_config == {"effort": "high"}
+    assert spec.max_tokens == 128_000
+
+
+def test_parse_gpt_5_6_luna_thinking_high():
+    spec = parse_model_name("gpt-5.6-luna-thinking-high")
+    assert spec.provider == "openai"
+    assert spec.model_id == "gpt-5.6-luna"
+    assert spec.thinking == {"summary": "auto", "context": "all_turns"}
+    assert spec.output_config == {"effort": "high"}
+    assert spec.max_tokens == 128_000
+
+
 def test_parse_gpt_6_astra_thinking_high():
     spec = parse_model_name("gpt-6-astra-thinking-high")
     assert spec.provider == "openai"
@@ -123,3 +141,22 @@ def test_parse_gpt_6_astra_thinking_high():
     assert spec.thinking == {"summary": "auto", "context": "all_turns"}
     assert spec.output_config == {"effort": "high"}
     assert spec.max_tokens == 128_000
+
+
+def test_friendly_model_name_drops_thinking_and_high():
+    assert friendly_model_name("claude-fable-5-1-thinking-high") == "Fable 5.1"
+    assert friendly_model_name("claude-opus-5-thinking-high") == "Opus 5"
+    assert friendly_model_name("claude-sonnet-5-thinking-high") == "Sonnet 5"
+    assert friendly_model_name("claude-haiku-4-5-thinking") == "Haiku 4.5"
+    assert friendly_model_name("gpt-5.6-sol-thinking-high") == "GPT 5.6 Sol"
+    assert friendly_model_name("gpt-5.6-terra-thinking-high") == "GPT 5.6 Terra"
+    assert friendly_model_name("gpt-5.6-luna-thinking-high") == "GPT 5.6 Luna"
+    assert friendly_model_name("gpt-6-astra-thinking-high") == "GPT 6 Astra"
+    assert friendly_model_name("grok-4.6-high") == "Grok 4.6"
+    assert friendly_model_name("grok-4.5-high") == "Grok 4.5"
+
+
+def test_friendly_model_name_keeps_non_high_effort():
+    assert friendly_model_name("claude-sonnet-5-thinking-low") == "Sonnet 5 Low"
+    assert friendly_model_name("claude-opus-4-8-thinking-xhigh") == "Opus 4.8 Xhigh"
+    assert friendly_model_name("claude-fable-5-1-thinking-high @ grep rules") == "Fable 5.1 @ grep rules"

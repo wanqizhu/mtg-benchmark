@@ -69,13 +69,30 @@ def _load_transcript(path: Path) -> Transcript:
     return Transcript(**data)
 
 
+def _unwrap_exception(exc: BaseException) -> BaseException:
+    """Prefer the API error inside a Tenacity RetryError, when present."""
+    last_attempt = getattr(exc, "last_attempt", None)
+    inner = getattr(last_attempt, "exception", None) if last_attempt is not None else None
+    if callable(inner):
+        try:
+            candidate = inner()
+        except Exception:
+            candidate = None
+        if isinstance(candidate, BaseException):
+            return candidate
+    return exc
+
+
 def _error_payload(exc: BaseException) -> dict[str, Any]:
-    status_code = getattr(exc, "status_code", None)
-    body = getattr(exc, "body", None)
+    root = _unwrap_exception(exc)
+    status_code = getattr(root, "status_code", None)
+    body = getattr(root, "body", None)
     payload: dict[str, Any] = {
-        "type": type(exc).__name__,
-        "message": str(exc),
+        "type": type(root).__name__,
+        "message": str(root),
     }
+    if type(root) is not type(exc):
+        payload["wrapper"] = type(exc).__name__
     if status_code is not None:
         payload["status_code"] = status_code
         payload["client_error"] = 400 <= int(status_code) < 500

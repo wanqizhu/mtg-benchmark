@@ -180,9 +180,79 @@ function formatCount(value) {
   return Number(value || 0).toLocaleString();
 }
 
+function taskCount(row) {
+  return Number(row.attempted || row.judged || 0);
+}
+
+function perTask(row, value) {
+  const n = taskCount(row);
+  return n ? (Number(value) || 0) / n : 0;
+}
+
+function formatPerTaskCount(value) {
+  const n = Number(value) || 0;
+  if (Math.abs(n - Math.round(n)) < 0.05) return formatCount(Math.round(n));
+  return n.toLocaleString(undefined, { maximumFractionDigits: 1, minimumFractionDigits: 1 });
+}
+
 function runLabel(runId) {
   const run = (MANIFEST?.runs || []).find((item) => item.run_id === runId);
   return run?.label || runId || "";
+}
+
+const DISPLAY_EFFORTS = new Set(["none", "low", "medium", "high", "xhigh", "max"]);
+
+function titleToken(token) {
+  if (token.toLowerCase() === "gpt") return "GPT";
+  if (!token) return token;
+  return token.slice(0, 1).toUpperCase() + token.slice(1);
+}
+
+function friendlyModelName(name) {
+  const text = String(name || "").trim();
+  if (text.includes(" @ ")) {
+    const idx = text.indexOf(" @ ");
+    return `${friendlyModelName(text.slice(0, idx))} @ ${text.slice(idx + 3)}`;
+  }
+  const parts = text.split("-");
+  let effort = null;
+  while (parts.length) {
+    const token = parts[parts.length - 1];
+    if (DISPLAY_EFFORTS.has(token)) {
+      effort = token;
+      parts.pop();
+    } else if (token === "thinking") {
+      parts.pop();
+    } else {
+      break;
+    }
+  }
+  if (parts[0] === "claude") parts.shift();
+  const tokens = [];
+  for (let i = 0; i < parts.length; ) {
+    if (/^\d+(?:\.\d+)?$/.test(parts[i])) {
+      const nums = [parts[i]];
+      i += 1;
+      while (i < parts.length && /^\d+$/.test(parts[i])) {
+        nums.push(parts[i]);
+        i += 1;
+      }
+      tokens.push(nums.join("."));
+    } else {
+      tokens.push(titleToken(parts[i]));
+      i += 1;
+    }
+  }
+  let label = tokens.join(" ") || text;
+  if (effort && effort !== "high") label = `${label} ${titleToken(effort)}`.trim();
+  return label;
+}
+
+function modelLabel(rowOrName) {
+  if (rowOrName && typeof rowOrName === "object") {
+    return friendlyModelName(rowOrName.original_model || rowOrName.name || rowOrName.model || "");
+  }
+  return friendlyModelName(rowOrName || "");
 }
 
 function isGrepRules(runId) {
@@ -305,6 +375,14 @@ function combineRunSummaries(runs) {
     problems,
     models: orderedModels,
   };
+}
+
+function listedProblems() {
+  return (DATA?.problems || []).filter((item) => item.has_detail !== false);
+}
+
+function isOnProblemsPage(sampleId) {
+  return listedProblems().some((item) => item.id === sampleId);
 }
 
 function manifestRun(runId) {
@@ -517,9 +595,7 @@ function showVersionColumn() {
 }
 
 function chartLabel(row) {
-  return String(row.original_model || row.name || "")
-    .replace(/-thinking-(high|low)$/, " ($1)")
-    .replace(/-thinking$/, "");
+  return modelLabel(row);
 }
 
 function providerHue(name) {
@@ -555,12 +631,12 @@ function renderCostScoreChart(rows) {
   const pad = { top: 18, right: 168, bottom: 52, left: 56 };
   const plotW = width - pad.left - pad.right;
   const plotH = height - pad.top - pad.bottom;
-  const costMax = niceCeiling(Math.max(...points.map((row) => Number(row.total_cost_usd) || 0), 1));
+  const costMax = niceCeiling(Math.max(...points.map((row) => perTask(row, row.total_cost_usd)), 1));
   const xTicks = 5;
   const yTicks = [0, 25, 50, 75, 100];
 
   const placed = points.map((row) => {
-    const cost = Number(row.total_cost_usd) || 0;
+    const cost = perTask(row, row.total_cost_usd);
     const score = (Number(row.pass_rate) || 0) * 100;
     return {
       row,
@@ -613,7 +689,7 @@ function renderCostScoreChart(rows) {
       <svg class="cost-score-chart" viewBox="0 0 ${width} ${height}" role="img" aria-label="Cost versus pass rate">
         ${grid.join("")}
         <text class="chart-axis" x="${pad.left - 40}" y="${pad.top + plotH / 2}" text-anchor="middle" transform="rotate(-90 ${pad.left - 40} ${pad.top + plotH / 2})">Score</text>
-        <text class="chart-axis" x="${pad.left + plotW / 2}" y="${height - 8}" text-anchor="middle">Total cost (USD)</text>
+        <text class="chart-axis" x="${pad.left + plotW / 2}" y="${height - 8}" text-anchor="middle">Cost per task (USD)</text>
         ${dots}
       </svg>
     </div>
@@ -648,21 +724,22 @@ function renderLeaderboard() {
       <table>
         <thead><tr>
           <th>Rank</th><th>Model</th>${versions ? "<th>Version</th>" : ""}<th>Pass Rate</th><th>Passed</th>
-          <th>Tokens</th>${tools ? "<th>Tools</th>" : ""}<th>Cost</th>
+          <th>Tokens / task</th>${tools ? "<th>Tools / task</th>" : ""}<th>Cost / task</th>
         </tr></thead>
         <tbody>
           ${DATA.leaderboard.map((row) => `<tr class="clickable" data-model="${esc(row.name)}">
             <td>${row.rank}</td>
-            <td><strong>${esc(row.original_model || row.name)}</strong></td>
+            <td><strong>${esc(modelLabel(row))}</strong></td>
             ${versions ? `<td>${esc(runLabel(row.version || DATA.run_id))}</td>` : ""}
             <td>${pct(row.pass_rate)}</td>
             <td>${row.passed}/${row.judged}</td>
-            <td>${formatCount(row.output_tokens)}</td>
-            ${tools ? `<td>${showToolCalls(row) ? formatCount(row.tool_call_count) : "—"}</td>` : ""}
-            <td>${money(row.total_cost_usd)}</td>
+            <td>${formatPerTaskCount(perTask(row, row.output_tokens))}</td>
+            ${tools ? `<td>${showToolCalls(row) ? formatPerTaskCount(perTask(row, row.tool_call_count)) : "—"}</td>` : ""}
+            <td>${money(perTask(row, row.total_cost_usd))}</td>
           </tr>`).join("")}
         </tbody>
       </table>
+      <p class="footnote">All models are with thinking effort high unless otherwise specified.</p>
     </section>
   </div>`;
   bindChartPoints(app);
@@ -683,11 +760,32 @@ function bindPairButtons(root) {
   });
 }
 
-async function renderProblems(selectedId = DATA.problems[0]?.id, seq = routeSeq) {
-  const problem = DATA.problems.find((item) => item.id === selectedId) || DATA.problems[0];
+function bindProblemPageButtons(root) {
+  root.querySelectorAll("[data-open-problem]").forEach((button) => {
+    button.addEventListener("click", () => navigate({
+      view: "problems",
+      problemId: button.dataset.openProblem,
+      modelName: null,
+      sampleId: null,
+    }));
+  });
+}
+
+async function renderProblems(selectedId = null, seq = routeSeq) {
+  const listed = listedProblems();
+  if (selectedId && listed.length && !listed.some((item) => item.id === selectedId)) {
+    navigate({
+      view: "problems",
+      problemId: listed[0].id,
+      modelName: null,
+      sampleId: null,
+    }, { replace: true });
+    return;
+  }
+  const problem = listed.find((item) => item.id === selectedId) || listed[0];
   if (!problem) {
     app.classList.remove("split");
-    app.innerHTML = `<section class="card"><h2>No Problems</h2></section>`;
+    app.innerHTML = `<section class="card"><h2>No Selected Problems</h2></section>`;
     return;
   }
   const detail = problem.has_detail ? await loadProblem(problem.id) : null;
@@ -705,9 +803,9 @@ async function renderProblems(selectedId = DATA.problems[0]?.id, seq = routeSeq)
   }
   app.innerHTML = `<div class="split-layout problem-layout">
     <aside class="card split-pane">
-      <h2>Problems</h2>
+      <h2>Selected Problems</h2>
       <div class="list">
-        ${DATA.problems.map((item) => `<button data-problem="${esc(item.id)}" class="${item.id === problem.id ? "active" : ""}">
+        ${listed.map((item) => `<button data-problem="${esc(item.id)}" class="${item.id === problem.id ? "active" : ""}">
           <strong>Problem ${esc(item.id)}</strong><br>
           <span class="muted">${esc(item.difficulty)} · ${item.passed}/${item.judged} passed</span>
         </button>`).join("")}
@@ -735,8 +833,13 @@ function renderProblemDetail(problem, detail) {
   const gold = published ? detail.problem_gold_md : "";
   const solution = published ? detail.solution_text : "";
   const sourceUrl = published ? detail.source_url : "";
-  const sourceLink = sourceUrl
-    ? `<p class="problem-source-link"><a class="title-link" href="${esc(sourceUrl)}" target="_blank" rel="noopener noreferrer">Original problem page</a></p>`
+  const solutionUrl = published ? detail.solution_url : "";
+  const sourceLinks = [
+    sourceUrl && `<a class="title-link" href="${esc(sourceUrl)}" target="_blank" rel="noopener noreferrer">Original problem page</a>`,
+    solutionUrl && `<a class="title-link" href="${esc(solutionUrl)}" target="_blank" rel="noopener noreferrer">Official solution</a>`,
+  ].filter(Boolean);
+  const sourceLink = sourceLinks.length
+    ? `<p class="problem-source-link">${sourceLinks.join('<span class="link-sep"> · </span>')}</p>`
     : "";
   const body = published
     ? `<div class="problem-source-grid">
@@ -769,7 +872,7 @@ function renderProblemDetail(problem, detail) {
 }
 
 function renderOutcomeRow(row) {
-  const label = `${esc(row.original_model || row.model)}${row.version ? ` · ${esc(runLabel(row.version))}` : ""}`;
+  const label = `${esc(modelLabel(row))}${row.version ? ` · ${esc(runLabel(row.version))}` : ""}`;
   if (row.status === "not_attempted") {
     return `<tr>
       <td><span class="muted">${label}</span></td>
@@ -800,7 +903,7 @@ function renderModels(selectedName = DATA.models[0]?.name) {
     });
     const detail = app.querySelector(".detail-pane");
     detail.innerHTML = `<section class="card">${renderModelTable(model)}</section>`;
-    bindPairButtons(detail);
+    bindProblemPageButtons(detail);
     return;
   }
   app.innerHTML = `<div class="split-layout models-layout">
@@ -808,7 +911,7 @@ function renderModels(selectedName = DATA.models[0]?.name) {
       <h2>Models</h2>
       <div class="list">
         ${DATA.models.map((item) => `<button data-model-list="${esc(item.name)}" class="${item.name === model.name ? "active" : ""}">
-          <strong>${esc(item.original_model || item.name)}</strong><br>
+          <strong>${esc(modelLabel(item))}</strong><br>
           <span class="muted">${item.version ? `${esc(runLabel(item.version))} · ` : ""}${pct(item.pass_rate)} · ${item.passed}/${item.judged}</span>
         </button>`).join("")}
       </div>
@@ -827,17 +930,19 @@ function renderModels(selectedName = DATA.models[0]?.name) {
       sampleId: null,
     }));
   });
-  bindPairButtons(app);
+  bindProblemPageButtons(app);
 }
 
 function renderModelTable(model) {
-  return `<h2>${esc(model.original_model || model.name)}</h2>
+  return `<h2>${esc(modelLabel(model))}</h2>
     <p class="muted">${model.version ? `${esc(runLabel(model.version))} · ` : ""}${esc(model.model_id)} · ${pct(model.pass_rate)} · ${model.passed}/${model.judged} passed</p>
     <details><summary>Model config</summary><pre>${esc(JSON.stringify(model.model_config || {}, null, 2))}</pre></details>
     <table>
       <thead><tr><th>Problem</th><th>Status</th><th>Usage</th><th>Cost</th></tr></thead>
       <tbody>${model.problems.map((row) => `<tr>
-        <td><button class="link-button" data-pair="${esc(model.name)}|||${esc(row.sample_id)}">Problem ${esc(row.sample_id)}</button></td>
+        <td>${isOnProblemsPage(row.sample_id)
+          ? `<button class="link-button" data-open-problem="${esc(row.sample_id)}">Problem ${esc(row.sample_id)}</button>`
+          : `Problem ${esc(row.sample_id)}`}</td>
         <td>${statusPill(row.passed, row.judged)}</td>
         <td>${esc(rolloutUsage({...row, version: row.version || model.version}))}</td>
         <td>${money((row.rollout_cost_usd || 0) + (row.judge_cost_usd || 0))}</td>
@@ -856,7 +961,7 @@ async function renderRunDetail(modelName, sampleId, seq = routeSeq) {
   app.innerHTML = `<button class="link-button" id="back-button">Back to ${esc(lastListView)}</button>
     <section class="grid">
       <article class="card">
-        <h2>${esc(detail.original_model || modelName)} · Problem ${esc(sampleId)}</h2>
+        <h2>${esc(modelLabel(detail.original_model || modelName))} · Problem ${esc(sampleId)}</h2>
         <p>${statusPill(detail.passed, detail.judged)} <span class="muted">${esc(rolloutUsage({
           ...detail,
           version: detail.version || DATA.run_id,

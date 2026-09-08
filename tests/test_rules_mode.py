@@ -1,6 +1,7 @@
 from benchmarks.mtg.bench import MTGBenchmark
 from harness.model_names import parse_model_name
 from harness.providers.anthropic import (
+    CONVERSATION_CACHE_MODELS,
     PREWARM_MAX_TOKENS,
     _apply_cache_control,
     _cache_control,
@@ -87,14 +88,8 @@ def test_prewarm_request_omits_thinking_when_disabled():
     assert "output_config" not in request
 
 
-def test_inline_one_shot_does_not_cache_user_prompt():
-    messages = [{"role": "user", "content": [{"type": "text", "text": "puzzle"}]}]
-    cached = _apply_cache_control(messages)
-    assert "cache_control" not in cached[0]["content"][0]
-
-
-def test_tools_does_not_cache_messages():
-    messages = [
+def _conversation() -> list[dict]:
+    return [
         {"role": "user", "content": [{"type": "text", "text": "puzzle"}]},
         {"role": "assistant", "content": [{"type": "text", "text": "thinking"}]},
         {
@@ -102,14 +97,56 @@ def test_tools_does_not_cache_messages():
             "content": [{"type": "tool_result", "tool_use_id": "1", "content": "rules"}],
         },
     ]
-    cached = _apply_cache_control(messages)
+
+
+def test_inline_one_shot_does_not_cache_user_prompt():
+    messages = [{"role": "user", "content": [{"type": "text", "text": "puzzle"}]}]
+    cached = _apply_cache_control(messages, cache=False)
+    assert "cache_control" not in cached[0]["content"][0]
+
+
+def test_uncached_models_do_not_cache_messages():
+    cached = _apply_cache_control(_conversation(), cache=False)
     assert "cache_control" not in cached[0]["content"][0]
     assert "cache_control" not in cached[2]["content"][0]
 
 
-def test_tools_does_not_cache_system_prompt():
+def test_rolling_breakpoint_marks_only_the_latest_turn():
+    cached = _apply_cache_control(_conversation(), cache=True)
+    assert cached[2]["content"][-1]["cache_control"] == {"type": "ephemeral", "ttl": "1h"}
+    assert "cache_control" not in cached[0]["content"][0]
+    assert "cache_control" not in cached[1]["content"][0]
+
+
+def test_rolling_breakpoint_moves_and_leaves_no_stale_markers():
+    """Turn N's breakpoint must be dropped when turn N+1 adds its own."""
+    messages = _apply_cache_control(_conversation(), cache=True)
+    messages.append(
+        {"role": "user", "content": [{"type": "tool_result", "tool_use_id": "2", "content": "more"}]}
+    )
+    cached = _apply_cache_control(messages, cache=True)
+    marked = [i for i, m in enumerate(cached) if "cache_control" in m["content"][-1]]
+    assert marked == [3]
+
+
+def test_apply_cache_control_does_not_mutate_caller_messages():
+    messages = _conversation()
+    _apply_cache_control(messages, cache=True)
+    assert "cache_control" not in messages[-1]["content"][-1]
+
+
+def test_system_prompt_caching_follows_the_cache_flag():
     assert "cache_control" not in _system_blocks("tools system", cache=False)[0]
     assert _system_blocks("inline rules", cache=True)[0]["cache_control"]["ttl"] == "1h"
+
+
+def test_conversation_cache_is_enabled_only_for_sonnet_5_and_opus_5():
+    cached = {parse_model_name(n).model_id for n in ("claude-sonnet-5", "claude-opus-5")}
+    assert CONVERSATION_CACHE_MODELS == cached
+    # Haiku's 4096-token minimum exceeds the tools-mode prefix, and short
+    # rollouts lose money on the write premium.
+    assert parse_model_name("claude-haiku-4-5-thinking").model_id not in CONVERSATION_CACHE_MODELS
+    assert parse_model_name("claude-fable-5-1-thinking-high").model_id not in CONVERSATION_CACHE_MODELS
 
 
 def test_default_judge_model_is_sol():

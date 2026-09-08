@@ -218,6 +218,11 @@ tr.clickable:hover { background: color-mix(in srgb, var(--accent) 8%, transparen
 .fail { color: var(--fail); border-color: color-mix(in srgb, var(--fail) 55%, var(--line)); }
 .warn { color: var(--warn); border-color: color-mix(in srgb, var(--warn) 55%, var(--line)); }
 .muted { color: var(--muted); }
+.footnote {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
 
 .list { display: grid; gap: 10px; }
 .list button { width: 100%; text-align: left; border-radius: 14px; }
@@ -244,6 +249,9 @@ tr.clickable:hover { background: color-mix(in srgb, var(--accent) 8%, transparen
 .problem-source-link {
   margin: 10px 0 0;
   font-size: 14px;
+}
+.link-sep {
+  color: var(--muted);
 }
 .methodology-card {
   max-width: 760px;
