@@ -325,6 +325,8 @@ def test_write_site_emits_split_data_with_public_transcripts(tmp_path):
     assert "Cost vs Score" in js
     assert "cost-score-chart" in css
     assert "showVersionColumn" in js
+    assert "omitRunFromHash" in js
+    assert "canonicalizeHash" in js
     assert "grep-rules" in js
     assert "runLabel" in js
     assert "methodology.md" in js

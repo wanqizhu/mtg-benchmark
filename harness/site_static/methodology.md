@@ -10,7 +10,7 @@ In private eval I am including puzzles from the most recent sets which are defin
 
 Models get a stock system prompt describing general puzzle assumptions (win this turn, assum no extra cards, etc), the transcribed puzzle, and must return detailed steps in `<solution>` tags, accounting for all opponent decisions. All cards in the puzzle have full oracle text included.
 
-To make sure models have full information available, we provide the full comprehensive rules. This is over 200k tokens, so we give the model ability to `grep` and `read` a local copy. (A second mode, full rules in context, pastes the entire rules document into the system prompt. I found it did not have a meaningful effect on model performance and costs significantly more, as frontier models mostly memorize the rules.)
+To make sure models have full information available, we provide the full comprehensive rules. This is over 200k tokens, so we give the model ability to `grep` and `read` a local copy. (A second mode, full rules in context, pastes the entire rules document into the system prompt. I found it did not have a meaningful effect on model performance and costs significantly more for frontier models, which mostly memorize the rules. It is possible this mode is better for really hard problems, since otherwise models might not know what to search for.)
 
 Full rollout transcripts are provided for a subset of problems, see problems detail page.
 

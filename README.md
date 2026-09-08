@@ -54,5 +54,5 @@ bench site --output-dir ../mtg-benchmark-site \
   --exclude-models claude-sonnet-5-thinking-low,claude-opus-4-8-thinking-high
 ```
 
-`--problems` is the leaderboard/models set. `--detail-problems` is the published puzzle pages. Preview with `python -m http.server 8000 --directory ../mtg-benchmark-site`.
+`--problems` is the leaderboard/models set. `--detail-problems` is the published puzzle pages. Preview with `python -m http.server 8000 --directory ../mtg-benchmark-site`. The site repo `.gitignore` allowlists problem files for 001-020 so later ids cannot be committed.
 

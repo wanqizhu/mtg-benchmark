@@ -21,42 +21,60 @@ function defaultRoute() {
   };
 }
 
+function knownRunId(value) {
+  return (MANIFEST?.runs || []).some((item) => item.run_id === value);
+}
+
+function omitRunFromHash() {
+  return !hasMultipleRuns();
+}
+
 function parseHash() {
   const route = defaultRoute();
   const encoded = (location.hash || "").replace(/^#\/?/, "");
   const parts = encoded.split("/").filter(Boolean).map((part) => {
     try { return decodeURIComponent(part); } catch { return part; }
   });
-  if (parts[0]) route.runId = parts[0];
-  if (parts[1] === "detail") {
+  if (!parts.length) return route;
+  let rest = parts;
+  if (knownRunId(parts[0])) {
+    route.runId = parts[0];
+    rest = parts.slice(1);
+  } else if (!VALID_VIEWS.has(parts[0])) {
+    route.runId = parts[0];
+    rest = parts.slice(1);
+  }
+  if (rest[0] === "detail") {
     route.view = "detail";
-    route.modelName = parts[2] || null;
-    route.sampleId = parts[3] || null;
+    route.modelName = rest[1] || null;
+    route.sampleId = rest[2] || null;
     return route;
   }
-  if (parts[1] && VALID_VIEWS.has(parts[1])) route.view = parts[1];
-  if (route.view === "problems") route.problemId = parts[2] || null;
-  if (route.view === "models") route.modelName = parts[2] || null;
+  if (rest[0] && VALID_VIEWS.has(rest[0])) route.view = rest[0];
+  if (route.view === "problems") route.problemId = rest[1] || null;
+  if (route.view === "models") route.modelName = rest[1] || null;
   return route;
 }
 
-function routeHash(route) {
-  const runId = encodeURIComponent(route.runId || defaultRoute().runId);
+function viewPath(route) {
   if (route.view === "detail" && route.modelName && route.sampleId) {
-    return `#/${runId}/detail/${encodeURIComponent(route.modelName)}/${encodeURIComponent(route.sampleId)}`;
+    return `detail/${encodeURIComponent(route.modelName)}/${encodeURIComponent(route.sampleId)}`;
   }
   if (route.view === "problems") {
-    return route.problemId
-      ? `#/${runId}/problems/${encodeURIComponent(route.problemId)}`
-      : `#/${runId}/problems`;
+    return route.problemId ? `problems/${encodeURIComponent(route.problemId)}` : "problems";
   }
   if (route.view === "models") {
-    return route.modelName
-      ? `#/${runId}/models/${encodeURIComponent(route.modelName)}`
-      : `#/${runId}/models`;
+    return route.modelName ? `models/${encodeURIComponent(route.modelName)}` : "models";
   }
-  if (route.view === "methodology") return `#/${runId}/methodology`;
-  return `#/${runId}/leaderboard`;
+  if (route.view === "methodology") return "methodology";
+  return "leaderboard";
+}
+
+function routeHash(route) {
+  const path = viewPath(route);
+  if (omitRunFromHash()) return `#/${path}`;
+  const runId = encodeURIComponent(route.runId || defaultRoute().runId);
+  return `#/${runId}/${path}`;
 }
 
 function navigate(patch, { replace = false } = {}) {
@@ -72,6 +90,12 @@ function navigate(patch, { replace = false } = {}) {
     return;
   }
   location.hash = hash;
+}
+
+function canonicalizeHash(route = parseHash()) {
+  const hash = routeHash(route);
+  if (hash !== location.hash) history.replaceState(null, "", hash);
+  return route;
 }
 
 function esc(value) {
@@ -512,6 +536,7 @@ function initRunSelector() {
 }
 
 async function applyRoute(route = parseHash()) {
+  canonicalizeHash(route);
   const seq = ++routeSeq;
   const meta = manifestRun(route.runId);
   try {
@@ -1085,10 +1110,7 @@ fetch("data/manifest.json", { cache: "no-store" })
     initRunSelector();
     document.querySelectorAll(".nav-button").forEach((button) => button.addEventListener("click", () => setView(button.dataset.view)));
     window.addEventListener("hashchange", () => applyRoute());
-    if (!location.hash) {
-      history.replaceState(null, "", routeHash(defaultRoute()));
-    }
-    applyRoute();
+    applyRoute(canonicalizeHash());
   })
   .catch((error) => {
     app.innerHTML = `<section class="card"><h2>Could not load data/manifest.json</h2><pre>${esc(error.stack || error.message || error)}</pre></section>`;
