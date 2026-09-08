@@ -24,6 +24,19 @@ def test_parse_005_skips_rulings_preamble():
     assert "vehicle can crew itself" not in steps
 
 
+def test_005_solution_notes_obsolete_self_crew():
+    metadata = json.loads((DATASET / "005" / "metadata.json").read_text(encoding="utf-8"))
+    text = metadata["solution_text"]
+    assert "vehicle could crew itself" in text
+    assert "This is no longer valid" in text
+    assert "15 damage" in text
+    assert "<solution>" in text
+    assert text.strip().endswith(
+        "Grade as correct if the model provided the old solution, or pointed out the crew rules change and provides a solution with 15 damage."
+    )
+    assert "Yes, a vehicle can crew itself" in metadata["solution_text_raw"]
+
+
 def test_parse_010_skips_rules_notes():
     steps = parse_official_solution(_raw("010"))
     assert steps.startswith("1. Cast Doomed Dissenter")

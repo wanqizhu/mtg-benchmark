@@ -192,7 +192,7 @@ function pct(value) {
 }
 
 function money(value) {
-  return value ? `$${Number(value).toFixed(4)}` : "-";
+  return value ? `$${Number(value).toFixed(2)}` : "-";
 }
 
 function statusPill(passed, judged) {
@@ -758,7 +758,7 @@ function renderLeaderboard() {
             ${versions ? `<td>${esc(runLabel(row.version || DATA.run_id))}</td>` : ""}
             <td>${pct(row.pass_rate)}</td>
             <td>${row.passed}/${row.judged}</td>
-            <td>${formatPerTaskCount(perTask(row, row.output_tokens))}</td>
+            <td>${formatCount(Math.round(perTask(row, row.output_tokens)))}</td>
             ${tools ? `<td>${showToolCalls(row) ? formatPerTaskCount(perTask(row, row.tool_call_count)) : "—"}</td>` : ""}
             <td>${money(perTask(row, row.total_cost_usd))}</td>
           </tr>`).join("")}
@@ -1016,9 +1016,61 @@ function prettyJson(value) {
   }
 }
 
-function renderCollapsible(title, body, { open = false, extraClass = "" } = {}) {
+function titleCaseName(name) {
+  const text = String(name || "").trim();
+  if (!text) return "Call";
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+function toolsCatalogText(tools) {
+  return (tools || []).map((tool) => {
+    const title = titleCaseName(tool.name);
+    const desc = String(tool.description || "").trim();
+    return desc ? `${title}\n${desc}` : title;
+  }).filter(Boolean).join("\n\n");
+}
+
+function mergeTranscriptTurns(turns) {
+  const catalog = [];
+  const rest = [];
+  for (const turn of turns || []) {
+    if (turn?.role === "tools") {
+      const text = toolsCatalogText(turn.tools);
+      if (text) catalog.push(text);
+      continue;
+    }
+    rest.push(turn);
+  }
+  if (!catalog.length) return rest;
+  const extra = catalog.join("\n\n");
+  const idx = rest.findIndex((turn) => turn?.role === "system");
+  if (idx >= 0) {
+    const system = rest[idx];
+    const copy = rest.slice();
+    copy[idx] = { ...system, text: [system.text, extra].filter(Boolean).join("\n\n") };
+    return copy;
+  }
+  return [{ role: "system", text: extra }, ...rest];
+}
+
+function toolCallParts(name, input) {
+  const args = input && typeof input === "object" && !Array.isArray(input) ? input : {};
+  const kind = String(name || "").toLowerCase();
+  if (kind === "grep" && args.pattern) return ["Pattern", String(args.pattern)];
+  if (kind === "read") {
+    const start = Number(args.line_number);
+    const count = Number(args.num_lines);
+    if (Number.isFinite(start) && start >= 1 && Number.isFinite(count) && count >= 1) {
+      return ["Lines", `${start}–${start + count - 1}`];
+    }
+    if (Number.isFinite(start) && start >= 1) return ["Lines", String(start)];
+  }
+  return null;
+}
+
+function renderCollapsible(title, body, { open = false, extraClass = "", maxOpen = 800 } = {}) {
   if (!body) return "";
-  const startOpen = open && body.length < 800;
+  const startOpen = open && body.length < maxOpen;
   return `<details class="turn-block ${extraClass}"${startOpen ? " open" : ""}><summary>${esc(title)}</summary><pre>${esc(body)}</pre></details>`;
 }
 
@@ -1028,32 +1080,41 @@ function renderLabeled(title, body, extraClass = "") {
   return `<div class="turn-block ${extraClass}"><div class="turn-label">${title}</div><pre>${esc(body)}</pre></div>`;
 }
 
+function renderToolUse(block) {
+  const name = titleCaseName(block?.name || "call");
+  const parts = toolCallParts(block?.name, block?.input || {});
+  let body = "";
+  if (parts) {
+    body = `<p class="tool-arg"><span class="tool-arg-label">${esc(parts[0])}</span> ${esc(parts[1])}</p>`;
+  } else {
+    const raw = prettyJson(block?.input || {});
+    if (raw && raw !== "{}") body = `<pre>${esc(raw)}</pre>`;
+  }
+  return `<div class="turn-block tool"><div class="turn-heading">${esc(name)}</div>${body}</div>`;
+}
+
 function renderContentBlock(block) {
   const type = block?.type;
   if (type === "thinking") {
-    return renderCollapsible("Thinking", block.thinking || "", { extraClass: "thinking" });
+    return renderCollapsible("Thinking", block.thinking || "", { open: true, extraClass: "thinking", maxOpen: 1000 });
   }
   if (type === "text") {
     return renderLabeled("Output", block.text || "", "output");
   }
   if (type === "tool_use") {
-    return renderLabeled(`Tool · ${block.name || "call"}`, prettyJson(block.input || {}), "tool");
+    return renderToolUse(block);
   }
   if (type === "tool_result") {
-    return renderCollapsible("Tool result", String(block.content || ""), { extraClass: "tool-result" });
+    return renderCollapsible("Tool Result", String(block.content || ""), { extraClass: "tool-result" });
   }
   return "";
 }
 
 function renderTurn(turn) {
   const role = turn?.role;
-  if (!role || role === "config") return "";
-  if (role === "tools") {
-    const names = (turn.tools || []).map((tool) => tool.name).filter(Boolean).join(", ");
-    return renderCollapsible(names ? `Tools · ${names}` : "Tools", prettyJson(turn.tools || []), { extraClass: "role-tools" });
-  }
+  if (!role || role === "config" || role === "tools") return "";
   if (role === "system") {
-    return renderCollapsible("System prompt", turn.text || "", { extraClass: "role-system" });
+    return renderCollapsible("System Prompt", turn.text || "", { extraClass: "role-system" });
   }
   const parts = [];
   if (role === "user" && turn.text) {
@@ -1069,7 +1130,7 @@ function renderTurn(turn) {
 }
 
 function renderTranscript(transcript) {
-  const turns = transcript?.turns || [];
+  const turns = mergeTranscriptTurns(transcript?.turns || []);
   if (!turns.length) {
     return `<article class="card"><h3>Rollout Transcript</h3><p class="muted">No transcript published for this attempt.</p></article>`;
   }

@@ -333,11 +333,18 @@ def test_write_site_emits_split_data_with_public_transcripts(tmp_path):
     assert "https?:[^)\\s]+" in js
     assert "renderTranscript" in js
     assert "Rollout Transcript" in js
+    assert "renderToolUse" in js
+    assert "tool-arg-label" in js
+    assert "maxOpen: 1000" in js
+    assert "mergeTranscriptTurns" in js
+    assert "System Prompt" in js
+    assert "Tool Result" in js
     assert "data-open-problem" in js
     assert "listedProblems" in js
     assert "friendlyModelName" in js
     assert "thinking effort high" in js
     assert ".footnote" in css
+    assert "#back-button" in css
     assert "thinking effort high" in (site_dir / "methodology.md").read_text(encoding="utf-8")
     html = (site_dir / "index.html").read_text(encoding="utf-8")
     assert "noindex" in html

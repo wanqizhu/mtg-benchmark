@@ -112,6 +112,7 @@ button, .link-button {
   padding: 8px 13px;
 }
 button:hover, .link-button:hover, button.active { border-color: var(--accent); color: var(--accent); }
+#back-button { margin-bottom: 18px; }
 
 .shell {
   width: min(1500px, 100%);
@@ -332,7 +333,11 @@ details {
   padding: 10px 12px;
 }
 details + details { margin-top: 10px; }
-summary { cursor: pointer; font-weight: 700; }
+summary, .turn-heading {
+  font-weight: 700;
+  color: var(--text);
+}
+summary { cursor: pointer; }
 details pre { border: 0; padding: 10px 0 0; background: transparent; }
 
 .transcript { display: grid; gap: 12px; }
@@ -351,8 +356,16 @@ details pre { border: 0; padding: 10px 0 0; background: transparent; }
   text-transform: uppercase;
   margin-bottom: 8px;
 }
-.turn-block.thinking { border-color: color-mix(in srgb, var(--warn) 40%, var(--line)); }
-.turn-block.tool, .turn-block.tool-result { border-color: color-mix(in srgb, var(--accent) 35%, var(--line)); }
+.turn-block.thinking { border-color: var(--warn); }
+.turn-block.tool, .turn-block.tool-result { border-color: var(--accent); }
 .turn-block.output { border-color: color-mix(in srgb, var(--pass) 35%, var(--line)); }
 .turn-block.prompt, .turn-block.role-system { border-color: var(--line); }
 .turn-block pre { border: 0; padding: 0; background: transparent; }
+.turn-block.tool pre { padding: 10px 0 0; }
+.tool-arg {
+  margin: 10px 0 0;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.45;
+}
+.tool-arg-label { color: var(--warn); }
