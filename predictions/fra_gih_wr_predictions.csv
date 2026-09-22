@@ -1,0 +1,291 @@
+set,collector_number,name,rarity,color,predicted_gih_wr
+FRA,1,"Emrakul, the Exigent Doom",mythic,C,53.5
+FRA,2,Academic Ascent,common,W,54.0
+FRA,3,Blossom-Blessed Angel // Seed Suture,common,W,55.0
+FRA,4,Campus Crier,common,W,54.5
+FRA,5,Enlightened Confidant,mythic,W,57.0
+FRA,6,Fateshaper Aspirant,common,W,53.5
+FRA,7,Flickering Hound,rare,W,55.0
+FRA,8,Generous Revival,uncommon,W,53.5
+FRA,9,Germinate Recruits,rare,W,52.5
+FRA,10,Graft Surgeon,common,W,54.5
+FRA,11,Guiding Hydra,rare,W,59.0
+FRA,12,Hexhaven Battalion,common,W,57.0
+FRA,13,Kindred Judgment,rare,W,56.0
+FRA,14,Loyal Tutor,rare,W,50.5
+FRA,15,Memory Trap,common,W,58.0
+FRA,16,Predictive Preparations,common,W,53.5
+FRA,17,Prophesied End,uncommon,W,56.0
+FRA,18,Refute Destiny,uncommon,W,54.5
+FRA,19,Repurposed Enforcer,rare,W,56.5
+FRA,20,Return to the Light Realms,mythic,W,49.0
+FRA,21,Shatterwing Pegasus,common,W,54.5
+FRA,22,Surgical Precision,common,W,56.5
+FRA,23,Unflinching Hortimancer,common,W,55.0
+FRA,24,Your Fate Ends Here,uncommon,W,58.0
+FRA,25,Countersculpt,uncommon,U,55.5
+FRA,26,Cruel Calculations,rare,U,51.0
+FRA,27,Cryotheory Adept,common,U,54.0
+FRA,28,Diviner of Victory // Unwind History,rare,U,54.0
+FRA,29,Divining Duelist,common,U,54.5
+FRA,30,Icy Reception,common,U,55.5
+FRA,31,Infinite Coursework,common,U,55.5
+FRA,32,Jace's Machinations,rare,U,55.5
+FRA,33,Mindseeker Oculus,common,U,57.0
+FRA,34,Perfected Theory,uncommon,U,54.5
+FRA,35,Plan for All Outcomes,uncommon,U,57.0
+FRA,36,Precise Redaction,uncommon,U,51.5
+FRA,37,Protege's Awakening,common,U,55.5
+FRA,38,Seasoned Cryomancer,mythic,U,58.5
+FRA,39,Semester Foreseer // Peer Review,common,U,54.5
+FRA,40,Sphinx of False Conclusions,rare,U,60.0
+FRA,41,Sphinx's Approach,common,U,54.0
+FRA,42,Surveillance Phantasm,common,U,53.5
+FRA,43,"The Theorist, Jace Beleren",mythic,U,62.5
+FRA,44,Theorist's Proxy,rare,U,56.5
+FRA,45,Undulating Witness,common,U,56.0
+FRA,46,Unsummon,common,U,53.0
+FRA,47,Variable Chaser // Arc of Fortune,rare,U,55.5
+FRA,48,Apex Witchstalker,common,B,55.5
+FRA,49,Bloodline Recollector // Ancestral Craving,mythic,B,53.5
+FRA,50,Break Under Pressure,uncommon,B,56.5
+FRA,51,Cast Away Doubt,common,B,54.5
+FRA,52,Dark Matter Manipulator,rare,B,54.0
+FRA,53,Darklight Phoenix,mythic,B,56.0
+FRA,54,Extended Absence,common,B,58.5
+FRA,55,Extrapolate the Impossible,rare,B,50.0
+FRA,56,Last Gasp,common,B,57.5
+FRA,57,Lich's Relic,rare,B,60.0
+FRA,58,Multiply by Zero,uncommon,B,58.5
+FRA,59,Overwrite the Multiverse,mythic,B,60.0
+FRA,60,Rampart Hunter,common,B,53.5
+FRA,61,Rank Rat,common,B,55.0
+FRA,62,Rewrite Regrets,uncommon,B,53.5
+FRA,63,Rise of the Deathbringer,rare,B,58.0
+FRA,64,Sanctum Lurker,rare,B,57.5
+FRA,65,Screeching Soulbreaker,common,B,55.0
+FRA,66,Silence the Echo,common,B,56.0
+FRA,67,Solve for Disappointment,common,B,52.5
+FRA,68,Terminal Criticism,uncommon,B,54.5
+FRA,69,Theoretical Necromancer,common,B,53.0
+FRA,70,Void Extrapolator // Omit Variables,common,B,54.5
+FRA,71,Vraska's Final Mercy,rare,B,58.5
+FRA,72,Ajani's Anguish,rare,R,56.0
+FRA,73,Artifist Acumen,common,R,53.5
+FRA,74,Awaken the Inferno,common,R,56.5
+FRA,75,Blazing Crescendo,common,R,54.5
+FRA,76,Chandra's Emberling,common,R,52.5
+FRA,77,Command the Stage,uncommon,R,54.0
+FRA,78,Craterclaw Colossus,mythic,R,55.5
+FRA,79,Curse-Marred Demon,rare,R,60.0
+FRA,80,Draconic Visitor,rare,R,59.0
+FRA,81,Eardrum Rattler,common,R,52.5
+FRA,82,Essence Burn,uncommon,R,52.0
+FRA,83,Face Yourself,rare,R,54.0
+FRA,84,Fulminous Forte,uncommon,R,58.5
+FRA,85,Hallway Heckler // Vicious Verse,common,R,53.5
+FRA,86,Heartstring Puller,common,R,54.5
+FRA,87,Identity Echo,rare,R,50.5
+FRA,88,Master of Barbs,rare,R,55.0
+FRA,89,No Admittance,common,R,57.5
+FRA,90,Pompous Battlemage // Improvised Act,rare,R,51.5
+FRA,91,Pyre Rhymer // Molten Tide,rare,R,55.0
+FRA,92,Skilled Battlecarver,common,R,54.5
+FRA,93,Stingcaster Mage,mythic,R,57.5
+FRA,94,Tether Technician,common,R,54.5
+FRA,95,Violent Echoes,uncommon,R,58.0
+FRA,96,Wrath of the Bloodmane,common,R,58.0
+FRA,97,Arcane Amphisbaena,common,G,55.0
+FRA,98,Bestial Incursion,common,G,56.0
+FRA,99,Budding Insurgent,common,G,54.5
+FRA,100,Carnivorous Cultivator // Enroot,rare,G,56.5
+FRA,101,Compel Brutality,common,G,57.0
+FRA,102,Flourishing Grapple,uncommon,G,51.5
+FRA,103,Gardenize,rare,G,47.0
+FRA,104,Greenhouse Propagator,common,G,55.5
+FRA,105,Heartwood Crafter // Soul Tether,uncommon,G,53.5
+FRA,106,Hexhaven Invigorator,mythic,G,57.0
+FRA,107,Hungering Puppetbeast,rare,G,58.5
+FRA,108,Hunter's Axe,uncommon,G,53.5
+FRA,109,Inspired Tethermage,common,G,53.5
+FRA,110,Omnipresence,mythic,G,47.5
+FRA,111,Puppet Crafting,rare,G,54.0
+FRA,112,Restore with Empathy,uncommon,G,52.5
+FRA,113,Simulacrum Shaper,rare,G,57.5
+FRA,114,Something Worth Saving,common,G,54.0
+FRA,115,Sureshot Sower,common,G,54.0
+FRA,116,Tarmogoyf,mythic,G,56.5
+FRA,117,Tethermage's Advantage,common,G,52.5
+FRA,118,Verdant Kraken,rare,G,58.0
+FRA,119,Vinelasher Adept,common,G,54.5
+FRA,120,Wrecking Gecko,common,G,54.5
+FRA,121,Aerid Konstrari,mythic,RG,63.0
+FRA,122,Avatar of Burgeoning Echoes,mythic,GU,58.5
+FRA,123,Blessed Ghoul,common,WB,51.5
+FRA,124,Bloombrute,uncommon,GW,58.0
+FRA,125,Charge the Sanctum,common,RW,52.0
+FRA,126,Clash of Elements,uncommon,UR,57.5
+FRA,127,Craftwork Crusher,uncommon,RG,56.0
+FRA,128,Denzilore Fatehold,mythic,WU,61.5
+FRA,129,Desperate Futurescribe,uncommon,WU,59.0
+FRA,130,Emergency Phytomedic // Seed Suture,common,GW,54.0
+FRA,131,Entrust the Spark,rare,GU,48.0
+FRA,132,Fatehold Charm,uncommon,WU,56.0
+FRA,133,Fatehold Chronologist // Peer Review,common,WU,54.5
+FRA,134,Ferocity of the Hunt,common,BG,52.0
+FRA,135,Frostbite Pyromental,rare,UR,52.5
+FRA,136,Grim Repriser,uncommon,BR,55.5
+FRA,137,Ingris Stingerquill,mythic,BR,60.5
+FRA,138,Konstrari Charm,uncommon,RG,53.5
+FRA,139,Konstrari Improviser // Soul Tether,common,RG,54.0
+FRA,140,Kwia Vigorbloom,mythic,GW,62.0
+FRA,141,Mind Meanderer,uncommon,GU,56.5
+FRA,142,Null Summoner,rare,UB,57.5
+FRA,143,Paradox Shaper // Omit Variables,uncommon,UB,53.5
+FRA,144,Primal Witchstalker,uncommon,BG,55.5
+FRA,145,Proctor of Potential,rare,WU,57.5
+FRA,146,Prudent Fateseer // Peer Review,uncommon,WU,55.5
+FRA,147,Recursive Recruitment,uncommon,UB,56.0
+FRA,148,Solarium Sentry,rare,GW,56.5
+FRA,149,Solitary Cell,rare,RW,56.0
+FRA,150,Stingerquill Charm,uncommon,BR,58.5
+FRA,151,Stingerquill Voxmancer // Vicious Verse,uncommon,BR,54.5
+FRA,152,Stinging Vitriol,rare,BR,53.5
+FRA,153,Tam's Resistance,common,GU,54.0
+FRA,154,Tenured Tethermage,rare,RG,55.5
+FRA,155,Theorix Charm,uncommon,UB,55.5
+FRA,156,Theorix Metamage // Omit Variables,common,UB,54.5
+FRA,157,Twinned Vision,common,UR,52.5
+FRA,158,Twisted Fates,uncommon,WB,57.0
+FRA,159,Uldaros Theorix,mythic,UB,61.0
+FRA,160,Vigorbloom Charm,uncommon,GW,57.0
+FRA,161,Vigorbloom Vanguard // Seed Suture,uncommon,GW,55.0
+FRA,162,Vindictive Triumph,rare,WB,58.0
+FRA,163,Warrior's Blades,uncommon,RW,56.0
+FRA,164,Whiplash Wordsmith // Vicious Verse,common,BR,53.5
+FRA,165,Woodwork Prodigy // Soul Tether,uncommon,RG,56.0
+FRA,166,Afterthought Sentry,common,C,52.0
+FRA,167,Archive Arbiter,uncommon,C,54.0
+FRA,168,"Codie, Ravenous Codex",rare,C,52.5
+FRA,169,The Echoverse Fulcrum,mythic,C,57.0
+FRA,170,Eye of Jace,uncommon,C,51.0
+FRA,171,Keeper of the Quiet Hour,common,C,53.5
+FRA,172,Living Library,common,C,52.0
+FRA,173,Medic's Kitesail,common,C,51.5
+FRA,174,Murmuring Volume,common,C,51.0
+FRA,175,Dedicated Commons,common,L,55.5
+FRA,176,Deserted Beach,rare,L,56.5
+FRA,177,Fatehold Annex,common,L,56.0
+FRA,178,Formidable Commons,common,L,55.5
+FRA,179,Hall of Echoes,rare,L,53.5
+FRA,180,Haunted Ridge,rare,L,56.5
+FRA,181,Hexhaven Dueling Arena,uncommon,L,51.0
+FRA,182,Innovative Commons,common,L,55.0
+FRA,183,Konstrari Annex,common,L,56.0
+FRA,184,Meticulous Commons,common,L,55.5
+FRA,185,Overgrown Farmland,rare,L,56.5
+FRA,186,Rockfall Vale,rare,L,56.5
+FRA,187,Roiling Canopy,rare,L,50.0
+FRA,188,Room of Refuge,common,L,54.5
+FRA,189,Shipwreck Marsh,rare,L,56.0
+FRA,190,Stingerquill Annex,common,L,56.5
+FRA,191,Theorist's Sanctum,rare,L,56.0
+FRA,192,Theorix Annex,common,L,55.5
+FRA,193,Transformative Commons,common,L,55.0
+FRA,194,Vigorbloom Annex,common,L,56.0
+FRA,195,Ajani Resolute,mythic,W,54.5
+FRA,196,"Danitha, Sword of Hope",uncommon,W,54.0
+FRA,197,Ghalta the Immovable,uncommon,W,52.0
+FRA,198,Gideon's Memorial,rare,W,54.0
+FRA,199,Koth of the Homestead,uncommon,W,56.0
+FRA,200,Liliana the Faultless,rare,W,56.5
+FRA,201,"Lyra, Archangel of Dawn",rare,W,59.5
+FRA,202,"Rescue Girl, First Responder",uncommon,W,53.5
+FRA,203,"Saheeli, Consul of Oversight",uncommon,W,56.5
+FRA,204,"Teyo, Lightshield Expert",uncommon,W,55.5
+FRA,205,"Thalia, the Survivor",uncommon,W,55.5
+FRA,206,"Tomik, Orzhov Lawmage",uncommon,W,55.0
+FRA,207,Way of the Healer,uncommon,W,55.0
+FRA,208,Way of the Mentor,uncommon,W,54.0
+FRA,209,"Yoshimaru, Beloved Companion",uncommon,W,53.5
+FRA,210,"Yuriko, Blade of the Mighty",uncommon,W,52.5
+FRA,211,"Arni, Humble Scribe",uncommon,U,55.5
+FRA,212,"Chandra, Chill of Compliance",mythic,U,56.0
+FRA,213,"Fblthp, Impossibly Lost",uncommon,U,53.0
+FRA,214,Geist of Saint Thalia,uncommon,U,54.0
+FRA,215,"Hapatra, the Desert Frost",uncommon,U,56.5
+FRA,216,"Jace, Reality Sculptor",rare,U,55.0
+FRA,217,"Lyra, Tolarian Archangel",rare,U,59.5
+FRA,218,"Proft, Consulting Detective",uncommon,U,56.0
+FRA,219,"Ruric Thar, Biomagus",uncommon,U,56.0
+FRA,220,"Samut, Tyrant of Naktamun",rare,U,50.5
+FRA,221,"Tetsuko Umezawa, Fugitive",uncommon,U,53.5
+FRA,222,"Traxos, Academy Guardian",uncommon,U,55.0
+FRA,223,Way of the Cryomancer,uncommon,U,54.5
+FRA,224,Way of the Mind Sculptor,uncommon,U,53.5
+FRA,225,"Yargle, Goliath of Otaria",uncommon,U,51.0
+FRA,226,"Yuriko, Hope from the Shadows",uncommon,U,53.5
+FRA,227,"Danitha, Spear of Agony",uncommon,B,54.5
+FRA,228,"Gallia, Tragic Host",uncommon,B,56.0
+FRA,229,"Garruk, Veiled Butcher",mythic,B,60.5
+FRA,230,Gideon the Oathless,rare,B,57.0
+FRA,231,Liliana the Repentant,rare,B,55.0
+FRA,232,"Loot, the Anomaly",uncommon,B,52.5
+FRA,233,"Mabel, Bitter Recluse",uncommon,B,54.5
+FRA,234,"Massacre Girl, Most Wanted",uncommon,B,55.5
+FRA,235,"Proft, Sinister Mastermind",uncommon,B,54.0
+FRA,236,"Teyo, Diamondblade Mage",uncommon,B,54.0
+FRA,237,"Tinybones, Pocket Nuisance",uncommon,B,55.0
+FRA,238,Way of the Deathbringer,uncommon,B,55.5
+FRA,239,Way of the Necromancer,uncommon,B,50.5
+FRA,240,"Winter, Tormented Loner",uncommon,B,54.5
+FRA,241,"Yargle, Glutton of Urborg",uncommon,B,50.5
+FRA,242,Ajani Unrelenting,mythic,R,61.0
+FRA,243,"Arni, Renowned Champion",uncommon,R,52.5
+FRA,244,"Chandra, Torch of Defiance",mythic,R,62.0
+FRA,245,"Gallia, the Merrymaker",uncommon,R,54.5
+FRA,246,"Jiang Yanggu, Alone",uncommon,R,54.0
+FRA,247,Kiora of Fire and Ashes,uncommon,R,58.0
+FRA,248,"Koth, the Geomancer",uncommon,R,55.5
+FRA,249,"Marwyn, the Clearcutter",uncommon,R,54.5
+FRA,250,"Pia, Determined Rebuilder",uncommon,R,55.5
+FRA,251,"Samut, Hazoret's Champion",rare,R,54.5
+FRA,252,"Tetsuko Umezawa, Pursuer",uncommon,R,56.0
+FRA,253,"Tomik, Izzet Sparkmage",uncommon,R,53.5
+FRA,254,Way of the Pyromancer,uncommon,R,53.5
+FRA,255,Way of the Warlord,uncommon,R,55.5
+FRA,256,"Winter, Team Player",uncommon,R,52.5
+FRA,257,"Edgar, Moonlit Sovereign",uncommon,G,56.0
+FRA,258,"Fblthp, Knows the Way",uncommon,G,54.0
+FRA,259,"Garruk, Curse Breaker",mythic,G,62.0
+FRA,260,Ghalta the Unstoppable,uncommon,G,54.0
+FRA,261,"Jiang Yanggu, Never Alone",uncommon,G,56.0
+FRA,262,"Loot, the Nexus",uncommon,G,55.0
+FRA,263,"Marwyn, the Preserver",uncommon,G,54.5
+FRA,264,"Pia, Aether Ascetic",uncommon,G,52.0
+FRA,265,"Ruric Thar, Magecrusher",uncommon,G,56.5
+FRA,266,"Titanbones, Towering Heart",uncommon,G,55.0
+FRA,267,Way of the Paradox,uncommon,G,53.0
+FRA,268,Way of the Wildspeaker,uncommon,G,57.5
+FRA,269,"Yoshimaru, Scrappy Stray",uncommon,G,55.0
+FRA,270,"Edgar, Ancient Bloodlord",uncommon,WB,55.0
+FRA,271,"Hapatra, the Desert Fang",uncommon,BG,57.5
+FRA,272,"Karn, Gilded Guardian",rare,WUBRG,51.0
+FRA,273,Kiora of Salt and Sand,uncommon,GU,53.5
+FRA,274,"Mabel, Valley Hero",uncommon,RW,55.5
+FRA,275,"Saheeli, Jewel of Avishkar",uncommon,UR,57.0
+FRA,276,"Tam, the Possibility",rare,WUBRG,51.5
+FRA,277,"Vraska, Soul of Stone",rare,URW,54.0
+FRA,278,"Vraska, the Cutting Glare",rare,BG,59.5
+FRA,279,"Karn, Argent Defender",rare,C,49.5
+FRA,280,"Traxos, Scourge Eternal",uncommon,C,54.5
+SPG,159,Eye of Ugin,mythic,L,45.0
+SPG,160,Austere Command,mythic,W,59.5
+SPG,161,Flesh Duplicate,mythic,U,55.5
+SPG,162,Consign to Memory,mythic,U,48.0
+SPG,163,Sublime Epiphany,mythic,U,57.0
+SPG,164,Consider,mythic,U,55.5
+SPG,165,Necrodominance,mythic,B,47.0
+SPG,166,Mind Twist,mythic,B,55.0
+SPG,167,Splinter Twin,mythic,R,51.0
+SPG,168,Root Maze,mythic,G,44.0
