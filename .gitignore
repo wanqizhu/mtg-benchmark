@@ -9,3 +9,4 @@ datasets/manual_solutions.json
 *.egg-info/
 dist/
 build/
+scratch/
