@@ -14,6 +14,7 @@ API_MODEL_IDS: dict[tuple[str, str], str] = {
     ("sonnet", "5"): "claude-sonnet-5",
     ("sonnet", "4-6"): "claude-sonnet-4-6",
     ("sonnet", "4-5"): "claude-sonnet-4-5-20250929",
+    ("opus", "5-5"): "claude-opus-5-5",
     ("opus", "5"): "claude-opus-5",
     ("opus", "4-8"): "claude-opus-4-8",
     ("opus", "4-7"): "claude-opus-4-7",
@@ -30,6 +31,7 @@ ADAPTIVE_THINKING_MODELS = frozenset(
         "claude-fable-5",
         "claude-sonnet-5",
         "claude-sonnet-4-6",
+        "claude-opus-5-5",
         "claude-opus-5",
         "claude-opus-4-6",
         "claude-opus-4-7",
@@ -45,6 +47,7 @@ EFFORT_MODELS = frozenset(
         "claude-sonnet-5",
         "claude-sonnet-4-6",
         "claude-sonnet-4-5-20250929",
+        "claude-opus-5-5",
         "claude-opus-5",
         "claude-opus-4-6",
         "claude-opus-4-7",
@@ -62,6 +65,7 @@ MODEL_MAX_OUTPUT_TOKENS: dict[str, int] = {
     "claude-fable-5": 128_000,
     "claude-sonnet-5": 128_000,
     "claude-sonnet-4-6": 128_000,
+    "claude-opus-5-5": 128_000,
     "claude-opus-5": 128_000,
     "claude-opus-4-8": 128_000,
     "claude-opus-4-7": 128_000,
@@ -74,6 +78,7 @@ FALLBACK_MAX_OUTPUT_TOKENS = 64_000
 
 # (version) -> xAI API model id. Friendly names use grok-{version}[-{effort}].
 GROK_API_MODEL_IDS: dict[str, str] = {
+    "4.7": "grok-4.7",
     "4.6": "grok-4.6",
     "4.5": "grok-4.5",
 }
@@ -86,6 +91,53 @@ GROK_DEFAULT_EFFORT = "high"
 # gpt-{version}[-{tier}][-thinking][-{effort}].
 OPENAI_MAX_OUTPUT_TOKENS = 128_000
 OPENAI_DEFAULT_EFFORT = "medium"
+
+# Gemini friendly names use gemini-{version}[-{tier}][-thinking][-{level}].
+# Gemini 3 always thinks; `-thinking` is accepted and ignored. The level maps
+# to thinking_config.thinking_level. https://ai.google.dev/gemini-api/docs/models
+GEMINI_THINKING_LEVELS = frozenset({"minimal", "low", "medium", "high"})
+GEMINI_API_MODEL_IDS: dict[str, str] = {
+    "3.1-pro": "gemini-3.1-pro-preview",
+    "3-flash": "gemini-3-flash-preview",
+    "3.8-flash": "gemini-3.8-flash",
+    "3.7-flash": "gemini-3.7-flash",
+    "3.6-flash": "gemini-3.6-flash",
+    "3.5-flash": "gemini-3.5-flash",
+    "3.1-flash-lite": "gemini-3.1-flash-lite",
+    "2.5-pro": "gemini-2.5-pro",
+    "2.5-flash": "gemini-2.5-flash",
+}
+# Gemini 3 Pro/Flash cap output (including thinking) at 65,536 tokens.
+GEMINI_MAX_OUTPUT_TOKENS = 65_536
+GEMINI_DEFAULT_LEVEL = "high"
+
+# OpenRouter serves open-weight models over OpenAI chat completions.
+# Friendly names: an alias below, or the raw `openrouter/{vendor}/{model}`,
+# each optionally followed by [-thinking][-{effort}].
+# https://openrouter.ai/models?supported_parameters=tools,reasoning
+OPENROUTER_ALIASES: dict[str, str] = {
+    "glm-5.3": "z-ai/glm-5.3",
+    "glm-5.2": "z-ai/glm-5.2",
+    "deepseek-v4-pro": "deepseek/deepseek-v4-pro",
+    "deepseek-v4-flash": "deepseek/deepseek-v4-flash",
+    "deepseek-v4.1-flash": "deepseek/deepseek-v4.1-flash",
+    "kimi-k3": "moonshotai/kimi-k3",
+    "kimi-k2.6": "moonshotai/kimi-k2.6",
+    # Open-weight Qwen 3.8 flagship (2.4T total / 95B active). qwen3.8-max is
+    # Alibaba's API-only model.
+    "qwen3.8": "qwen/qwen3.8-2.4t-a95b",
+    "qwen3.8-max": "qwen/qwen3.8-max-0902",
+    "qwen3.7-max": "qwen/qwen3.7-max",
+    "nemotron-3-ultra": "nvidia/nemotron-3-ultra-550b-a55b",
+    "minimax-m3": "minimax/minimax-m3",
+    "gpt-oss-120b": "openai/gpt-oss-120b",
+    "gpt-oss-20b": "openai/gpt-oss-20b",
+    "gemma-4-31b": "google/gemma-4-31b-it",
+}
+OPENROUTER_PREFIX = "openrouter/"
+OPENROUTER_EFFORT_LEVELS = frozenset({"none", "minimal", "low", "medium", "high", "xhigh", "max"})
+OPENROUTER_MAX_OUTPUT_TOKENS = 128_000
+OPENROUTER_DEFAULT_EFFORT = "high"
 
 
 @dataclass(frozen=True)
@@ -199,20 +251,98 @@ def _parse_openai_model_name(name: str) -> ModelSpec:
     )
 
 
+def _split_suffix(name: str, levels: frozenset[str]) -> tuple[str, str | None]:
+    """Strip trailing -thinking / -{level} tokens. Returns (base, level)."""
+    parts = name.split("-")
+    level: str | None = None
+    while len(parts) > 1:
+        token = parts[-1]
+        if token in levels:
+            level = token
+            parts = parts[:-1]
+        elif token == "thinking":
+            parts = parts[:-1]
+        else:
+            break
+    return "-".join(parts), level
+
+
+def _parse_gemini_model_name(name: str) -> ModelSpec:
+    """Parse gemini-{version}[-{tier}][-thinking][-{level}] into API settings.
+
+    Version may be dotted (`3.1`) or hyphenated (`3-1`). The level is a
+    Gemini thinking_level; default high.
+    """
+    base, level = _split_suffix(name, GEMINI_THINKING_LEVELS)
+    parts = base.split("-")
+    if len(parts) < 2 or parts[0] != "gemini":
+        raise ValueError(f"Invalid model name: {name!r}")
+    rest = parts[1:]
+    if len(rest) >= 2 and rest[0].isdigit() and rest[1].isdigit():
+        rest = [f"{rest[0]}.{rest[1]}", *rest[2:]]
+    version = "-".join(rest)
+    if not version:
+        raise ValueError(f"Missing version in model name: {name!r}")
+    model_id = GEMINI_API_MODEL_IDS.get(version, f"gemini-{version}")
+    level = level or GEMINI_DEFAULT_LEVEL
+    return ModelSpec(
+        name=name,
+        provider="gemini",
+        model_id=model_id,
+        thinking={"thinking_level": level, "include_thoughts": True},
+        output_config={"effort": level},
+        max_tokens=GEMINI_MAX_OUTPUT_TOKENS,
+    )
+
+
+def _parse_openrouter_model_name(name: str) -> ModelSpec | None:
+    """Parse an OpenRouter alias or `openrouter/{vendor}/{model}[-thinking][-{effort}]`.
+
+    Returns None when the name is not an OpenRouter model.
+    """
+    base, effort = _split_suffix(name, OPENROUTER_EFFORT_LEVELS)
+    if base.startswith(OPENROUTER_PREFIX):
+        model_id = base[len(OPENROUTER_PREFIX) :]
+        if "/" not in model_id:
+            raise ValueError(
+                f"OpenRouter model must be '{OPENROUTER_PREFIX}vendor/model': {name!r}"
+            )
+    elif base in OPENROUTER_ALIASES:
+        model_id = OPENROUTER_ALIASES[base]
+    else:
+        return None
+    return ModelSpec(
+        name=name,
+        provider="openrouter",
+        model_id=model_id,
+        thinking=None,
+        output_config={"effort": effort or OPENROUTER_DEFAULT_EFFORT},
+        max_tokens=OPENROUTER_MAX_OUTPUT_TOKENS,
+    )
+
+
 def parse_model_name(name: str) -> ModelSpec:
     """Parse a friendly model name into API settings.
 
     Claude: claude-{family}-{version}[-thinking][-{effort}]
     Grok: grok-{version}[-thinking][-{effort}]
     OpenAI: gpt-{version}[-{tier}][-thinking][-{effort}]
+    Gemini: gemini-{version}[-{tier}][-thinking][-{level}]
+    OpenRouter: {alias} or openrouter/{vendor}/{model}, each [-thinking][-{effort}]
     """
+    openrouter = _parse_openrouter_model_name(name)
+    if openrouter is not None:
+        return openrouter
+    if name.startswith("gemini-"):
+        return _parse_gemini_model_name(name)
     if name.startswith("grok-"):
         return _parse_grok_model_name(name)
     if name.startswith("gpt-"):
         return _parse_openai_model_name(name)
     if not name.startswith("claude-"):
         raise ValueError(
-            f"Model name must start with 'claude-', 'grok-', or 'gpt-': {name!r}"
+            "Model name must start with 'claude-', 'grok-', 'gpt-', 'gemini-', "
+            f"'openrouter/', or be an OpenRouter alias ({', '.join(sorted(OPENROUTER_ALIASES))}): {name!r}"
         )
 
     parts = name.split("-")
@@ -264,13 +394,16 @@ def safe_result_dir_name(name: str) -> str:
     return re.sub(r"[^\w.-]+", "_", name)
 
 
-_DISPLAY_EFFORTS = EFFORT_LEVELS | GROK_EFFORT_LEVELS | OPENAI_EFFORT_LEVELS
+_DISPLAY_EFFORTS = (
+    EFFORT_LEVELS | GROK_EFFORT_LEVELS | OPENAI_EFFORT_LEVELS | GEMINI_THINKING_LEVELS | OPENROUTER_EFFORT_LEVELS
+)
 _VERSION_TOKEN = re.compile(r"\d+(?:\.\d+)?")
+_UPPER_TOKENS = {"gpt": "GPT", "glm": "GLM", "oss": "OSS"}
 
 
 def _title_token(token: str) -> str:
-    if token.lower() == "gpt":
-        return "GPT"
+    if token.lower() in _UPPER_TOKENS:
+        return _UPPER_TOKENS[token.lower()]
     if not token:
         return token
     return token[:1].upper() + token[1:]
@@ -282,6 +415,9 @@ def friendly_model_name(name: str) -> str:
     if " @ " in text:
         left, _, right = text.partition(" @ ")
         return f"{friendly_model_name(left)} @ {right}"
+    if text.startswith(OPENROUTER_PREFIX):
+        # openrouter/z-ai/glm-5.3-thinking-high -> label from the model slug only.
+        text = text.rsplit("/", 1)[-1]
 
     parts = text.split("-")
     effort: str | None = None

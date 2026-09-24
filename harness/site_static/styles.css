@@ -255,7 +255,7 @@ tr.clickable:hover { background: color-mix(in srgb, var(--accent) 8%, transparen
   color: var(--muted);
 }
 .methodology-card {
-  max-width: 760px;
+  max-width: none;
 }
 .methodology-md h1 { font-size: 1.6rem; margin: 0 0 .6em; }
 .methodology-md h2 { font-size: 1.2rem; margin: 1.4em 0 .5em; }

@@ -7,9 +7,10 @@ from typing import Any
 import anthropic
 from tenacity import retry, stop_after_attempt, wait_exponential
 
-from harness.config import get_api_key
+from harness.config import DEFAULT_MAX_TOKEN_CONTINUES, get_api_key
 from harness.core import Tool, Transcript
 from harness.model_names import ModelSpec
+from harness.providers.base import append_max_token_continue
 from harness.progress import RolloutProgress, snapshot_output_size
 from harness.prompt_log import log_tools
 
@@ -149,7 +150,7 @@ PROMPT_CACHE_TTL = "1h"
 # no-op). 1h rather than 5m because turn durations are long -- p50 164s, p90
 # 745s -- so a 5m entry expires mid-rollout ~40% of the time, and a miss
 # re-writes the whole prefix at the write rate instead of reading it at 0.1x.
-CONVERSATION_CACHE_MODELS = frozenset({"claude-sonnet-5", "claude-opus-5"})
+CONVERSATION_CACHE_MODELS = frozenset({"claude-sonnet-5", "claude-opus-5", "claude-opus-5-5"})
 
 
 def _prewarm_request(*, spec: ModelSpec, system: str) -> dict[str, Any]:
@@ -331,7 +332,7 @@ class AnthropicProvider:
         prompt: str,
         tools: list[Tool],
         max_turns: int,
-        max_token_continues: int = 0,
+        max_token_continues: int = DEFAULT_MAX_TOKEN_CONTINUES,
         resume_from: Transcript | None = None,
         progress: RolloutProgress | None = None,
     ) -> Transcript:
@@ -365,7 +366,6 @@ class AnthropicProvider:
             tool_call_count = 0
         else:
             transcript_turns = list(resume_from.turns)
-            messages = _messages_from_transcript(transcript_turns)
             usage = dict(resume_from.usage)
             tool_call_count = resume_from.tool_call_count
 
@@ -374,6 +374,19 @@ class AnthropicProvider:
             for turn in transcript_turns
             if turn.get("role") == "user" and turn.get("reason") == "continue_after_max_tokens"
         )
+        if resume_from is not None:
+            queued = max_token_continue_count
+            max_token_continue_count = append_max_token_continue(
+                transcript_turns,
+                max_token_continue_count,
+                max_token_continues,
+            )
+            messages = _messages_from_transcript(transcript_turns)
+            if max_token_continue_count != queued and progress:
+                progress.log(
+                    f"continuing after max_tokens "
+                    f"({max_token_continue_count}/{max_token_continues})"
+                )
 
         if progress:
             progress.write(

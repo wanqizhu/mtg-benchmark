@@ -1,5 +1,7 @@
 # Methodology
 
+Source and harness: [github.com/wanqizhu/mtg-benchmark](https://github.com/wanqizhu/mtg-benchmark).
+
 ## Puzzles
 
 Problems come from [Possibility Storm](https://www.patreon.com/mtgpuzzles). We transcribe the original image with a combination of models and cross-verified manually. Official solutions are taken from patreon and used for grading. To prevent solution leakage, I am only publishing details for a subset of problems.  

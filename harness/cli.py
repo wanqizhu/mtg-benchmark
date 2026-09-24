@@ -8,6 +8,7 @@ from pathlib import Path
 from harness.config import (
     DEFAULT_CONCURRENCY,
     DEFAULT_JUDGE_MODEL,
+    DEFAULT_MAX_TOKEN_CONTINUES,
     DEFAULT_MAX_TURNS,
     RESULTS_DIR,
 )
@@ -104,7 +105,7 @@ async def _async_main(args: argparse.Namespace) -> None:
         concurrency=concurrency,
         rules_mode=rules_mode,
         max_tokens=getattr(args, "max_tokens", None),
-        max_token_continues=getattr(args, "max_token_continues", 0),
+        max_token_continues=getattr(args, "max_token_continues", DEFAULT_MAX_TOKEN_CONTINUES),
         judge_model=judge_model,
     )
 
@@ -144,7 +145,8 @@ def main() -> None:
             help=(
                 "Comma-separated model names, e.g. "
                 "claude-sonnet-4-6-thinking-high, gpt-5.6-sol-thinking-high, "
-                "or grok-4.6-high"
+                "grok-4.6-high, gemini-3.1-pro-thinking-high, glm-5.3-thinking-high, "
+                "or openrouter/deepseek/deepseek-v4-pro-thinking-high"
             ),
         )
         p.add_argument("--samples", help="Comma-separated sample ids, e.g. 001,002")
@@ -167,8 +169,11 @@ def main() -> None:
     run_parser.add_argument(
         "--max-token-continues",
         type=int,
-        default=0,
-        help="Append a single 'continue' user message up to N times after stop_reason=max_tokens",
+        default=DEFAULT_MAX_TOKEN_CONTINUES,
+        help=(
+            "Append a single 'continue' user message up to N times after "
+            f"stop_reason=max_tokens (default: {DEFAULT_MAX_TOKEN_CONTINUES})"
+        ),
     )
     run_parser.add_argument("--concurrency", type=int, default=4)
     run_parser.add_argument(

@@ -382,7 +382,13 @@ function combineRunSummaries(runs) {
     }
   }
 
-  leaderboard.sort((a, b) => (b.pass_rate - a.pass_rate) || (b.passed - a.passed) || a.version.localeCompare(b.version) || a.name.localeCompare(b.name));
+  leaderboard.sort((a, b) => (
+    (b.pass_rate - a.pass_rate)
+    || (perTask(a, a.total_cost_usd) - perTask(b, b.total_cost_usd))
+    || (b.passed - a.passed)
+    || String(a.version || "").localeCompare(String(b.version || ""))
+    || a.name.localeCompare(b.name)
+  ));
   leaderboard.forEach((row, index) => { row.rank = index + 1; });
   const modelsByName = Object.fromEntries(models.map((model) => [model.name, model]));
   const orderedModels = leaderboard.map((row) => modelsByName[row.name]).filter(Boolean);
@@ -625,6 +631,8 @@ function chartLabel(row) {
 
 function providerHue(name) {
   const value = String(name || "").toLowerCase();
+  // Open-weight models served through OpenRouter (gpt-oss included).
+  if (/(openrouter\/|gpt-oss|glm-|deepseek|kimi|qwen|nemotron|minimax|gemma)/.test(value)) return "other";
   if (/(claude|fable|haiku|sonnet|opus)/.test(value)) return "anthropic";
   if (/(gpt|astra|openai)/.test(value)) return "openai";
   if (value.includes("grok")) return "xai";
@@ -665,7 +673,7 @@ function renderCostScoreChart(rows) {
     const score = (Number(row.pass_rate) || 0) * 100;
     return {
       row,
-      x: pad.left + (cost / costMax) * plotW,
+      x: pad.left + ((costMax - cost) / costMax) * plotW,
       y: pad.top + (1 - score / 100) * plotH,
       score,
       cost,
@@ -693,7 +701,7 @@ function renderCostScoreChart(rows) {
     grid.push(`<text class="chart-tick" x="${pad.left - 8}" y="${y + 4}" text-anchor="end">${score}</text>`);
   }
   for (let i = 0; i < xTicks; i++) {
-    const value = (costMax / (xTicks - 1)) * i;
+    const value = costMax - (costMax / (xTicks - 1)) * i;
     const x = pad.left + (i / (xTicks - 1)) * plotW;
     grid.push(`<line class="chart-grid" x1="${x}" y1="${pad.top}" x2="${x}" y2="${pad.top + plotH}"></line>`);
     grid.push(`<text class="chart-tick" x="${x}" y="${pad.top + plotH + 18}" text-anchor="middle">${esc(axisMoney(value))}</text>`);

@@ -13,7 +13,7 @@ python -m venv .venv
 source .venv/bin/activate
 pip install -e .
 cp .env.example .env
-# set ANTHROPIC_API_KEY / OPENAI_API_KEY / XAI_API_KEY in .env
+# set ANTHROPIC_API_KEY / OPENAI_API_KEY / XAI_API_KEY / GEMINI_API_KEY / OPENROUTER_API_KEY in .env
 
 Put the puzzles dataset at `datasets/mtg/` (gitignored).
 `results/` is also gitignored, so rollout transcripts stay local.
@@ -26,6 +26,8 @@ bench run --run-id smoke-001 --models claude-haiku-4-5 --samples 001 --judge
 ```
 
 Results are written under `results/<run-id>/`.
+
+Model names: `claude-{family}-{version}[-thinking][-{effort}]`, `gpt-{version}[-{tier}]-thinking-{effort}`, `grok-{version}-{effort}`, `gemini-{version}[-{tier}]-thinking-{level}` (e.g. `gemini-3.1-pro-thinking-high`, `gemini-3.8-flash-thinking-high`), and open-weight models via OpenRouter: an alias such as `glm-5.3-thinking-high`, `deepseek-v4-pro-thinking-high`, `kimi-k3-thinking-high`, `gpt-oss-120b-thinking-high`, or the raw `openrouter/{vendor}/{model}[-thinking][-{effort}]`. OpenRouter cost comes from the billed `usage.cost`; other providers use the rate table in `harness/pricing.py`. Aliased OpenRouter models are pinned to a fixed host at native precision (`OPENROUTER_PROVIDER_PINS` in `harness/providers/openrouter.py`) so results are reproducible and prompt caching works across turns; each transcript records the pin (`provider_pin` on the config turn) and the host that actually served each turn (`served_by`). Raw `openrouter/...` names use OpenRouter's default routing.
 
 `--models` is comma-separated and runs those models in one process (same `--rules-mode` / `--run-id`). To run several versions at once, start one `bench run` per mode/run-id (or per model if you want isolated logs) and they share `--concurrency` within that process.
 

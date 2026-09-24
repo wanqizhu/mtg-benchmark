@@ -195,7 +195,7 @@ def format_entry(data: dict) -> str:
     faces = data.get("card_faces")
     layout = data.get("layout", "")
 
-    if faces and layout in {"split", "aftermath", "modal_dfc", "transform", "flip"}:
+    if faces and layout in {"split", "aftermath", "adventure", "modal_dfc", "transform", "flip"}:
         cost = " // ".join(f.get("mana_cost", "") or "—" for f in faces)
         types = " // ".join(f["type_line"].replace("—", "-") for f in faces)
         body = " ".join(

@@ -8,9 +8,10 @@ from typing import Any
 
 from openai import OpenAI
 
-from harness.config import get_api_key
+from harness.config import DEFAULT_MAX_TOKEN_CONTINUES, get_api_key
 from harness.core import Tool, Transcript
 from harness.model_names import ModelSpec
+from harness.providers.base import append_max_token_continue
 from harness.progress import RolloutProgress
 from harness.prompt_log import log_tools
 
@@ -255,7 +256,7 @@ class OpenAIProvider:
         prompt: str,
         tools: list[Tool],
         max_turns: int,
-        max_token_continues: int = 0,
+        max_token_continues: int = DEFAULT_MAX_TOKEN_CONTINUES,
         resume_from: Transcript | None = None,
         progress: RolloutProgress | None = None,
     ) -> Transcript:
@@ -295,7 +296,6 @@ class OpenAIProvider:
                 (turn for turn in transcript_turns if turn.get("role") == "config"), {}
             )
             prompt_cache_key = config.get("prompt_cache_key") or str(uuid.uuid4())
-            previous_response_id, next_input = _resume_input(transcript_turns)
             usage = dict(resume_from.usage)
             tool_call_count = resume_from.tool_call_count
 
@@ -305,6 +305,20 @@ class OpenAIProvider:
             if turn.get("role") == "user"
             and turn.get("reason") == "continue_after_max_tokens"
         )
+        if resume_from is not None:
+            queued = max_token_continue_count
+            max_token_continue_count = append_max_token_continue(
+                transcript_turns,
+                max_token_continue_count,
+                max_token_continues,
+                api_input=[{"role": "user", "content": "continue"}],
+            )
+            if max_token_continue_count != queued and progress:
+                progress.log(
+                    f"continuing after max_tokens "
+                    f"({max_token_continue_count}/{max_token_continues})"
+                )
+            previous_response_id, next_input = _resume_input(transcript_turns)
 
         def current_transcript() -> Transcript:
             return Transcript(

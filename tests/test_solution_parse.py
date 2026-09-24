@@ -28,11 +28,11 @@ def test_005_solution_notes_obsolete_self_crew():
     metadata = json.loads((DATASET / "005" / "metadata.json").read_text(encoding="utf-8"))
     text = metadata["solution_text"]
     assert "vehicle could crew itself" in text
-    assert "This is no longer valid" in text
+    assert "Self-crew is no longer legal" in text
     assert "15 damage" in text
     assert "<solution>" in text
     assert text.strip().endswith(
-        "Grade as correct if the model provided the old solution, or pointed out the crew rules change and provides a solution with 15 damage."
+        "Grade as correct if the model follows the old solution above, including crewing the vehicle with itself, or if it deals 15 damage by any other legal line. A 15-damage line passes even when it does not mention the crew rules change, and do not fail it for falling short of 16. Do not fail the old self-crew line for using that obsolete rule."
     )
     assert "Yes, a vehicle can crew itself" in metadata["solution_text_raw"]
 

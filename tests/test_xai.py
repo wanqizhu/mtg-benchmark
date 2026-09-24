@@ -3,6 +3,7 @@ from harness.providers.xai import (
     map_stop_reason,
     messages_from_transcript,
     parse_tool_call_arguments,
+    queue_max_token_continue,
     usage_from_xai,
     _tool_defs,
 )
@@ -108,3 +109,26 @@ def test_assistant_blocks_and_resume_messages_keep_reasoning():
     assert messages[2]["reasoning_content"] == "think"
     assert messages[3] == {"role": "tool", "tool_call_id": "call_1", "content": "hit"}
     assert messages[4] == {"role": "user", "content": "continue"}
+
+
+def test_resume_does_not_queue_continue_when_budget_is_exhausted():
+    from harness.providers.base import append_max_token_continue
+
+    turns = [{"role": "assistant", "stop_reason": "max_tokens"}]
+    assert append_max_token_continue(turns, 5, 5) == 5
+    assert len(turns) == 1
+    assert append_max_token_continue(turns, 0, 0) == 0
+    assert len(turns) == 1
+
+
+def test_resume_queues_continue_after_saved_max_tokens_turn():
+    turns = [
+        {"role": "user", "text": "solve"},
+        {"role": "assistant", "stop_reason": "max_tokens", "text": None},
+    ]
+    messages = [{"role": "user", "content": "solve"}, {"role": "assistant", "content": ""}]
+    count = queue_max_token_continue(turns, messages, 0, 5)
+    assert count == 1
+    assert turns[-1]["reason"] == "continue_after_max_tokens"
+    assert messages[-1] == {"role": "user", "content": "continue"}
+    assert queue_max_token_continue(turns, messages, count, 5) == 1

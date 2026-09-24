@@ -330,6 +330,21 @@ def _available_run_dirs(results_dir: Path, run_ids: list[str] | None = None) -> 
     return preferred or available
 
 
+def _leaderboard_sort_key(row: dict[str, Any]) -> tuple[Any, ...]:
+    """Higher pass rate first. Equal rates go to the cheaper run."""
+    judged = row.get("judged") or 0
+    attempted = row.get("attempted") or judged
+    cost = row.get("total_cost_usd") or 0.0
+    per_task = cost / attempted if attempted else cost
+    return (
+        -float(row.get("pass_rate") or 0.0),
+        per_task,
+        -int(row.get("passed") or 0),
+        str(row.get("version") or ""),
+        str(row.get("name") or ""),
+    )
+
+
 def _model_version_name(model_name: str, run_id: str) -> str:
     return f"{model_name} @ {run_label(run_id)}"
 
@@ -660,7 +675,7 @@ def collect_site_data(
 
     leaderboard = sorted(
         (_model_row(model_name, entries) for model_name, entries in entries_by_model.items()),
-        key=lambda row: (-row["pass_rate"], -row["passed"], row["name"]),
+        key=_leaderboard_sort_key,
     )
     for rank, row in enumerate(leaderboard, start=1):
         row["rank"] = rank
@@ -745,7 +760,7 @@ def combine_run_summaries(runs: list[dict[str, Any]]) -> dict[str, Any]:
                 versioned_summary["version"] = run_id
                 combined_problem["models"].append(versioned_summary)
 
-    leaderboard.sort(key=lambda row: (-row["pass_rate"], -row["passed"], row["version"], row["name"]))
+    leaderboard.sort(key=_leaderboard_sort_key)
     for rank, row in enumerate(leaderboard, start=1):
         row["rank"] = rank
 

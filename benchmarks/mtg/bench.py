@@ -28,6 +28,7 @@ MODEL_CONTEXT_TOKENS: dict[str, int] = {
     "claude-sonnet-5": 1_000_000,
     "claude-sonnet-4-6": 1_000_000,
     "claude-sonnet-4-5-20250929": 200_000,
+    "claude-opus-5-5": 1_000_000,
     "claude-opus-5": 1_000_000,
     "claude-opus-4-8": 1_000_000,
     "claude-opus-4-7": 1_000_000,
@@ -38,9 +39,19 @@ MODEL_CONTEXT_TOKENS: dict[str, int] = {
     "gpt-5.6-sol": 1_050_000,
     "gpt-5.6-terra": 1_050_000,
     "gpt-5.6-luna": 1_050_000,
+    "gpt-6-sol": 1_050_000,
+    "gpt-6-luna": 1_050_000,
     "gpt-6-astra": 1_050_000,
+    "grok-4.7": 500_000,
     "grok-4.6": 500_000,
     "grok-4.5": 500_000,
+    "gemini-3.1-pro-preview": 1_048_576,
+    "gemini-3.8-flash": 1_048_576,
+    "gemini-3.7-flash": 1_048_576,
+    "gemini-3.6-flash": 1_048_576,
+    "gemini-3-flash-preview": 1_048_576,
+    "gemini-3.1-flash-lite": 1_048_576,
+    # OpenRouter ids vary per model; unknown ids fall back to 200k (tools mode only).
 }
 
 

@@ -223,6 +223,58 @@ def test_grok_rollout_cost_applies_long_context_per_turn():
     assert cost["breakdown_usd"]["cache_read"] == 0.199
 
 
+def test_gemini_pro_long_context_and_flash_rates():
+    short = estimate_cost(
+        {"input_tokens": 100_000, "output_tokens": 10_000, "cache_read_input_tokens": 0, "prompt_tokens": 100_000},
+        model_id="gemini-3.1-pro-preview",
+        cache_ttl="auto",
+    )
+    assert short["breakdown_usd"]["input"] == 0.2
+    assert short["breakdown_usd"]["output"] == 0.12
+    assert short["long_context"] is False
+
+    long = estimate_cost(
+        {"input_tokens": 300_000, "output_tokens": 10_000, "cache_read_input_tokens": 0, "prompt_tokens": 300_000},
+        model_id="gemini-3.1-pro-preview",
+        cache_ttl="auto",
+    )
+    assert long["long_context"] is True
+    assert long["breakdown_usd"]["input"] == 1.2
+    assert long["breakdown_usd"]["output"] == 0.18
+
+    flash = estimate_cost(
+        {"input_tokens": 1_000_000, "output_tokens": 1_000_000, "cache_read_input_tokens": 0},
+        model_id="gemini-3.8-flash",
+        cache_ttl="auto",
+    )
+    assert flash["usd"] == 4.5
+
+
+def test_unpriced_model_uses_reported_cost():
+    usage = {"input_tokens": 10, "output_tokens": 5, "reported_cost_usd": 0.0042}
+    cost = estimate_cost(usage, model_id="z-ai/glm-5.3", cache_ttl="auto")
+    assert cost["usd"] == 0.0042
+    assert cost["pricing_source"].startswith("https://openrouter.ai")
+
+    rollout = estimate_rollout_cost(
+        usage={"reported_cost_usd": 0.003},
+        turns=[
+            {"role": "assistant", "usage": {"input_tokens": 1, "reported_cost_usd": 0.001}},
+            {"role": "assistant", "usage": {"input_tokens": 1, "reported_cost_usd": 0.002}},
+        ],
+        model_id="z-ai/glm-5.3",
+        cache_ttl="auto",
+    )
+    assert rollout["usd"] == 0.003
+
+
+def test_unpriced_model_without_reported_cost_still_raises():
+    import pytest
+
+    with pytest.raises(KeyError):
+        estimate_cost({"input_tokens": 1}, model_id="nobody/unknown-model")
+
+
 def test_gpt_5_6_sol_pricing_includes_cached_input():
     usage = {
         "input_tokens": 100_000,

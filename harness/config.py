@@ -11,6 +11,9 @@ load_dotenv()
 
 DEFAULT_JUDGE_MODEL = "gpt-5.6-sol-thinking-high"
 DEFAULT_MAX_TURNS = 20
+# A turn that stops on the output cap was still thinking. Ask it to continue
+# rather than grading the truncated turn. Five matches the Sonnet runs.
+DEFAULT_MAX_TOKEN_CONTINUES = 5
 DEFAULT_CONCURRENCY = 4
 RESULTS_DIR = Path("results")
 
@@ -24,6 +27,7 @@ def get_api_key(provider: str) -> str:
         "anthropic": "ANTHROPIC_API_KEY",
         "openai": "OPENAI_API_KEY",
         "gemini": "GEMINI_API_KEY",
+        "openrouter": "OPENROUTER_API_KEY",
         "xai": "XAI_API_KEY",
     }
     env_name = env_map.get(provider)

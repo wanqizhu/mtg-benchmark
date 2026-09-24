@@ -8,14 +8,23 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from harness.config import DEFAULT_CONCURRENCY, DEFAULT_JUDGE_MODEL, DEFAULT_MAX_TURNS, RESULTS_DIR, get_model
+from harness.config import (
+    DEFAULT_CONCURRENCY,
+    DEFAULT_JUDGE_MODEL,
+    DEFAULT_MAX_TOKEN_CONTINUES,
+    DEFAULT_MAX_TURNS,
+    RESULTS_DIR,
+    get_model,
+)
 from harness.model_names import ModelSpec, safe_result_dir_name
 from harness.core import Benchmark, Sample, Transcript
 from harness.pricing import estimate_cost, estimate_rollout_cost
 from harness.progress import RolloutProgress
 from harness.providers.anthropic import PROMPT_CACHE_TTL, AnthropicProvider
 from harness.providers.base import Provider
+from harness.providers.gemini import CACHE_TTL as GEMINI_CACHE_TTL, GeminiProvider
 from harness.providers.openai import CACHE_TTL as OPENAI_CACHE_TTL, OpenAIProvider
+from harness.providers.openrouter import CACHE_TTL as OPENROUTER_CACHE_TTL, OpenRouterProvider
 from harness.providers.xai import CACHE_TTL as XAI_CACHE_TTL, XAIProvider
 
 
@@ -106,6 +115,10 @@ def cache_ttl_for(spec: ModelSpec) -> str:
         return XAI_CACHE_TTL
     if spec.provider == "openai":
         return OPENAI_CACHE_TTL
+    if spec.provider == "gemini":
+        return GEMINI_CACHE_TTL
+    if spec.provider == "openrouter":
+        return OPENROUTER_CACHE_TTL
     return PROMPT_CACHE_TTL
 
 
@@ -116,6 +129,10 @@ def get_provider(spec: ModelSpec) -> Provider:
         return XAIProvider()
     if spec.provider == "openai":
         return OpenAIProvider()
+    if spec.provider == "gemini":
+        return GeminiProvider()
+    if spec.provider == "openrouter":
+        return OpenRouterProvider()
     raise NotImplementedError(f"Provider not implemented: {spec.provider}")
 
 
@@ -130,7 +147,7 @@ class Runner:
         concurrency: int = DEFAULT_CONCURRENCY,
         rules_mode: str = "tools",
         max_tokens: int | None = None,
-        max_token_continues: int = 0,
+        max_token_continues: int = DEFAULT_MAX_TOKEN_CONTINUES,
         judge_model: str | None = None,
     ) -> None:
         self.benchmark = benchmark

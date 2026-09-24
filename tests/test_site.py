@@ -405,6 +405,26 @@ def test_collect_multi_run_site_data_can_include_all_runs(tmp_path):
     assert order == [row["model"] for row in combined["problems"][0]["models"]]
 
 
+def test_leaderboard_breaks_pass_rate_ties_by_cost(tmp_path):
+    run_dir = tmp_path / "results" / "run"
+    dataset_dir = tmp_path / "dataset"
+    _write_problem(dataset_dir, "001")
+    (dataset_dir / "001" / "puzzle.png").write_bytes(b"png")
+    cheap = _result("cheap", "001")
+    cheap["cost"] = {"usd": 0.10}
+    pricey = _result("pricey", "001")
+    pricey["cost"] = {"usd": 1.50}
+    _write_json(run_dir / "pricey" / "001.json", pricey)
+    _write_json(run_dir / "pricey" / "001.judge.json", _judge("pricey", "001", True))
+    _write_json(run_dir / "cheap" / "001.json", cheap)
+    _write_json(run_dir / "cheap" / "001.judge.json", _judge("cheap", "001", True))
+
+    data = collect_site_data(run_dir, dataset_root=dataset_dir)
+
+    assert [row["name"] for row in data["leaderboard"]] == ["cheap", "pricey"]
+    assert [row["model"] for row in data["problems"][0]["models"]] == ["cheap", "pricey"]
+
+
 def test_write_multi_run_site_emits_split_layout(tmp_path):
     results_dir = tmp_path / "results"
     dataset_dir = tmp_path / "dataset"

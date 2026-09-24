@@ -8,6 +8,9 @@ from typing import Any
 PRICING_SOURCE = "https://platform.claude.com/docs/en/about-claude/pricing"
 XAI_PRICING_SOURCE = "https://docs.x.ai/developers/pricing"
 OPENAI_PRICING_SOURCE = "https://developers.openai.com/api/docs/models/gpt-5.6-sol"
+GEMINI_PRICING_SOURCE = "https://ai.google.dev/gemini-api/docs/pricing"
+# OpenRouter returns the billed amount in usage.cost; no rate table needed.
+OPENROUTER_PRICING_SOURCE = "https://openrouter.ai/docs/api_reference/overview (usage.cost)"
 
 
 @dataclass(frozen=True)
@@ -26,6 +29,8 @@ class ModelPricing:
 MODEL_PRICING: dict[str, ModelPricing] = {
     "claude-fable-5-1": ModelPricing(10, 50, 0.25, 12.5, 20),
     "claude-fable-5": ModelPricing(10, 50, 1, 12.5, 20),
+    # Opus 5.5 cache reads are 5% of input, not the usual 10%.
+    "claude-opus-5-5": ModelPricing(4, 20, 0.2, 5, 8),
     "claude-opus-5": ModelPricing(5, 25, 0.5, 6.25, 10),
     "claude-opus-4-8": ModelPricing(5, 25, 0.5, 6.25, 10),
     "claude-opus-4-7": ModelPricing(5, 25, 0.5, 6.25, 10),
@@ -71,6 +76,28 @@ MODEL_PRICING: dict[str, ModelPricing] = {
         long_context_output_multiplier=1.5,
         pricing_source="https://developers.openai.com/api/docs/models/gpt-5.6-luna",
     ),
+    "gpt-6-sol": ModelPricing(
+        2,
+        10,
+        0.2,
+        2.5,
+        2.5,
+        long_context_threshold=272_001,
+        long_context_multiplier=2.0,
+        long_context_output_multiplier=1.5,
+        pricing_source="https://developers.openai.com/api/docs/models/gpt-6-sol",
+    ),
+    "gpt-6-luna": ModelPricing(
+        0.1,
+        0.5,
+        0.01,
+        0.125,
+        0.125,
+        long_context_threshold=272_001,
+        long_context_multiplier=2.0,
+        long_context_output_multiplier=1.5,
+        pricing_source="https://developers.openai.com/api/docs/models/gpt-6-luna",
+    ),
     "gpt-6-astra": ModelPricing(
         10,
         50,
@@ -84,6 +111,16 @@ MODEL_PRICING: dict[str, ModelPricing] = {
     ),
     # Cached input is billed at cache_read; xAI has no separate cache-write fee.
     # Rates double when a request's prompt (including cached tokens) is >= 200k.
+    "grok-4.7": ModelPricing(
+        2,
+        6,
+        0.5,
+        0,
+        0,
+        long_context_threshold=200_000,
+        long_context_multiplier=2.0,
+        pricing_source=XAI_PRICING_SOURCE,
+    ),
     "grok-4.6": ModelPricing(
         2,
         6,
@@ -104,7 +141,41 @@ MODEL_PRICING: dict[str, ModelPricing] = {
         long_context_multiplier=2.0,
         pricing_source=XAI_PRICING_SOURCE,
     ),
+    # Gemini output price includes thinking tokens. Implicit caching has no
+    # write fee. 3.1 Pro doubles input and charges 1.5x output above 200k prompt.
+    # Flash rates are the promotional ones through 2026-12-31.
+    "gemini-3.1-pro-preview": ModelPricing(
+        2,
+        12,
+        0.2,
+        0,
+        0,
+        long_context_threshold=200_001,
+        long_context_multiplier=2.0,
+        long_context_output_multiplier=1.5,
+        pricing_source=GEMINI_PRICING_SOURCE,
+    ),
+    "gemini-3.8-flash": ModelPricing(0.75, 3.75, 0.075, 0, 0, pricing_source=GEMINI_PRICING_SOURCE),
+    "gemini-3.7-flash": ModelPricing(0.75, 3.75, 0.075, 0, 0, pricing_source=GEMINI_PRICING_SOURCE),
+    "gemini-3.6-flash": ModelPricing(0.75, 3.75, 0.075, 0, 0, pricing_source=GEMINI_PRICING_SOURCE),
+    "gemini-3-flash-preview": ModelPricing(0.5, 3, 0.05, 0, 0, pricing_source=GEMINI_PRICING_SOURCE),
+    "gemini-3.1-flash-lite": ModelPricing(0.25, 1.5, 0.025, 0, 0, pricing_source=GEMINI_PRICING_SOURCE),
 }
+
+
+def _reported_cost(usage: dict[str, Any], model_id: str) -> dict[str, Any] | None:
+    """Cost as billed by the gateway (OpenRouter usage.cost), when present."""
+    reported = usage.get("reported_cost_usd")
+    if reported is None:
+        return None
+    return {
+        "usd": round(float(reported), 6),
+        "breakdown_usd": {"reported": round(float(reported), 6)},
+        "model_id": model_id,
+        "cache_ttl": None,
+        "pricing_source": OPENROUTER_PRICING_SOURCE,
+        "long_context": False,
+    }
 
 
 def _mtok_cost(tokens: int, rate_per_mtok: float) -> float:
@@ -141,6 +212,10 @@ def estimate_cost(
     if not usage:
         return {"usd": 0.0, "breakdown_usd": {}}
 
+    if model_id not in MODEL_PRICING:
+        reported = _reported_cost(usage, model_id)
+        if reported is not None:
+            return reported
     pricing = get_model_pricing(model_id)
     multiplier = 1.0
     if pricing.long_context_threshold and prompt_token_count(usage) >= pricing.long_context_threshold:
