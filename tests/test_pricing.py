@@ -34,6 +34,32 @@ def test_inline_cache_write_uses_1h_rate():
     assert cost_1h["breakdown_usd"]["cache_creation"] > cost_5m["breakdown_usd"]["cache_creation"]
 
 
+def test_gpt_6_1_sol_cache_read_is_half_of_gpt_6_sol():
+    usage = {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "cache_creation_input_tokens": 0,
+        "cache_read_input_tokens": 100_000,
+    }
+    newer = estimate_cost(usage, model_id="gpt-6.1-sol", cache_ttl="5m")
+    older = estimate_cost(usage, model_id="gpt-6-sol", cache_ttl="5m")
+    assert newer["breakdown_usd"]["cache_read"] == 0.01
+    assert older["breakdown_usd"]["cache_read"] == 0.02
+
+
+def test_sonnet_5_5_matches_sonnet_5_rates():
+    usage = {
+        "input_tokens": 1_000_000,
+        "output_tokens": 1_000_000,
+        "cache_creation_input_tokens": 1_000_000,
+        "cache_read_input_tokens": 1_000_000,
+    }
+    newer = estimate_cost(usage, model_id="claude-sonnet-5-5", cache_ttl="1h")
+    older = estimate_cost(usage, model_id="claude-sonnet-5", cache_ttl="1h")
+    assert newer["breakdown_usd"] == older["breakdown_usd"]
+    assert newer["usd"] == 16.2
+
+
 def test_sonnet_5_pricing():
     usage = {
         "input_tokens": 1_000_000,

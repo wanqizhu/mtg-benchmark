@@ -11,6 +11,7 @@ OPENAI_EFFORT_LEVELS = frozenset({"none", "low", "medium", "high", "xhigh", "max
 # (family, version) -> Anthropic API model id
 API_MODEL_IDS: dict[tuple[str, str], str] = {
     ("haiku", "4-5"): "claude-haiku-4-5-20251001",
+    ("sonnet", "5-5"): "claude-sonnet-5-5",
     ("sonnet", "5"): "claude-sonnet-5",
     ("sonnet", "4-6"): "claude-sonnet-4-6",
     ("sonnet", "4-5"): "claude-sonnet-4-5-20250929",
@@ -29,6 +30,7 @@ ADAPTIVE_THINKING_MODELS = frozenset(
     {
         "claude-fable-5-1",
         "claude-fable-5",
+        "claude-sonnet-5-5",
         "claude-sonnet-5",
         "claude-sonnet-4-6",
         "claude-opus-5-5",
@@ -44,6 +46,7 @@ EFFORT_MODELS = frozenset(
     {
         "claude-fable-5-1",
         "claude-fable-5",
+        "claude-sonnet-5-5",
         "claude-sonnet-5",
         "claude-sonnet-4-6",
         "claude-sonnet-4-5-20250929",
@@ -63,6 +66,7 @@ DEFAULT_THINKING_BUDGET = 10_000
 MODEL_MAX_OUTPUT_TOKENS: dict[str, int] = {
     "claude-fable-5-1": 128_000,
     "claude-fable-5": 128_000,
+    "claude-sonnet-5-5": 128_000,
     "claude-sonnet-5": 128_000,
     "claude-sonnet-4-6": 128_000,
     "claude-opus-5-5": 128_000,

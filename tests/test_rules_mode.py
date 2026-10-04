@@ -143,7 +143,7 @@ def test_system_prompt_caching_follows_the_cache_flag():
 def test_conversation_cache_models():
     cached = {
         parse_model_name(n).model_id
-        for n in ("claude-sonnet-5", "claude-opus-5", "claude-opus-5-5")
+        for n in ("claude-sonnet-5-5", "claude-sonnet-5", "claude-opus-5", "claude-opus-5-5")
     }
     assert CONVERSATION_CACHE_MODELS == cached
     # Haiku's 4096-token minimum exceeds the tools-mode prefix, and short

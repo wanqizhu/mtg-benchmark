@@ -36,6 +36,7 @@ MODEL_PRICING: dict[str, ModelPricing] = {
     "claude-opus-4-7": ModelPricing(5, 25, 0.5, 6.25, 10),
     "claude-opus-4-6": ModelPricing(5, 25, 0.5, 6.25, 10),
     "claude-opus-4-5-20251101": ModelPricing(5, 25, 0.5, 6.25, 10),
+    "claude-sonnet-5-5": ModelPricing(2, 10, 0.2, 2.5, 4),
     "claude-sonnet-5": ModelPricing(2, 10, 0.2, 2.5, 4),
     "claude-sonnet-4-6": ModelPricing(3, 15, 0.3, 3.75, 6),
     "claude-sonnet-4-5-20250929": ModelPricing(3, 15, 0.3, 3.75, 6),
@@ -86,6 +87,18 @@ MODEL_PRICING: dict[str, ModelPricing] = {
         long_context_multiplier=2.0,
         long_context_output_multiplier=1.5,
         pricing_source="https://developers.openai.com/api/docs/models/gpt-6-sol",
+    ),
+    # Same token rates as GPT-6 Sol, except cached input is $0.10 / MTok.
+    "gpt-6.1-sol": ModelPricing(
+        2,
+        10,
+        0.1,
+        2.5,
+        2.5,
+        long_context_threshold=272_001,
+        long_context_multiplier=2.0,
+        long_context_output_multiplier=1.5,
+        pricing_source="https://developers.openai.com/api/docs/models/gpt-6.1-sol",
     ),
     "gpt-6-luna": ModelPricing(
         0.1,

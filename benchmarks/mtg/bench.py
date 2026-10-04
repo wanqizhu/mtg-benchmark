@@ -25,6 +25,7 @@ INLINE_MIN_CONTEXT_TOKENS = 250_000
 
 MODEL_CONTEXT_TOKENS: dict[str, int] = {
     "claude-haiku-4-5-20251001": 200_000,
+    "claude-sonnet-5-5": 1_000_000,
     "claude-sonnet-5": 1_000_000,
     "claude-sonnet-4-6": 1_000_000,
     "claude-sonnet-4-5-20250929": 200_000,
@@ -40,6 +41,7 @@ MODEL_CONTEXT_TOKENS: dict[str, int] = {
     "gpt-5.6-terra": 1_050_000,
     "gpt-5.6-luna": 1_050_000,
     "gpt-6-sol": 1_050_000,
+    "gpt-6.1-sol": 1_050_000,
     "gpt-6-luna": 1_050_000,
     "gpt-6-astra": 1_050_000,
     "grok-4.7": 500_000,

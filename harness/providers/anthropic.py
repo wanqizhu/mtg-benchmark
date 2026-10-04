@@ -150,7 +150,9 @@ PROMPT_CACHE_TTL = "1h"
 # no-op). 1h rather than 5m because turn durations are long -- p50 164s, p90
 # 745s -- so a 5m entry expires mid-rollout ~40% of the time, and a miss
 # re-writes the whole prefix at the write rate instead of reading it at 0.1x.
-CONVERSATION_CACHE_MODELS = frozenset({"claude-sonnet-5", "claude-opus-5", "claude-opus-5-5"})
+CONVERSATION_CACHE_MODELS = frozenset(
+    {"claude-sonnet-5-5", "claude-sonnet-5", "claude-opus-5", "claude-opus-5-5"}
+)
 
 
 def _prewarm_request(*, spec: ModelSpec, system: str) -> dict[str, Any]:

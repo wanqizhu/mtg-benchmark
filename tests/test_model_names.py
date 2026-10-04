@@ -206,6 +206,23 @@ def test_parse_newest_frontier_models():
     assert friendly_model_name("grok-4.7-high") == "Grok 4.7"
 
 
+def test_parse_gpt_6_1_sol_and_sonnet_5_5():
+    sol = parse_model_name("gpt-6.1-sol-thinking-high")
+    sonnet = parse_model_name("claude-sonnet-5-5-thinking-high")
+    assert sol.provider == "openai"
+    assert sol.model_id == "gpt-6.1-sol"
+    assert sol.thinking == {"summary": "auto", "context": "all_turns"}
+    assert sol.output_config == {"effort": "high"}
+    assert sol.max_tokens == 128_000
+    assert sonnet.provider == "anthropic"
+    assert sonnet.model_id == "claude-sonnet-5-5"
+    assert sonnet.thinking == {"type": "adaptive", "display": "summarized"}
+    assert sonnet.output_config == {"effort": "high"}
+    assert sonnet.max_tokens == 128_000
+    assert friendly_model_name("gpt-6.1-sol-thinking-high") == "GPT 6.1 Sol"
+    assert friendly_model_name("claude-sonnet-5-5-thinking-high") == "Sonnet 5.5"
+
+
 def test_parse_gpt_6_astra_thinking_high():
     spec = parse_model_name("gpt-6-astra-thinking-high")
     assert spec.provider == "openai"
