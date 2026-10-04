@@ -171,7 +171,7 @@ button:hover, .link-button:hover, button.active { border-color: var(--accent); c
   display: block;
   width: 100%;
   height: auto;
-  max-height: 460px;
+  max-height: 520px;
 }
 .chart-grid {
   stroke: var(--line);
@@ -182,18 +182,35 @@ button:hover, .link-button:hover, button.active { border-color: var(--accent); c
   font-size: 12px;
 }
 .chart-axis { font-weight: 700; letter-spacing: .04em; }
-.chart-point { cursor: pointer; outline: none; }
+.chart-point {
+  cursor: pointer;
+  outline: none;
+  transition: opacity .12s ease;
+}
 .chart-point circle {
   stroke: var(--panel);
   stroke-width: 2;
+}
+.chart-leader {
+  stroke: var(--muted);
+  stroke-width: 1;
+  opacity: .45;
 }
 .chart-point text {
   fill: var(--text);
   font-size: 12px;
   font-weight: 600;
 }
-.chart-point:hover circle, .chart-point:focus circle { stroke-width: 3; }
-.chart-point:hover text, .chart-point:focus text { fill: var(--accent); }
+.cost-score-chart.is-focusing .chart-point,
+.cost-score-chart:has(.chart-point:focus-visible) .chart-point {
+  opacity: .4;
+}
+.cost-score-chart.is-focusing .chart-point.is-active,
+.cost-score-chart .chart-point:focus-visible {
+  opacity: 1;
+}
+.chart-point.is-active circle, .chart-point:focus-visible circle { stroke-width: 3; }
+.chart-point.is-active text, .chart-point:focus-visible text { fill: var(--accent); }
 .chart-point.hue-openai circle { fill: #3d9a6a; }
 .chart-point.hue-anthropic circle { fill: #d4783a; }
 .chart-point.hue-xai circle { fill: #8b7cd6; }

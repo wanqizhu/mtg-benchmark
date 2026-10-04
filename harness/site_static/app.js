@@ -655,13 +655,87 @@ function axisMoney(value) {
   return `$${Number(value).toFixed(2)}`;
 }
 
+function estimateChartLabelWidth(label) {
+  return Math.max(28, String(label).length * 7.1 + 4);
+}
+
+function chartLabelBox(point) {
+  const width = estimateChartLabelWidth(point.label);
+  const height = 16;
+  const gap = 10;
+  return point.labelOnRight
+    ? { x: point.x + gap, y: point.labelY - 10, w: width, h: height }
+    : { x: point.x - gap - width, y: point.labelY - 10, w: width, h: height };
+}
+
+function boxesOverlap(a, b, pad = 4) {
+  return (
+    a.x < b.x + b.w + pad &&
+    a.x + a.w + pad > b.x &&
+    a.y < b.y + b.h + pad &&
+    a.y + a.h + pad > b.y
+  );
+}
+
+function placeCostScoreLabels(placed, { width, minY, maxY, midX }) {
+  placed.sort((a, b) => a.y - b.y || a.x - b.x);
+  const step = 16;
+  const placedBoxes = [];
+
+  for (const point of placed) {
+    const preferRight = point.x < midX;
+    const sides = preferRight ? [true, false] : [false, true];
+    let chosen = null;
+
+    search:
+    for (let n = 0; n <= 12; n += 1) {
+      const offsets = n === 0 ? [0] : [n, -n];
+      for (const stepN of offsets) {
+        for (const onRight of sides) {
+          const labelY = Math.min(maxY, Math.max(minY, point.y + stepN * step));
+          const candidate = { labelOnRight: onRight, labelY };
+          const box = chartLabelBox({ ...point, ...candidate });
+          if (box.x < 2 || box.x + box.w > width - 2) continue;
+          const hitsLabel = placedBoxes.some((other) => boxesOverlap(box, other));
+          const hitsDot = placed.some((other) => {
+            if (other === point) return false;
+            return (
+              box.x < other.x + 9 &&
+              box.x + box.w > other.x - 9 &&
+              box.y < other.y + 9 &&
+              box.y + box.h > other.y - 9
+            );
+          });
+          if (!hitsLabel && !hitsDot) {
+            chosen = { ...candidate, box };
+            break search;
+          }
+        }
+      }
+    }
+
+    if (!chosen) {
+      const labelOnRight = preferRight;
+      const labelY = placedBoxes.length
+        ? Math.min(maxY, Math.max(minY, placedBoxes[placedBoxes.length - 1].y + step + 9))
+        : point.y;
+      chosen = { labelOnRight, labelY };
+      chosen.box = chartLabelBox({ ...point, ...chosen });
+    }
+
+    point.labelOnRight = chosen.labelOnRight;
+    point.labelY = chosen.labelY;
+    placedBoxes.push(chosen.box);
+  }
+}
+
 function renderCostScoreChart(rows) {
   const points = rows.filter((row) => (row.judged || 0) > 0);
   if (!points.length) return "";
 
   const width = 840;
-  const height = 420;
-  const pad = { top: 18, right: 168, bottom: 52, left: 56 };
+  const height = 460;
+  const pad = { top: 24, right: 176, bottom: 56, left: 56 };
   const plotW = width - pad.left - pad.right;
   const plotH = height - pad.top - pad.bottom;
   const costMax = niceCeiling(Math.max(...points.map((row) => perTask(row, row.total_cost_usd)), 1));
@@ -681,18 +755,12 @@ function renderCostScoreChart(rows) {
       hue: providerHue(row.original_model || row.name),
     };
   });
-  placed.sort((a, b) => a.y - b.y);
-  for (const point of placed) {
-    point.labelY = point.y;
-    point.labelOnRight = point.x < pad.left + plotW * 0.62;
-  }
-  for (let i = 1; i < placed.length; i++) {
-    const prev = placed[i - 1];
-    const cur = placed[i];
-    if (Math.abs(cur.x - prev.x) < 110 && cur.labelY - prev.labelY < 14) {
-      cur.labelY = prev.labelY + 14;
-    }
-  }
+  placeCostScoreLabels(placed, {
+    width,
+    minY: pad.top + 8,
+    maxY: pad.top + plotH,
+    midX: pad.left + plotW * 0.55,
+  });
 
   const grid = [];
   for (const score of yTicks) {
@@ -710,7 +778,11 @@ function renderCostScoreChart(rows) {
   const dots = placed.map((point) => {
     const anchor = point.labelOnRight ? "start" : "end";
     const labelX = point.x + (point.labelOnRight ? 10 : -10);
+    const leader = Math.abs(point.labelY - point.y) > 6
+      ? `<line class="chart-leader" x1="${point.x.toFixed(1)}" y1="${point.y.toFixed(1)}" x2="${labelX.toFixed(1)}" y2="${point.labelY.toFixed(1)}"></line>`
+      : "";
     return `<g class="chart-point hue-${point.hue}" data-model="${esc(point.row.name)}" tabindex="0" role="button" aria-label="${esc(`${point.label}, ${pct(point.row.pass_rate)}, ${money(point.cost)}`)}">
+      ${leader}
       <circle cx="${point.x.toFixed(1)}" cy="${point.y.toFixed(1)}" r="6"></circle>
       <text x="${labelX.toFixed(1)}" y="${(point.labelY + 4).toFixed(1)}" text-anchor="${anchor}">${esc(point.label)}</text>
     </g>`;
@@ -730,6 +802,17 @@ function renderCostScoreChart(rows) {
 }
 
 function bindChartPoints(root) {
+  const chart = root.querySelector(".cost-score-chart");
+  if (!chart) return;
+  const release = () => {
+    chart.classList.remove("is-focusing");
+    chart.querySelectorAll(".chart-point.is-active").forEach((other) => {
+      other.classList.remove("is-active");
+    });
+  };
+  chart.addEventListener("pointerleave", (event) => {
+    if (!chart.contains(event.relatedTarget)) release();
+  });
   root.querySelectorAll(".chart-point").forEach((point) => {
     const open = () => navigate({
       view: "models",
@@ -737,6 +820,24 @@ function bindChartPoints(root) {
       problemId: null,
       sampleId: null,
     });
+    const activate = () => {
+      chart.querySelectorAll(".chart-point.is-active").forEach((other) => {
+        other.classList.remove("is-active");
+      });
+      point.classList.add("is-active");
+      chart.classList.add("is-focusing");
+    };
+    const deactivate = (event) => {
+      if (event.relatedTarget && point.contains(event.relatedTarget)) return;
+      point.classList.remove("is-active");
+      if (!chart.querySelector(".chart-point.is-active, .chart-point:focus-visible")) {
+        chart.classList.remove("is-focusing");
+      }
+    };
+    point.addEventListener("pointerenter", activate);
+    point.addEventListener("pointerleave", deactivate);
+    point.addEventListener("focus", activate);
+    point.addEventListener("blur", release);
     point.addEventListener("click", open);
     point.addEventListener("keydown", (event) => {
       if (event.key === "Enter" || event.key === " ") {
