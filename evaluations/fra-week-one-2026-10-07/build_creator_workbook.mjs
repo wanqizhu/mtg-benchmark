@@ -43,6 +43,7 @@ function writeTable(sheet,row,headers,values,col=0){
 title(cards,'Creator card predictions','295 cards. Published grades and final fitted GIH conversions. October 7 observed snapshot.');
 writeTable(cards,6,data.cards_header,data.cards);
 cards.freezePanes.freezeRows(6);cards.freezePanes.freezeColumns(1);cards.tabColor=header;
+cards.getRange('A7:A301').format.wrapText=true;
 for(let i=0;i<10;i++){
   cards.getRangeByIndexes(6,1+i*2,295,1).format.horizontalAlignment='left';
   cards.getRangeByIndexes(6,1+i*2,295,1).format.wrapText=true;
@@ -50,7 +51,7 @@ for(let i=0;i<10;i++){
 }
 for(let i=0;i<data.cards.length;i++){
   const longest=Math.max(...data.cards[i].filter((_,j)=>j%2===1).map(v=>String(v??'').length));
-  cards.getRangeByIndexes(i+6,0,1,21).format.rowHeight=Math.max(22,18*Math.ceil(longest/21));
+  cards.getRangeByIndexes(i+6,0,1,21).format.rowHeight=Math.max(22,18*Math.ceil(longest/21),18*Math.ceil(data.cards[i][0].length/35));
 }
 cards.getRange('A3').format.columnWidth=38;
 
@@ -93,7 +94,8 @@ console.log((await wb.inspect({kind:'table',range:'Cards!A6:G11',include:'values
 console.log((await wb.inspect({kind:'table',range:'Creator models!A6:I16',include:'values',tableMaxRows:11,tableMaxCols:9,maxChars:3500})).ndjson);
 console.log((await wb.inspect({kind:'match',searchTerm:'#REF!|#DIV/0!|#VALUE!|#NAME\\?|#N/A|#NUM!|#NULL!|#SPILL!|#CALC!',options:{useRegex:true,maxResults:20},summary:'Final error scan'})).ndjson);
 const contextualRow=data.cards.findIndex(row=>row[15]&&String(row[15]).length>21)+7;
-for(const [sheetName,range,file] of [['Cards','A1:G13','cards'],['Cards',`O${contextualRow}:U${contextualRow+3}`,'contextual-grades'],['Creator models','A1:I17','models'],['Context','A1:G17','context'],['Context','I3:L16','sources']]){
+const longestCardRow=data.cards.reduce((best,row,i)=>row[0].length>data.cards[best][0].length?i:best,0)+7;
+for(const [sheetName,range,file] of [['Cards','A1:G13','cards'],['Cards',`A${longestCardRow}:E${longestCardRow+2}`,'long-card-names'],['Cards',`O${contextualRow}:U${contextualRow+3}`,'contextual-grades'],['Creator models','A1:I17','models'],['Context','A1:G17','context'],['Context','I3:L16','sources']]){
   const preview=await wb.render({sheetName,range,scale:1.5,format:'png'});
   await fs.writeFile(path.join(previews,file+'.png'),new Uint8Array(await preview.arrayBuffer()));
 }
