@@ -27,7 +27,7 @@
   <div class="eyebrow">FRA • Premier Draft • prerelease predictions</div>
   <h1>Which predictions held up?</h1>
   <p class="muted" id="snapshot-line"></p>
-  <nav aria-label="Analysis sections"><a href="#models">Six models</a><a href="#leaderboard">Models and creators</a><a href="#explore">Card explorer</a><a href="#method">Method and sources</a></nav>
+  <nav aria-label="Analysis sections"><a href="#models">Six models</a><a href="#leaderboard">Models and creators</a><a href="#explore">Card explorer</a><a href="#method">Method and sources</a><a href="native-creators/creator_table.html">Updated creator table, including LR rares</a></nav>
   <section id="models">
     <h2>Six original model forecasts</h2>
     <p class="notice">Same reported main-set cards in every panel. The diagonal is a perfect prediction. Hover a point for its card, mana cost, rules, sample count, and error.</p>
@@ -36,6 +36,7 @@
   </section>
   <section id="leaderboard" class="section">
     <h2>Models and prerelease creator grades</h2>
+    <p class="notice">These plots retain the original creator conversion. The <a href="native-creators/creator_models.html">updated native-grade models</a> include LR rares and the requested contextual terms; their complete card table is available separately.</p>
     <div class="controls"><label>Comparison pool<select id="score-pool"><option value="main_shared_creators">Shared cards: models and broad creator reviews</option><option value="main_available">Each source's available main-set cards</option><option value="cu_shared_including_lr">Shared commons/uncommons, including LSV + Marshall</option><option value="main_n1000">Main set, at least 1,000 GIH observations</option><option value="main_n5000">Main set, at least 5,000 GIH observations</option></select></label></div>
     <p class="notice" id="pool-note"></p>
     <div class="table-wrap"><table id="score-table"><thead><tr><th>Predictor</th><th>Cards</th><th>Pearson r</th><th>Spearman ρ</th><th>Raw MAE<br>(models, pp)</th><th>Calibrated MAE<br>(all, pp)</th><th>Raw bias<br>(models, pp)</th></tr></thead><tbody></tbody></table></div>
@@ -63,7 +64,7 @@
     <h2>Method and provenance</h2>
     <p>Original model forecasts come from the submitted commits in PRs #8–#13. Prepared creatures and their front-face names resolve to the same card. Missing cards and suppressed 17Lands rates remain missing.</p>
     <p>Creator grade conversion uses increasing isotonic regression: each grade's mean win rate is pooled with adjacent grades when needed to preserve tier ordering. Five shared card folds, repeated twenty times, keep the scored card out of every training sample. Card identity, color, rarity, and rules never enter the mapping. Explicit ordinary grades with conditional alternatives are retained at their ordinary grade. Conditional-only and sideboard-only grades have no invented general percentage.</p>
-    <p>Alex and Marc's preserved September editions are used; their October joint tier list is excluded. Limited Resources uses only the prerelease common/uncommon episode with Marshall and LSV. The later rare review is excluded. The community collector retains native grades and original evidence links.</p>
+    <p>Alex and Marc's preserved September editions are used; their October joint tier list is excluded. In these original plots, Limited Resources uses only the prerelease common/uncommon episode with Marshall and LSV. The <a href="native-creators/creator_table.html">updated analysis</a> includes episode 873's September 29 release-day rare audio review. The community collector retains native grades and original evidence links.</p>
     <details><summary>Source editions and coverage</summary><div id="source-list"></div></details>
     <details><summary>Lords of Limited and other limits</summary><p>Episode 497, published September 21, supplies selected card picks and format hypotheses rather than a complete card grade table. Its accessible opening explicitly praises Craftwork Crusher, which is now first by reported GIH among the 107 main-set uncommons (62.47%, 18,994 observations). A full card correlation is therefore not assigned. Episode 498 incorporates early-access games and is excluded. Jim Davis' ungraded commentary is also excluded from numerical scoring.</p><p>Observed GIH rates reflect deck selection, archetypes, and player usage as well as card strength. Intervals are approximate binomial intervals, and repeated cards/players/decks are not independent. This early snapshot may change. The Astra model forecasted a first-month window and several other models forecasted eventual all-time rates; this is an early checkpoint.</p></details>
     <p><a href="report.html">Detailed report</a> · <a href="scores.csv">All score tables</a> · <a href="cards_and_predictions.csv">Joined card data</a> · <a href="predictions_long.csv">Card/source table with explicit units</a> · <a href="mistakes.csv">Error rankings</a> · <a href="calibration.csv">Tier conversion audit</a> · <a href="paired_comparisons.csv">Paired comparisons</a> · <a href="validation.json">Validation</a></p>
