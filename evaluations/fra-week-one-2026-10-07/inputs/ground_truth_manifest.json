@@ -1,0 +1,15 @@
+{
+  "url": "https://www.17lands.com/api/card_data?expansion=FRA&event_type=PremierDraft&time_period=ALL_TIME",
+  "page_url": "https://www.17lands.com/card_data?expansion=FRA&format=PremierDraft&time_period=ALL_TIME",
+  "retrieved_at": "2026-10-07T05:58:08.926494+00:00",
+  "sha256": "f7f382cfe6137f7da493eed7f3c109e54f64320518d1eadaf26acb5f1f93c511",
+  "event_type": "PremierDraft",
+  "expansion": "FRA",
+  "time_period": "ALL_TIME",
+  "user_group": "default all tracked users",
+  "deck_colors": "all",
+  "metric": "ever_drawn_win_rate",
+  "scope": "Live early-format ALL_TIME snapshot retrieved Oct 7; not an exact seven-calendar-day slice. The endpoint supports time_period and ignores start_date/end_date.",
+  "usage_guidelines": "https://www.17lands.com/usage_guidelines",
+  "raw_data_policy": "Live response remains local and is excluded from public commits."
+}

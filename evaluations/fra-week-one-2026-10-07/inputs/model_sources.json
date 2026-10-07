@@ -1,0 +1,50 @@
+[
+  {
+    "id": "gemini-3.8-flash",
+    "pr": 8,
+    "commit": "89d75570cc0fe5733f06a511691531bfbe045e91",
+    "original_path": "predictions_reality_fracture_gih.md",
+    "file": "models/gemini-3.8-flash.md",
+    "url": "https://raw.githubusercontent.com/wanqizhu/mtg-benchmark/89d75570cc0fe5733f06a511691531bfbe045e91/predictions_reality_fracture_gih.md"
+  },
+  {
+    "id": "gpt-6-astra-xhigh",
+    "pr": 9,
+    "commit": "e1e717038c7c14d15b4832d0c395294d72381829",
+    "original_path": "predictions/reality-fracture-gih-win-rates.md",
+    "file": "models/gpt-6-astra-xhigh.md",
+    "url": "https://raw.githubusercontent.com/wanqizhu/mtg-benchmark/e1e717038c7c14d15b4832d0c395294d72381829/predictions/reality-fracture-gih-win-rates.md"
+  },
+  {
+    "id": "claude-fable-5.1",
+    "pr": 10,
+    "commit": "0eff02db78c3eb92a63fcaf804c6db4c991504b8",
+    "original_path": "predictions/fra_gih_wr_predictions.csv",
+    "file": "models/claude-fable-5.1.csv",
+    "url": "https://raw.githubusercontent.com/wanqizhu/mtg-benchmark/0eff02db78c3eb92a63fcaf804c6db4c991504b8/predictions/fra_gih_wr_predictions.csv"
+  },
+  {
+    "id": "grok-4.7",
+    "pr": 11,
+    "commit": "b2230cabea727ba1ca1944bd02d8e360bc610ac9",
+    "original_path": "predictions/reality_fracture_gih.md",
+    "file": "models/grok-4.7.md",
+    "url": "https://raw.githubusercontent.com/wanqizhu/mtg-benchmark/b2230cabea727ba1ca1944bd02d8e360bc610ac9/predictions/reality_fracture_gih.md"
+  },
+  {
+    "id": "claude-opus-5.5",
+    "pr": 12,
+    "commit": "03128701798f6f9c5489270104b3af0059efc756",
+    "original_path": "predictions/fra_17lands_gih_wr_claude-opus-5.5.md",
+    "file": "models/claude-opus-5.5.md",
+    "url": "https://raw.githubusercontent.com/wanqizhu/mtg-benchmark/03128701798f6f9c5489270104b3af0059efc756/predictions/fra_17lands_gih_wr_claude-opus-5.5.md"
+  },
+  {
+    "id": "gpt-6",
+    "pr": 13,
+    "commit": "f1144f80a75d545aef363b95780f5d4f8bcbb2ba",
+    "original_path": "predictions/reality-fracture-gih-win-rates.md",
+    "file": "models/gpt-6.md",
+    "url": "https://raw.githubusercontent.com/wanqizhu/mtg-benchmark/f1144f80a75d545aef363b95780f5d4f8bcbb2ba/predictions/reality-fracture-gih-win-rates.md"
+  }
+]
