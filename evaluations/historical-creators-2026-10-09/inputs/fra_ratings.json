@@ -2626,7 +2626,7 @@
       "name": "Draftsim",
       "url": "https://draftsim.com/FRA-pick-order/",
       "publication_or_recorded_date": "2026-09-25",
-      "date_basis": "collector's source-activity ledger, checked against dated original reviews",
+      "date_basis": "Collector records Sep 25 source activity; saved collector bundle generated Oct 6 after Arena launch. No independent prelaunch edition or edit history recovered.",
       "scale": "0.0 to 5.0",
       "kind": "creator",
       "rows": [
@@ -5241,8 +5241,9 @@
           "source_url": "https://draftsim.com/FRA-pick-order/"
         }
       ],
-      "edition": "prerelease published grades; current collector snapshot",
-      "caveat": ""
+      "edition": "Provisional prelaunch-rating attribution; values from postlaunch collector",
+      "caveat": "A recorded prelaunch source-activity date does not prove that the retained ratings were unchanged after launch.",
+      "timing_provenance": "provisional"
     },
     {
       "id": "limitedresources",

@@ -119,8 +119,21 @@ Casual and Alex each contribute five version-verified individual lists. LR has
 five sets with partial caption reconstruction outside the full Hobbit
 transcription; Avatar contributes CU only. The isolated captured LR D− is
 S.H.I.E.L.D. Helicarrier from Marvel. This is not a count of every grade spoken
-in the complete reviews. The bot has only two admitted editions (HOB/SOS) and
-weaker dating proof than versioned 17Lands. Later revised bot lists are excluded.
+in the complete reviews. The bot has only two provisionally admitted editions
+(HOB/SOS). HOB's secondary snapshots self-report August 11 and August 14 and
+agree on all 188 bot ratings; those dates lack independent archive verification.
+SOS is a current public asset whose publisher declares April 15 as its latest
+update, before the April 21 Arena launch. No independent prelaunch copy or edit
+history was recovered, so it could have changed without that date changing.
+The bot's numerical results are conditional on these source-timing assumptions.
+Lists with explicitly late update dates are excluded. One-set source-strength
+sensitivities are available; neither bot edition has the timing assurance of
+17Lands' version history.
+FRA's bot inputs have the same limitation: the source-activity ledger records
+September 25, but the saved collector bundle was generated October 6, after the
+September 29 Arena launch. No independent prelaunch bot copy or edit history was
+recovered. Its FRA evaluation is therefore provisional too; excluding FRA
+outcomes from historical fitting does not verify the input ratings' timing.
 No media was played during research.
 
 This is retrospective analysis. The earlier conditional-gap family was added
