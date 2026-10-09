@@ -1,0 +1,465 @@
+{
+  "policy": "Original prediction editions no later than three calendar days after Arena launch; historical versions before subsequent updates are accepted. Main-set nonbasic cards only. No outcome-based source selection. Up to five sets per creator; missing sets are not invented.",
+  "arena_dates": {
+    "HOB": "2026-08-11",
+    "MSH": "2026-06-23",
+    "SOS": "2026-04-21",
+    "TMT": "2026-03-03",
+    "ECL": "2026-01-20",
+    "TLA": "2025-11-18"
+  },
+  "sources": [
+    {
+      "creator": "casualspike",
+      "set": "HOB",
+      "admitted": true,
+      "release": "2026-08-11",
+      "published_or_frozen": "2026-07-31T22:24:28",
+      "basis": "17Lands earliest version covering all main cards that received a grade in this source; reconstructed from history",
+      "url": "https://www.17lands.com/data/tier_list/aed3cb5bc0604f9db2cfd1ce93688cce?date=2026-07-31T22:24:28",
+      "archive_file": "work/historical-calibration/tiers/casualspike_HOB_frozen.json",
+      "archive_sha256": "514546aba2aec9443a493b4e8868f938afe740b3f846bc8b81e617b68e908aef",
+      "rated_main": 188,
+      "complete": true,
+      "main_catalog_count": 188,
+      "notes": "Original version includes original flags; later grade and context edits are excluded."
+    },
+    {
+      "creator": "casualspike",
+      "set": "MSH",
+      "admitted": true,
+      "release": "2026-06-23",
+      "published_or_frozen": "2026-06-09T18:28:31",
+      "basis": "17Lands earliest version covering all main cards that received a grade in this source; reconstructed from history",
+      "url": "https://www.17lands.com/data/tier_list/4c638bcf3b134a40853cb5920e1d9328?date=2026-06-09T18:28:31",
+      "archive_file": "work/historical-calibration/tiers/casualspike_MSH_frozen.json",
+      "archive_sha256": "e46d76e49a8725c63871f55a01441adce78f2735536af13f5e61101c2429bbe0",
+      "rated_main": 276,
+      "complete": true,
+      "main_catalog_count": 276,
+      "notes": "Original version includes original flags; later grade and context edits are excluded."
+    },
+    {
+      "creator": "casualspike",
+      "set": "SOS",
+      "admitted": true,
+      "release": "2026-04-21",
+      "published_or_frozen": "2026-04-11T02:41:59",
+      "basis": "17Lands earliest version covering all main cards that received a grade in this source; reconstructed from history",
+      "url": "https://www.17lands.com/data/tier_list/420879087c5948b98bfe85ffc2985955?date=2026-04-11T02:41:59",
+      "archive_file": "work/historical-calibration/tiers/casualspike_SOS_frozen.json",
+      "archive_sha256": "e78f04aac96425d8903c9f0154b9d4b4fac50fcf28ad7231912662d955703ebf",
+      "rated_main": 266,
+      "complete": true,
+      "main_catalog_count": 266,
+      "notes": "Original version includes original flags; later grade and context edits are excluded."
+    },
+    {
+      "creator": "casualspike",
+      "set": "TMT",
+      "admitted": true,
+      "release": "2026-03-03",
+      "published_or_frozen": "2026-02-21T15:16:41",
+      "basis": "17Lands earliest version covering all main cards that received a grade in this source; reconstructed from history",
+      "url": "https://www.17lands.com/data/tier_list/d988f71f2b0a4520bc310eed322b517f?date=2026-02-21T15:16:41",
+      "archive_file": "work/historical-calibration/tiers/casualspike_TMT_frozen.json",
+      "archive_sha256": "8ce70bb4ca344ba6c45cd49d625c500a29152c89a8450aa204ce5f52acaa53bf",
+      "rated_main": 189,
+      "complete": false,
+      "main_catalog_count": 190,
+      "notes": "Original version includes original flags; later grade and context edits are excluded."
+    },
+    {
+      "creator": "casualspike",
+      "set": "ECL",
+      "admitted": true,
+      "release": "2026-01-20",
+      "published_or_frozen": "2026-01-10T07:21:10",
+      "basis": "17Lands earliest version covering all main cards that received a grade in this source; reconstructed from history",
+      "url": "https://www.17lands.com/data/tier_list/be15b13a5661422baa2953a68bebde20?date=2026-01-10T07:21:10",
+      "archive_file": "work/historical-calibration/tiers/casualspike_ECL_frozen.json",
+      "archive_sha256": "08041cc9aafa232eff1b04a4c5eb8325d13b627ed3713dd1d9f30b8d76f8ed0e",
+      "rated_main": 268,
+      "complete": true,
+      "main_catalog_count": 268,
+      "notes": "Original version includes original flags; later grade and context edits are excluded."
+    },
+    {
+      "creator": "alexnikolic",
+      "set": "MSH",
+      "admitted": true,
+      "release": "2026-06-23",
+      "published_or_frozen": "2026-06-16T02:45:29",
+      "basis": "17Lands earliest version covering all main cards that received a grade in this source; reconstructed from history",
+      "url": "https://www.17lands.com/data/tier_list/b07c077b8c8145288f75d71bf4f90d65?date=2026-06-16T02:45:29",
+      "archive_file": "work/historical-calibration/tiers/alexnikolic_MSH_frozen.json",
+      "archive_sha256": "612c17c06ed4351376baa3c3cd5a280469afd3379dcc4a5cd4215ed1496c53a5",
+      "rated_main": 276,
+      "complete": true,
+      "main_catalog_count": 276,
+      "notes": "Original version includes original flags; later grade and context edits are excluded."
+    },
+    {
+      "creator": "alexnikolic",
+      "set": "SOS",
+      "admitted": true,
+      "release": "2026-04-21",
+      "published_or_frozen": "2026-04-14T01:38:52",
+      "basis": "17Lands earliest version covering all main cards that received a grade in this source; reconstructed from history",
+      "url": "https://www.17lands.com/data/tier_list/3dda4b67b4b0403caeb0a744887b0208?date=2026-04-14T01:38:52",
+      "archive_file": "work/historical-calibration/tiers/alexnikolic_SOS_frozen.json",
+      "archive_sha256": "582900a968b7c1a3baffa9042dc8d07efe9a4a741b66115860d791120d279f07",
+      "rated_main": 266,
+      "complete": true,
+      "main_catalog_count": 266,
+      "notes": "Original version includes original flags; later grade and context edits are excluded."
+    },
+    {
+      "creator": "alexnikolic",
+      "set": "TMT",
+      "admitted": true,
+      "release": "2026-03-03",
+      "published_or_frozen": "2026-02-24T22:06:53",
+      "basis": "17Lands earliest version covering all main cards that received a grade in this source; reconstructed from history",
+      "url": "https://www.17lands.com/data/tier_list/c1489602e3d544d9aa90718692f16a32?date=2026-02-24T22:06:53",
+      "archive_file": "work/historical-calibration/tiers/alexnikolic_TMT_frozen.json",
+      "archive_sha256": "261f50577682f19b5fee97a8537a536ce9314477c5e95bca6bca87dffdff1c2b",
+      "rated_main": 189,
+      "complete": false,
+      "main_catalog_count": 190,
+      "notes": "Original version includes original flags; later grade and context edits are excluded."
+    },
+    {
+      "creator": "alexnikolic",
+      "set": "ECL",
+      "admitted": true,
+      "release": "2026-01-20",
+      "published_or_frozen": "2026-01-14T02:30:17",
+      "basis": "17Lands earliest version covering all main cards that received a grade in this source; reconstructed from history",
+      "url": "https://www.17lands.com/data/tier_list/4f09f4891cc148f0bb7afe510d4605ec?date=2026-01-14T02:30:17",
+      "archive_file": "work/historical-calibration/tiers/alexnikolic_ECL_frozen.json",
+      "archive_sha256": "0b61f3519740409925bf0921aef760e1ebbfbf29dcf7c549a2aa02b3903db291",
+      "rated_main": 268,
+      "complete": true,
+      "main_catalog_count": 268,
+      "notes": "Original version includes original flags; later grade and context edits are excluded."
+    },
+    {
+      "creator": "alexnikolic",
+      "set": "TLA",
+      "admitted": true,
+      "release": "2025-11-18",
+      "published_or_frozen": "2025-11-11T18:55:32",
+      "basis": "17Lands earliest version covering all main cards that received a grade in this source; reconstructed from history",
+      "url": "https://www.17lands.com/data/tier_list/6554520225504ef9a3d5360c062a8274?date=2025-11-11T18:55:32",
+      "archive_file": "work/historical-calibration/tiers/alexnikolic_TLA_frozen.json",
+      "archive_sha256": "ea42e47d52f503b3319ecb0f8b8a05f5aa3363a1bcd82d03d0f890c576b642b8",
+      "rated_main": 281,
+      "complete": true,
+      "main_catalog_count": 281,
+      "notes": "Original version includes original flags; later grade and context edits are excluded."
+    },
+    {
+      "creator": "marcanderson",
+      "set": "MSH",
+      "admitted": true,
+      "release": "2026-06-23",
+      "published_or_frozen": "2026-06-10T23:12:23",
+      "basis": "17Lands earliest version covering all main cards that received a grade in this source; reconstructed from history",
+      "url": "https://www.17lands.com/data/tier_list/e0c4c50e90914ac390a1f792e0717ed2?date=2026-06-10T23:12:23",
+      "archive_file": "work/historical-calibration/tiers/marcanderson_MSH_frozen.json",
+      "archive_sha256": "b43c0fb5bfec5c16a2fde743e25496664758502aea56fcc76a4fcc7036935223",
+      "rated_main": 276,
+      "complete": true,
+      "main_catalog_count": 276,
+      "notes": "Original version includes original flags; later grade and context edits are excluded."
+    },
+    {
+      "creator": "marcanderson",
+      "set": "SOS",
+      "admitted": true,
+      "release": "2026-04-21",
+      "published_or_frozen": "2026-04-14T04:13:56",
+      "basis": "17Lands earliest version covering all main cards that received a grade in this source; reconstructed from history",
+      "url": "https://www.17lands.com/data/tier_list/09ccc33bf4d6461f9c73de01bd8efe0c?date=2026-04-14T04:13:56",
+      "archive_file": "work/historical-calibration/tiers/marcanderson_SOS_frozen.json",
+      "archive_sha256": "43de768a144664e9669b27d198c75e5fdf0fd1e86c71039fe122a7f2f79cdd63",
+      "rated_main": 266,
+      "complete": true,
+      "main_catalog_count": 266,
+      "notes": "Original version includes original flags; later grade and context edits are excluded."
+    },
+    {
+      "creator": "marcanderson",
+      "set": "TMT",
+      "admitted": true,
+      "release": "2026-03-03",
+      "published_or_frozen": "2026-02-22T03:45:55",
+      "basis": "17Lands earliest version covering all main cards that received a grade in this source; reconstructed from history",
+      "url": "https://www.17lands.com/data/tier_list/a8a502ee50d84a31b6a501bb6b4d5920?date=2026-02-22T03:45:55",
+      "archive_file": "work/historical-calibration/tiers/marcanderson_TMT_frozen.json",
+      "archive_sha256": "247f9b5399ef3890dbfb700857ad62364882948c907f3dbdb451c53f545d312b",
+      "rated_main": 190,
+      "complete": true,
+      "main_catalog_count": 190,
+      "notes": "Original version includes original flags; later grade and context edits are excluded."
+    },
+    {
+      "creator": "marcanderson",
+      "set": "ECL",
+      "admitted": true,
+      "release": "2026-01-20",
+      "published_or_frozen": "2026-01-10T17:35:30",
+      "basis": "17Lands earliest version covering all main cards that received a grade in this source; reconstructed from history",
+      "url": "https://www.17lands.com/data/tier_list/0fef073a7db5401ba7e260e8649f2bea?date=2026-01-10T17:35:30",
+      "archive_file": "work/historical-calibration/tiers/marcanderson_ECL_frozen.json",
+      "archive_sha256": "2bacc1628898a47b96f72a90b7c1889030c1edd05f7483f16ff069577e8687cd",
+      "rated_main": 268,
+      "complete": true,
+      "main_catalog_count": 268,
+      "notes": "Original version includes original flags; later grade and context edits are excluded."
+    },
+    {
+      "creator": "marcanderson",
+      "set": "TLA",
+      "admitted": true,
+      "release": "2025-11-18",
+      "published_or_frozen": "2025-11-09T00:21:04",
+      "basis": "17Lands earliest version covering all main cards that received a grade in this source; reconstructed from history",
+      "url": "https://www.17lands.com/data/tier_list/10ab962ac03b4774b7cd2cb8bec152af?date=2025-11-09T00:21:04",
+      "archive_file": "work/historical-calibration/tiers/marcanderson_TLA_frozen.json",
+      "archive_sha256": "c587fc3b0f6e8f41aeeb6a626be1ad4d49f8128fc1d38542d0553c3c84c1af0c",
+      "rated_main": 281,
+      "complete": true,
+      "main_catalog_count": 281,
+      "notes": "Original version includes original flags; later grade and context edits are excluded."
+    },
+    {
+      "creator": "limitedresources",
+      "set": "HOB",
+      "admitted": true,
+      "release": "2026-08-11",
+      "published_or_frozen": "2026-08-14T18:12:49Z",
+      "basis": "Original Aug 3 CU / Aug 13 rare audio; Aug 4 / Aug 14 videos; self-dated Aug 14 full transcription",
+      "url": "https://chunk.science/mtga-hobbit.html",
+      "archive_file": "work/historical-calibration/collector_HOB_aug14.json",
+      "archive_sha256": "9642cab04a1eb15159de45716f7b1c0970e4277ebe2d09afba3cbadb9076f7fb",
+      "rated_main": 188,
+      "complete": true,
+      "notes": "Rare audio +2 days and video +3 days; early secondary file timestamp is recorded by publisher, not independently cryptographic proof."
+    },
+    {
+      "creator": "limitedresources",
+      "set": "MSH",
+      "admitted": true,
+      "release": "2026-06-23",
+      "published_or_frozen": "CU Jun 16 / rares Jun 25 (+2 days)",
+      "basis": "Dated original LR episodes, text-only reconstruction of explicit grades",
+      "url": "https://lrcast.com/episodes/",
+      "archive_files": [
+        "work/historical-calibration/captions/MSH_cu_direct.json",
+        "work/historical-calibration/captions/MSH_rare_direct.json"
+      ],
+      "archive_sha256": {
+        "work/historical-calibration/captions/MSH_cu_direct.json": "9e52fb0ce5414d022d75d9d5beb388e21d230358915d237d5267ba2ca5551c0e",
+        "work/historical-calibration/captions/MSH_rare_direct.json": "9f3aff31cbd34af19dfc41c76cf768df150f8b37c4f9dfa7cc31eaaac7430f7a"
+      },
+      "rated_main": 91,
+      "complete": false,
+      "notes": "Partial caption reconstruction; unresolved card attribution or grade statements omitted. Includes rares where episode meets +3 day cutoff. TLA CU only; TMT primer is not a full graded review."
+    },
+    {
+      "creator": "limitedresources",
+      "set": "SOS",
+      "admitted": true,
+      "release": "2026-04-21",
+      "published_or_frozen": "CU Apr 14 / rares Apr 21 (+0 days)",
+      "basis": "Dated original LR episodes, text-only reconstruction of explicit grades",
+      "url": "https://lrcast.com/episodes/",
+      "archive_files": [
+        "work/historical-calibration/captions/SOS_cu_direct.json",
+        "work/historical-calibration/captions/SOS_rare_direct.json"
+      ],
+      "archive_sha256": {
+        "work/historical-calibration/captions/SOS_cu_direct.json": "5d40a9f9a98dcce774c8a03ebd419ce1e26a4589353ab37b727828415f8a3fdd",
+        "work/historical-calibration/captions/SOS_rare_direct.json": "1f044702afef1eb4b76d9ed980bb3b2c1652597c051b31a4f369edc0b38fbc60"
+      },
+      "rated_main": 125,
+      "complete": false,
+      "notes": "Partial caption reconstruction; unresolved card attribution or grade statements omitted. Includes rares where episode meets +3 day cutoff. TLA CU only; TMT primer is not a full graded review."
+    },
+    {
+      "creator": "limitedresources",
+      "set": "ECL",
+      "admitted": true,
+      "release": "2026-01-20",
+      "published_or_frozen": "CU Jan 15 / rares Jan 22 (+2 days)",
+      "basis": "Dated original LR episodes, text-only reconstruction of explicit grades",
+      "url": "https://lrcast.com/episodes/",
+      "archive_files": [
+        "work/historical-calibration/captions/ECL_cu_direct.json",
+        "work/historical-calibration/captions/ECL_rare_direct.json"
+      ],
+      "archive_sha256": {
+        "work/historical-calibration/captions/ECL_cu_direct.json": "f86d0be2fce16f93aed27e7e2203c9093da7dff10623fe9c69667183b7edff78",
+        "work/historical-calibration/captions/ECL_rare_direct.json": "483e40b4141dd4b5a24c355dd6ccc27d58eca513253bf4a1d37c6f081c735e10"
+      },
+      "rated_main": 87,
+      "complete": false,
+      "notes": "Partial caption reconstruction; unresolved card attribution or grade statements omitted. Includes rares where episode meets +3 day cutoff. TLA CU only; TMT primer is not a full graded review."
+    },
+    {
+      "creator": "limitedresources",
+      "set": "TLA",
+      "admitted": true,
+      "release": "2025-11-18",
+      "published_or_frozen": "CU Nov 14; rare episode Nov 22 excluded (+4 days)",
+      "basis": "Dated original LR episodes, text-only reconstruction of explicit grades",
+      "url": "https://lrcast.com/episodes/",
+      "archive_files": [
+        "work/historical-calibration/captions/TLA_cu_direct.json"
+      ],
+      "archive_sha256": {
+        "work/historical-calibration/captions/TLA_cu_direct.json": "e487cc2a5f43cca94f88810658af5ce3bf33fb1070bea31b36fbaa7efd4a4a36"
+      },
+      "rated_main": 62,
+      "complete": false,
+      "notes": "Partial caption reconstruction; unresolved card attribution or grade statements omitted. Includes rares where episode meets +3 day cutoff. TLA CU only; TMT primer is not a full graded review."
+    },
+    {
+      "creator": "draftsim",
+      "set": "HOB",
+      "admitted": true,
+      "release": "2026-08-11",
+      "published_or_frozen": "2026-08-11T21:03:45Z",
+      "basis": "Self-dated frozen Aug 11 bot snapshot, corroborated by unchanged Aug 14 values",
+      "url": "https://chunk.science/mtga-hobbit.html",
+      "archive_file": "work/historical-calibration/collector_HOB_aug11.json",
+      "archive_sha256": "e35e8aa24bea3e3ac075ec35551fc07457c164f273b9fb626b461b54cfaa6cab",
+      "rated_main": 188,
+      "complete": true,
+      "notes": "Secondary archive; later bot updates are excluded. Recorded source activity Aug 13 also lies within +3 day rule."
+    },
+    {
+      "creator": "draftsim",
+      "set": "SOS",
+      "admitted": true,
+      "release": "2026-04-21",
+      "published_or_frozen": "2026-04-15",
+      "basis": "Publisher latest-update date predates release and no later edition evidence found",
+      "url": "https://draftsim.com/SOS-pick-order/",
+      "archive_file": "work/historical-calibration/draftsim_SOS_original.txt",
+      "archive_sha256": "ad643d347c43a379d6fd9059fc38019933eef9baeac78a1cb2ca2ffc3f5b0a01",
+      "rated_main": 266,
+      "complete": true,
+      "notes": "Current public asset and display date; weaker timing guarantee than versioned 17Lands. Kept separately for source-strength sensitivity."
+    },
+    {
+      "creator": "draftsim",
+      "set": "MSH",
+      "admitted": false,
+      "published_or_frozen": "2026-07-13",
+      "basis": "Current latest-update date after launch cutoff; no verified original archive recovered",
+      "url": "https://draftsim.com/MSH-pick-order/",
+      "notes": "Written Andrew Quinn reviews are a different 0–10 source and are not substituted for bot grades."
+    },
+    {
+      "creator": "draftsim",
+      "set": "TMT",
+      "admitted": false,
+      "published_or_frozen": "2026-03-10",
+      "basis": "Current latest-update date after launch cutoff; no verified original archive recovered",
+      "url": "https://draftsim.com/TMT-pick-order/",
+      "notes": "Written Andrew Quinn reviews are a different 0–10 source and are not substituted for bot grades."
+    },
+    {
+      "creator": "draftsim",
+      "set": "ECL",
+      "admitted": false,
+      "published_or_frozen": "2026-02-17",
+      "basis": "Current latest-update date after launch cutoff; no verified original archive recovered",
+      "url": "https://draftsim.com/ECL-pick-order/",
+      "notes": "Written Andrew Quinn reviews are a different 0–10 source and are not substituted for bot grades."
+    },
+    {
+      "creator": "draftsim",
+      "set": "TLA",
+      "admitted": false,
+      "published_or_frozen": "2025-12-17",
+      "basis": "Current latest-update date after launch cutoff; no verified original archive recovered",
+      "url": "https://draftsim.com/TLA-pick-order/",
+      "notes": "Written Andrew Quinn reviews are a different 0–10 source and are not substituted for bot grades."
+    },
+    {
+      "creator": "draftsim",
+      "set": "EOE",
+      "admitted": false,
+      "published_or_frozen": "2025-08-26",
+      "basis": "Current latest-update date after launch cutoff; no verified original archive recovered",
+      "url": "https://draftsim.com/EOE-pick-order/",
+      "notes": "Written Andrew Quinn reviews are a different 0–10 source and are not substituted for bot grades."
+    },
+    {
+      "creator": "draftsim",
+      "set": "TDM",
+      "admitted": false,
+      "published_or_frozen": "2025-04-21",
+      "basis": "Current latest-update date after launch cutoff; no verified original archive recovered",
+      "url": "https://draftsim.com/TDM-pick-order/",
+      "notes": "Written Andrew Quinn reviews are a different 0–10 source and are not substituted for bot grades."
+    },
+    {
+      "creator": "draftsim",
+      "set": "DFT",
+      "admitted": false,
+      "published_or_frozen": "2025-02-28",
+      "basis": "Current latest-update date after launch cutoff; no verified original archive recovered",
+      "url": "https://draftsim.com/DFT-pick-order/",
+      "notes": "Written Andrew Quinn reviews are a different 0–10 source and are not substituted for bot grades."
+    },
+    {
+      "creator": "draftsim",
+      "set": "FDN",
+      "admitted": false,
+      "published_or_frozen": "2024-11-30",
+      "basis": "Current latest-update date after launch cutoff; no verified original archive recovered",
+      "url": "https://draftsim.com/FDN-pick-order/",
+      "notes": "Written Andrew Quinn reviews are a different 0–10 source and are not substituted for bot grades."
+    },
+    {
+      "creator": "draftsim",
+      "set": "DSK",
+      "admitted": false,
+      "published_or_frozen": "2024-10-12",
+      "basis": "Current latest-update date after launch cutoff; no verified original archive recovered",
+      "url": "https://draftsim.com/DSK-pick-order/",
+      "notes": "Written Andrew Quinn reviews are a different 0–10 source and are not substituted for bot grades."
+    },
+    {
+      "creator": "alexnikolic / marcanderson",
+      "set": "HOB",
+      "admitted": false,
+      "basis": "Joint Alex + Marc list; cannot attribute to either individual model",
+      "url": "https://www.17lands.com/tier_list/528d1c45d1f04b59abac2a897a8928c8"
+    },
+    {
+      "creator": "limitedresources",
+      "set": "TMT",
+      "admitted": false,
+      "basis": "Only set primer located, not a complete native card-grade review"
+    },
+    {
+      "creator": "limitedresources",
+      "set": "TLA rares",
+      "admitted": false,
+      "published_or_frozen": "2025-11-22",
+      "basis": "Four days after Arena launch; exceeds declared three-day cutoff"
+    },
+    {
+      "creator": "casualspike",
+      "set": "TLA / EOE",
+      "admitted": false,
+      "basis": "Dated original authored posts located through public RSS; older than five most recent admitted Casual sets. Full rating-version recovery not needed after five-set cap."
+    }
+  ]
+}
