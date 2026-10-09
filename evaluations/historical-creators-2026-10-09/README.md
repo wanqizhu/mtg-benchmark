@@ -1,177 +1,166 @@
-# Historical creator calibration, October 9, 2026
+# Historical creator calibration — updated model rules
 
-Fit each creator's original native grades to historical Premier Draft GIH win
-rates, then transfer that mapping to Reality Fracture (FRA). This branch contains
-the code and curated prediction facts. Live response envelopes and generated
-outcome tables stay local under the repository's ignored `results/` directory.
+Four active sources: Casual Spike, Alex Nikolic, LSV + Marshall / Limited Resources,
+and Draftsim bot. Original editions are admitted through three calendar days
+post Arena launch. Native source facts and labels are preserved. Historical
+training uses official FIRST_WEEK PremierDraft GIH, all users and colors,
+reported outcomes with at least 500 games, and nonbasic main-set cards.
+Each card-set observation has equal weight.
 
-## Result
+## Requested changes
 
-The identical 265-card FRA comparison uses the frozen October 7 snapshot from
-the earlier evaluation, not a new October 9 download.
+- Marc is removed from the active canonical inputs, fit, evaluation and display.
+- SB and explicitly sideboard-marked inputs are grouped with F for letter models
+  (native 1 for a numeric bot source). There is no separate SB or sideboard-effect
+  coefficient. Raw published labels remain visible for provenance.
+- For a letter grade with n < 10 real card-set memberships, its final coefficient
+  is (n × base coefficient + donor-weighted base coefficients) / 10. Exactly
+  10 − n weight is borrowed from closest observed native grades. Equal-distance
+  donors share weight equally, capped at actual support; borrowing expands to
+  the next distance only after exhausting closer classes. Adjustments are
+  simultaneous and use unsmoothed donor coefficients. An unobserved letter
+  class borrows all ten weights. Counts remain labelled as real versus borrowed.
+- Unordered sparse context effects borrow toward the ordinary-card zero-effect
+  baseline: final effect = min(1, n/10) × base effect. This is the explicit
+  extension for terms without a nearby ordinal grade class.
+- Draftsim uses a monotone regression of its continuous native rating. Candidates
+  are linear with two coefficients or cubic B-splines with four through nine.
+  Every candidate has fewer than ten total fitted coefficients. Decimal rating
+  labels do not receive independent parameters or ten-sample bucket adjustments.
 
-| Source | Historical sets | Eligible training observations | Pearson r | Spearman rho | MAE, percentage points | RMSE, percentage points |
+The ten-sample adjustment follows the base historical letter fit, whose
+monotone/free family and grade/context penalties are selected using history.
+It is applied within every historical validation fold. Large letter classes
+receive no ten-sample adjustment; refitting/model selection can change their
+base coefficients. Pseudo-sample weight does not create more observed or
+independent cards. C++ lies midway between C+ and B−, and split grades retain
+original component weights.
+
+## Historical coefficients
+
+Values are final predicted GIH percentages; parentheses show real card-set
+memberships. F includes the grouped sideboard inputs.
+
+| Grade | Casual Spike | Alex Nikolic | LSV + Marshall / LR |
+|---|---:|---:|---:|
+| F | 52.00690% (20) | 50.62165% (20) | 49.26828% (13) |
+| D- | 52.75218% (22) | 50.79565% (26) | 51.43784% (1) |
+| D | 52.86566% (65) | 52.09870% (72) | 53.21294% (61) |
+| D+ | 53.86647% (101) | 53.06636% (157) | 53.59529% (16) |
+| C- | 53.86647% (116) | 54.57734% (187) | 53.59529% (27) |
+| C | 55.05715% (218) | 55.35578% (200) | 54.48918% (102) |
+| C+ | 56.01745% (192) | 56.64991% (221) | 55.53417% (67) |
+| C++ | 56.45768% (0) | 57.08437% (0) | 55.53417% (41) |
+| B- | 56.89791% (150) | 57.51884% (132) | 55.53417% (49) |
+| B | 58.41040% (135) | 58.98822% (85) | 56.24438% (119) |
+| B+ | 59.40137% (83) | 60.63965% (60) | 58.75319% (73) |
+| A- | 60.25391% (23) | 61.03106% (41) | 60.02972% (21) |
+| A | 61.61057% (26) | 62.62489% (46) | 62.10231% (23) |
+| A+ | 61.96420% (11) | 65.72842% (11) | 62.75242% (4) |
+
+### Draftsim regression
+
+Selected monotone cubic B-spline regression, with **5 total fitted coefficients**.
+Curvature penalty 50; unconstrained smoother trace
+2.414805. Historical native-rating domain
+[1.0, 4.7]; predictions use the nearest endpoint beyond this range.
+
+| Term | Coefficient |
+|---|---:|
+| cubic_basis_1 | 46.94643708 |
+| cubic_basis_2 | 50.89924660 |
+| cubic_basis_3 | 55.10392781 |
+| cubic_basis_4 | 59.62331873 |
+| cubic_basis_5 | 64.26183714 |
+
+Knot vector: `[1.0, 1.0, 1.0, 1.0, 2.85, 4.7, 4.7, 4.7, 4.7]`.
+
+Prediction is the coefficient-weighted sum of cubic B-spline bases evaluated
+at the clipped native rating. Fixed knots add no fitted parameters.
+
+### Context coefficients
+
+| Creator | Term | Final coefficient | Real examples | Borrowed zero-effect weight |
+|---|---|---:|---:|---:|
+| Casual Spike | build_around offset, pp | -0.62308523 | 27 | 0 |
+| Alex Nikolic | build_around offset, pp | -0.39161851 | 22 | 0 |
+| Alex Nikolic | synergy offset, pp | -0.32280844 | 52 | 0 |
+| LSV + Marshall / Limited Resources | build_around offset, pp | -1.89227389 | 33 | 0 |
+| LSV + Marshall / Limited Resources | scenario offset, pp | -0.14739191 | 24 | 0 |
+| LSV + Marshall / Limited Resources | build_around conditional grade gap, pp/native step | +0.43705637 | 5 | 5 |
+| LSV + Marshall / Limited Resources | scenario conditional grade gap, pp/native step | +0.00000000 | 13 | 0 |
+
+## FRA evaluation
+
+The original October 7 ALL_TIME outcome snapshot remains frozen. The new shared
+pool has 266 cards: the verified qualitative sideboard assessment of Refute
+Destiny now supplies an F model input under the requested alias. Four other LR
+qualitative assessments remain unmapped. The report also compares both policies
+on the prior identical 265-card pool.
+
+| Source | Training observations | Historical sets | Pearson r | Spearman rho | MAE, pp | RMSE, pp |
 |---|---:|---:|---:|---:|---:|---:|
-| Marc Anderson | 5 | 1,259 | 0.777 | 0.727 | 2.12 | 2.75 |
-| Alex Nikolic | 5 | 1,258 | 0.771 | 0.697 | 2.15 | 2.76 |
-| Casual Spike | 5 | 1,162 | 0.687 | 0.644 | 2.34 | 3.08 |
-| LSV + Marshall / Limited Resources | 5, partial | 543 | 0.680 | 0.613 | 2.37 | 3.08 |
-| Draftsim bot | 2 | 443 | 0.617 | 0.563 | 2.54 | 3.31 |
+| Casual Spike | 1162 | 5 | 0.690 | 0.648 | 2.333 | 3.073 |
+| Alex Nikolic | 1258 | 5 | 0.778 | 0.700 | 2.128 | 2.720 |
+| LSV + Marshall / Limited Resources | 543 | 5 | 0.717 | 0.650 | 2.301 | 2.932 |
+| Draftsim bot | 443 | 2 | 0.606 | 0.565 | 2.557 | 3.354 |
 
-Marc and Alex's mean absolute errors differ by only 0.028 points. A descriptive
-paired card bootstrap includes zero; these results do not establish a clear
-winner between them. The all-card output retains 295 canonical cards and five
-creator columns, with missing grades left blank. Four creators score 270
-reported main-set cards; LR scores 265.
+## Validation and limits
 
-## Original-source audit
+Models and penalties are chosen by historical purged leave-one-set-out RMSE.
+Every historical training printing matching a held-out scoring-fold card name
+is removed. These are tuning scores, not nested unbiased generalization scores.
+After selection, refit all admitted history and lock by hash before evaluation
+reads FRA outcomes. A guarded repeat fit blocks every FRA file and the current
+results folder; coefficients and model choices reproduce exactly.
 
-Admission uses an original edition published no later than three calendar days
-after Arena release. Later edits are excluded using version history whenever
-available. Up to five recent sets are included per source, without selecting
-sources for their outcome performance.
+The new fit has 3,406 eligible observations from 17 admitted source/set editions.
+Casual and Alex each contribute five version-verified individual lists. LR has
+five sets with partial caption reconstruction outside the full Hobbit
+transcription; Avatar contributes CU only. The isolated captured LR D− is
+S.H.I.E.L.D. Helicarrier from Marvel. This is not a count of every grade spoken
+in the complete reviews. The bot has only two admitted editions (HOB/SOS) and
+weaker dating proof than versioned 17Lands. Later revised bot lists are excluded.
+No media was played during research.
 
-| Source | Admitted historical sets | Evidence and limits |
-|---|---|---|
-| Casual Spike | HOB, MSH, SOS, TMT, ECL | Original 17Lands versions linked from dated authored posts; original flags frozen too. TMT has one ungraded main card. |
-| Alex Nikolic | MSH, SOS, TMT, ECL, TLA | Separate original 17Lands versions. The joint Alex/Marc Hobbit list is excluded. TMT has one ungraded main card. |
-| Marc Anderson | MSH, SOS, TMT, ECL, TLA | Separate original 17Lands versions. The joint Hobbit list is excluded. |
-| LR | HOB, MSH, SOS, ECL, TLA | HOB has a full dated secondary transcription. Other sets have partial, manually checked caption reconstructions. TLA has CU only. This is a joint LSV/Marshall source. |
-| Draftsim bot | HOB, SOS | HOB has early self-dated collector files; SOS has a publisher latest-update date preceding release. These guarantees are weaker than 17Lands history. Later revised bot tables are excluded. |
+This is retrospective analysis. The earlier conditional-gap family was added
+after inspection of an initial FRA evaluation. The current support rule,
+sideboard merge and regression cap were requested after that evaluation.
+Numerical fitting/model selection still use history only. First-week GIH is
+noisy and depends on deck, player and cohort composition. FRA's early ALL_TIME
+horizon is about 7.6 days; historical windows use the site's FIRST_WEEK.
 
-Set codes: HOB = The Hobbit; MSH = Marvel Superheroes; SOS = Secrets of
-Strixhaven; TMT = Teenage Mutant Ninja Turtles; ECL = Lorwyn Eclipsed;
-TLA = Avatar: The Last Airbender.
+## Reproduce
 
-LR rares were available within the permitted window: [HOB August 13](https://lrcast.com/limited-resources-866-the-hobbit-set-review-rare-and-mythic-rare/),
-[MSH June 25](https://lrcast.com/limited-resources-859-marvel-superheroes-set-review-rare-and-mythic-rare/),
-and [ECL January 22](https://lrcast.com/limited-resources-837-lorwyn-eclipsed-set-review-rare-and-mythic-rare/)
-were each two days after Arena launch; [SOS April 21](https://lrcast.com/limited-resources-850-secrets-of-strixhaven-set-review-rare-and-mythic-rare/)
-was release day. TLA's rare review was four days after launch and is excluded.
-The dated audio pages establish timing; caption text supplies card evidence.
-No media was played during collection.
-
-The canonical input files preserve every retained raw grade, conditional grade,
-source timestamp, original-version identifier and available hash. The audit
-also records rejected editions and ambiguous spoken statements. Collection
-helpers document the scratch workflow; they require the original workspace
-scratch layout. For refitting, use the curated `inputs/historical_ratings.json`
-directly. The helpers are not intended to silently recreate manually checked
-facts from fresh web content.
-
-## Model
-
-The historical target is 17Lands' official `FIRST_WEEK` PremierDraft
-`ever_drawn_win_rate`, all tracked users and colors. Training uses nonbasic
-main-set cards with a reported GIH and at least 500 GIH games. Each card-set
-observation has equal weight. There are 4,755 captured source rows and 4,665
-eligible training observations.
-
-Each native letter or decimal grade receives a fitted win-rate parameter.
-Equivalent numeric strings share a bucket; C++ stays between C+ and B−. Split
-grades average their component bucket mappings. SB is an unordered bucket.
-Observed context types receive separate offsets. Explicit conditional-only
-letters can supply the input when an ordinary grade is absent. Qualitative
-assessments without a recoverable letter or number remain unmapped.
-
-Conditional combinations such as build-around B share the native grade curve
-and context effects. They are not given separate unrelated parameters: almost
-all such combinations still have fewer than ten observations. All captured
-combinations and their actual counts remain available in the conditional table.
-
-The objective is equal-card squared error plus penalties on adjacent grade
-differences, SB's distance from the lowest supported ordinary bucket, and
-context coefficients. Model selection compares monotone/free curves; grade
-penalties 0, 2, 10, 50; context penalties 2, 10, 50; and conditional-grade-gap
-terms on/off. Purged leave-one-set-out selection removes every training card
-name appearing in the held-out scoring fold. These CV results are tuning scores, not
-nested unbiased estimates.
-
-| Source | Selected grade penalty | Selected context penalty | Conditional-gap terms |
-|---|---:|---:|---|
-| Casual Spike | 10 | 50 | Off |
-| Alex | 10 | 50 | Off |
-| Marc | 10 | 50 | Off |
-| LR | 2 | 10 | On |
-| Bot | 0 | 50, unused | Off |
-
-All selected curves are monotone. Every observed bucket is retained, including
-buckets with fewer than ten cards. Smoothing borrows strength; it does not
-manufacture ten observations. Omit-one-set mapping ranges show sensitivity,
-not confidence intervals. The exact coefficients and counts are generated in
-`historical_models.json`, `grade_mappings.csv`, `context_coefficients.csv`, and
-the raw/conditional bucket count tables.
-
-LR's conditional build-around gap is fitted from only five nonzero examples.
-Its contribution is provisional. The gap family was added after inspecting
-the initial flag-only FRA evaluation. Selection and fitting still use history
-only, and the initial results are retained. This is a retrospective transfer
-analysis, not an analyst-blind or preregistered forecast. Casual's fifth set
-was recovered later through source research and admitted on provenance.
-
-FRA outcomes are never read by the fitting stage. Its saved model is locked by
-hash before evaluation. Historical printings of FRA cards are allowed as past
-information; a sensitivity excludes them. Other sensitivity runs use mature
-ALL_TIME historical targets, grade-only terms, no postlaunch LR rare episodes,
-and each individual bot set. Hyperparameters remain fixed in sensitivity runs.
-
-## Reproduce locally
-
-Python dependencies: numpy, pandas, scipy, plotly and markdown. The scripts use
-paths relative to their own location. From this analysis directory:
+Dependencies: numpy, pandas, scipy, plotly, markdown. From this directory:
 
 ```sh
 python3 historical_creators.py fit --truth-dir /path/to/historical-truth
 python3 historical_creators.py evaluate --truth-dir /path/to/historical-truth \
   --fra-truth /path/to/original-17lands_fra_all_time.json
+python3 verify_historical.py --truth-dir /path/to/historical-truth \
+  --source-scratch /path/to/historical-calibration
 python3 present_historical.py --destination /path/to/display-folder
 ```
 
-`historical-truth` must contain `<SET>_FIRST_WEEK.json` and `<SET>.json` for all
-six admitted set codes. Each is a JSON envelope with the API result in `data`.
-Endpoints:
+Historical truth requires `<SET>_FIRST_WEEK.json` and `<SET>.json` for HOB, MSH,
+SOS, TMT, ECL and TLA. Each JSON envelope holds its API response under `data`.
+Endpoints use `https://www.17lands.com/api/card_data?expansion=<SET>&event_type=PremierDraft&time_period=FIRST_WEEK`
+and the same URL with `time_period=ALL_TIME`. The FRA envelope must match the
+hash in the sibling `fra-week-one-2026-10-07/inputs/ground_truth_manifest.json`;
+a fresh download cannot reproduce that snapshot. Live envelopes stay local.
 
-```text
-https://www.17lands.com/api/card_data?expansion=<SET>&event_type=PremierDraft&time_period=FIRST_WEEK
-https://www.17lands.com/api/card_data?expansion=<SET>&event_type=PremierDraft&time_period=ALL_TIME
-```
+Source facts in `inputs/` are canonical refit inputs. `collection/` documents
+the original scratch research and manual attribution checks; it is not a fresh
+web scrape that silently replaces the frozen checked inputs. Local original
+scratch is `work/historical-calibration` relative to the task workspace.
 
-The FRA file must match the original SHA-256 in the sibling
-`fra-week-one-2026-10-07/inputs/ground_truth_manifest.json`; a fresh download
-cannot reproduce that frozen snapshot. The source ZIP preserves this sibling
-layout and includes the canonical catalog, curated inputs, code, and published
-derived results, including the initial flag-only comparison. Live API response
-envelopes are not included. A fresh clone also needs the preserved initial
-flag-only results to generate its comparison panel.
-
-The original local scratch inputs are under `work/historical-calibration`
-relative to the task workspace. Verification:
-
-```sh
-python3 verify_historical.py --truth-dir /path/to/historical-truth \
-  --source-scratch /path/to/historical-calibration
-```
-
-This independently refits with all FRA files forbidden, checks original tier
-history replay, verifies percentages/monotonicity, checks the 295 × 5 export,
-recomputes shared-card metrics, and confirms FIRST_WEEK responses differ from
-mature ALL_TIME data. The completed audit is in `results/validation.json`.
-
-## Read the results
-
-`historical_creators.html` is a standalone offline dashboard: no remote scripts,
-video, audio, or tracking. Scatter hover/click includes native grades, mapped
-rates, sample sizes and full card rules; filters include creator, rarity, name
-and the shared comparison pool. It also has grade curves, color residuals,
-all-card raw/mapped tables, source audits, sparse counts and exact models.
-
-`historical_report.md` explains the methods and largest errors. Common errors
-include underpredicting blue, overpredicting red, and compressing Ajani's
-extreme observed rate into the historical A/A+ average. High grades alone do
-not distinguish exceptional bombs within the same grade bucket.
-
-Limits: partial LR transcription can bias the historical sample; the bot has
-only two weaker dated editions; sparse contextual and extreme grade buckets
-remain; first-week GIH is noisy and affected by deck/player context. FRA's
-original early ALL_TIME horizon is about 7.6 days, slightly longer than the
-historical FIRST_WEEK window.
+Generated `results/` remain Gitignored. The offline dashboard has plots,
+card hover/click details, complete 295 × 4 raw/mapped tables, source audit,
+historical coefficients and exact borrowed weights. Downloads include
+`model_coefficients.csv`, `borrowed_sample_weights.csv`, `historical_models.json`,
+`historical_report.md`, CV candidates/predictions, sensitivity scores and
+`validation.json`. Bot grade-grid values in `grade_mappings.csv` are curve
+evaluations, not extra coefficients. The source ZIP includes sibling catalog
+paths and derived results, with no live API envelopes. The optional prior-score
+summary enables the fixed 265-card comparison panel.
