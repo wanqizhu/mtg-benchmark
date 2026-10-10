@@ -166,11 +166,12 @@ python3 export_benchmark_tab.py \
   --output /path/to/mtg-benchmark-site/data/draft-predictions.json
 ```
 
-Open the site at `/#/draft-predictions`. The default plot shows predicted GIH
-against prediction minus observed GIH, with an alternate predicted versus
-observed view. Hover shows card rates and samples; clicking opens its rules
-and model inputs. Data collection, fitting, final coefficients and the full
-card table are collapsed initially.
+Open the site at `/#/draft-predictions`. The plot shows predicted versus observed
+GIH. Hover shows card rates, differences and samples; clicking opens its rules
+and model inputs. Source names are colored by AI model or content creator.
+Methodology includes the full shared prediction prompt. Data collection,
+fitting and final coefficients are grouped under Content Creator Historical
+Data Details. All expansions and the full card table are collapsed initially.
 
 ### Historical fits
 
