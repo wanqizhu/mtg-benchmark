@@ -145,6 +145,35 @@ horizon is about 7.6 days; historical windows use the site's FIRST_WEEK.
 
 ## Reproduce
 
+### Benchmark website tab
+
+The `Draft Predictions` tab combines the six original AI percentage forecasts
+with these four historical creator models. Its initial score table and scatter
+plot use the identical 266-card pool. The complete expandable table includes
+295 cards, the ten predictions, and creators' published raw grades. Native
+creator grades are converted only by the retained historical fits; the AI
+forecasts use their original values without FRA recalibration.
+
+The exporter checks the shared outcome hash, card coverage, and equality with
+the existing creator scores. It writes a compact analyzed JSON and a CSV;
+live response envelopes remain local. The static assets are included in
+`harness/site_static`, and the site generator preserves the exported data when
+puzzle scores are updated.
+
+```sh
+python3 export_benchmark_tab.py \
+  --model-data ../fra-week-one-2026-10-07/results/dashboard_data.json \
+  --output /path/to/mtg-benchmark-site/data/draft-predictions.json
+```
+
+Open the site at `/#/draft-predictions`. The default plot shows predicted GIH
+against prediction minus observed GIH, with an alternate predicted versus
+observed view. Hover shows card rates and samples; clicking opens its rules
+and model inputs. Data collection, fitting, final coefficients and the full
+card table are collapsed initially.
+
+### Historical fits
+
 Dependencies: numpy, pandas, scipy, plotly, markdown. From this directory:
 
 ```sh
