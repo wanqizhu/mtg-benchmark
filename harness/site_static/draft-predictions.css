@@ -73,15 +73,22 @@
 .dp-card-button { font-weight:500; color:var(--text); }
 .dp-card-meta { display:block; color:var(--muted); font-size:10px; margin-top:2px; }
 .dp-cell-grade { display:block; color:var(--muted); font-size:10px; max-width:155px; white-space:normal; }
-.dp-dialog { color:var(--text); background:var(--panel-strong); border:1px solid var(--line); border-radius:14px; padding:24px; width:min(570px,calc(100vw - 28px)); max-height:85vh; }
+.dp-dialog { box-sizing:border-box; color:var(--text); background:var(--panel-strong); border:1px solid var(--line); border-radius:14px; padding:24px; width:min(760px,calc(100vw - 28px)); max-height:85vh; overflow:auto; }
 .dp-dialog::backdrop { background:#0005; }
-.dp-dialog-heading { display:flex; justify-content:space-between; gap:12px; }
-.dp-dialog h2 { font-size:22px; margin:0 0 8px; }
+.dp-dialog-heading { display:flex; align-items:start; justify-content:space-between; gap:12px; margin-bottom:18px; }
+.dp-dialog h2 { font-size:22px; margin:0; }
+.dp-dialog-heading button { flex-shrink:0; }
 .dp-dialog p { font-size:13px; line-height:1.6; }
-.dp-dialog .dp-rules { white-space:pre-wrap; padding:15px 0; border-block:1px solid var(--line); }
-.dp-dialog .dp-detail-rates { display:flex; gap:22px; margin:20px 0; }
+.dp-card-detail-layout { display:grid; grid-template-columns:minmax(220px,310px) minmax(0,1fr); gap:24px; align-items:start; }
+.dp-card-images { margin:0; text-align:center; }
+.dp-card-image { width:100%; height:auto; border-radius:12px; display:block; }
+.dp-card-image[hidden] { display:none; }
+.dp-card-images figcaption { margin-top:9px; font-size:11px; }
+.dp-dialog .dp-modal-source { font-size:14px; font-weight:600; margin:0 0 16px; }
+.dp-dialog .dp-detail-rates { display:grid; grid-template-columns:1fr 1fr; gap:22px 16px; margin:0 0 20px; }
 .dp-dialog .dp-detail-rates small { display:block; font-size:11px; color:var(--muted); margin-bottom:3px; }
 .dp-dialog .dp-detail-rates strong { font-size:21px; font-weight:500; font-variant-numeric:tabular-nums; }
 .dp-dialog a { color:var(--accent); }
+@media(max-width:650px) { .dp-card-detail-layout { grid-template-columns:1fr; }.dp-card-images { width:min(300px,100%); margin:0 auto; }.dp-dialog { padding:20px; } }
 @media(max-width:1000px) { .dp-overview { grid-template-columns:285px minmax(0,1fr); gap:14px; }.dp-chart-header { flex-wrap:wrap; }.dp-heading h1 { font-size:25px; } }
 @media(max-width:760px) { .dp-overview, .dp-model-grid { grid-template-columns:1fr; }.dp-heading { align-items:start; flex-direction:column; gap:8px; }.dp-meta { text-align:left; }.dp-board th:first-child { width:65%; }.dp-board td { padding-block:7px; }.dp-source { font-size:13px; }.dp-chart-card { padding:16px 10px 10px; }.dp-expand>summary span { display:block; margin:5px 0 0 14px; }.dp-table-controls { align-items:start; flex-direction:column; }.dp-dialog .dp-detail-rates { gap:16px; } }

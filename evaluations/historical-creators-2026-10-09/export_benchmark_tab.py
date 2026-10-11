@@ -22,6 +22,7 @@ def export(model_data, destination):
     assert set(models) == expected
     ai_ids = [key for key, value in ai['sources'].items() if value['kind'] == 'model']
     assert len(ai_ids) == 6
+    images = {c['name']: c for c in json.loads((ROOT / 'inputs/card_images.json').read_text())['cards']}
     lookup = {(r['creator'], r['card']): r for r in history['records']}
     shared = set.intersection(*[{r['card'] for r in history['records']
                                if r['creator'] == key and r['primary'] and r['prediction'] is not None}
@@ -39,6 +40,7 @@ def export(model_data, destination):
                             provisional=key == 'draftsim', fra_provenance=fra_sources[key].get('caveat', '')))
     cards = []
     for card in ai['cards']:
+        assert images[card['name']]['scryfall_uri'] == card['url']
         values = {}
         for key in ai_ids:
             raw = card['values'].get(key, {}).get('raw')
@@ -55,7 +57,8 @@ def export(model_data, destination):
         cards.append(dict(name=card['name'], rarity=card['rarity'], color=card['color'],
                           set=card['set'], cost=card['cost'], type=card['type'], oracle=card['oracle'],
                           url=card['url'], actual=card['actual'], games=card['n'],
-                          shared=card['name'] in shared, values=values))
+                          shared=card['name'] in shared, values=values,
+                          images=images[card['name']]['images']))
     assert len(cards) == 295 and len({c['name'] for c in cards}) == 295
     for source in sources:
         pool = [c for c in cards if c['shared']]

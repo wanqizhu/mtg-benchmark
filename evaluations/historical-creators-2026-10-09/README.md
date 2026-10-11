@@ -154,6 +154,10 @@ plot use the identical 266-card pool. The complete expandable table includes
 creator grades are converted only by the retained historical fits; the AI
 forecasts use their original values without FRA recalibration.
 
+`inputs/card_images.json` contains Scryfall image URLs matched to all 295
+canonical print URLs from the retained raw Scryfall metadata. Images load on
+card click; their URLs are metadata, and no image files are vendored.
+
 The exporter checks the shared outcome hash, card coverage, and equality with
 the existing creator scores. It writes a compact analyzed JSON and a CSV;
 live response envelopes remain local. The static assets are included in
@@ -167,8 +171,12 @@ python3 export_benchmark_tab.py \
 ```
 
 Open the site at `/#/draft-predictions`. The plot shows predicted versus observed
-GIH. Hover shows card rates, differences and samples; clicking opens its rules
-and model inputs. Source names are colored by AI model or content creator.
+GIH, with prediction on x and observation on y. Hover shows card rates,
+differences and samples; clicking opens its Scryfall image and prediction stats.
+The full table defaults to descending observed GIH. Source names are colored
+by AI model or content creator. Unused grades with no historical observations
+are omitted from the fitted-coefficient display; their fallback mappings remain
+in the model artifact, and the predictions are unchanged.
 Methodology includes the full shared prediction prompt. Data collection,
 fitting and final coefficients are grouped under Content Creator Historical
 Data Details. All expansions and the full card table are collapsed initially.
