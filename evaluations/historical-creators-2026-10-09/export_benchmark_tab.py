@@ -11,6 +11,11 @@ import numpy as np
 from scipy.stats import pearsonr
 
 ROOT = Path(__file__).resolve().parent
+SOURCE_NAMES = {
+    # Confirmed from the original September 24 prediction run's model metadata.
+    'gpt-6': 'GPT-6 Sol',
+    'alexnikolic': 'Alex Nikolic (Limited Level-Ups)',
+}
 
 
 def export(model_data, destination):
@@ -28,14 +33,14 @@ def export(model_data, destination):
                                if r['creator'] == key and r['primary'] and r['prediction'] is not None}
                               for key in models])
     assert len(shared) == 266
-    sources = [dict(id=key, name=ai['sources'][key]['name'], kind='ai',
+    sources = [dict(id=key, name=SOURCE_NAMES.get(key, ai['sources'][key]['name']), kind='ai',
                     url=ai['sources'][key]['url'], commit=ai['sources'][key]['commit']) for key in ai_ids]
     audits = json.loads((ROOT / 'inputs/source_audit.json').read_text())['sources']
     fra_sources = {s['id']: s for s in json.loads((ROOT / 'inputs/fra_ratings.json').read_text())['sources']}
     for key, model in models.items():
         fields = ['set', 'release', 'published_or_frozen', 'basis', 'url', 'rated_main', 'complete', 'notes']
         collection = [{k: row.get(k) for k in fields} for row in audits if row['creator'] == key and row['admitted']]
-        sources.append(dict(id=key, name=model['name'], kind='creator', model=model,
+        sources.append(dict(id=key, name=SOURCE_NAMES.get(key, model['name']), kind='creator', model=model,
                             collection=collection, url=fra_sources[key]['url'],
                             provisional=key == 'draftsim', fra_provenance=fra_sources[key].get('caveat', '')))
     cards = []
@@ -87,7 +92,7 @@ def export(model_data, destination):
         if s['kind'] == 'creator':
             headers.append(s['name'] + ' raw grade')
     with destination.with_suffix('.csv').open('w', encoding='utf-8-sig', newline='') as file:
-        writer = csv.writer(file)
+        writer = csv.writer(file, lineterminator='\n')
         writer.writerow(headers)
         for c in cards:
             row = [c['name'], c['set'], c['rarity'], c['actual'], c['games'], c['shared']]

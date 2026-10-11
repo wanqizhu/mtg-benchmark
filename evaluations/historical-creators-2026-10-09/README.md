@@ -154,6 +154,12 @@ plot use the identical 266-card pool. The complete expandable table includes
 creator grades are converted only by the retained historical fits; the AI
 forecasts use their original values without FRA recalibration.
 
+Display names identify the original `gpt-6` submission as **GPT-6 Sol**,
+confirmed by its September 24 run metadata (`gpt-6-sol`, xhigh). The original
+source ID, commit and numerical forecasts are retained. Alex Nikolic is labeled
+with his publication, **Limited Level-Ups**; LSV and Marshall remain the separate
+Limited Resources source.
+
 `inputs/card_images.json` contains Scryfall image URLs matched to all 295
 canonical print URLs from the retained raw Scryfall metadata. Images load on
 card click; their URLs are metadata, and no image files are vendored.
