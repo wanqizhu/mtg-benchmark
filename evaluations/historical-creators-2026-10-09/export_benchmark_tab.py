@@ -58,6 +58,7 @@ def export(model_data, destination):
                 assert abs(row['actual'] - card['actual']) < 1e-8
             values[key] = dict(prediction=row['prediction'], grade=row['native_grade'],
                                grade_used=row['grade_used'], contexts=row['contexts'],
+                               applied_contexts=row['applied_contexts'], rating_structure=row['rating_structure'],
                                support=row['support_notes'], source_url=row['source_url'])
         cards.append(dict(name=card['name'], rarity=card['rarity'], color=card['color'],
                           set=card['set'], cost=card['cost'], type=card['type'], oracle=card['oracle'],

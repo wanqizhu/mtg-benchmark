@@ -20,7 +20,8 @@ ROOT=Path(__file__).resolve().parent
 PREVIOUS=ROOT.parent/'fra-week-one-2026-10-07'
 CREATORS={'casualspike':'Casual Spike','alexnikolic':'Alex Nikolic','limitedresources':'LSV + Marshall / Limited Resources','draftsim':'Draftsim bot'}
 LETTER={'F':0.,'D-':1.,'D':2.,'D+':3.,'C-':4.,'C':5.,'C+':6.,'C++':6.5,'B-':7.,'B':8.,'B+':9.,'A-':10.,'A':11.,'A+':12.}
-CONTEXTS=['build_around','synergy','sideboard','scenario','alternate']
+CONTEXTS=['build_around','synergy','sideboard','scenario','alternate','context_flag']
+CONTEXT_FLAG_KINDS={'build_around','synergy','scenario'}
 GRADE_LAMBDAS=[0.,2.,10.,50.]
 CONTEXT_LAMBDAS=[2.,10.,50.]
 MINIMUM_BUCKET_SAMPLES=10
@@ -93,7 +94,10 @@ def prepare(row):
     a=atoms(label)
     if not a:a=atoms(r.get('native'));label=r.get('native');basis='published raw grade'
     if not a:
-        for c in r.get('contexts',[]):
+        # The applicability grade is the primary grade when a conditional-only
+        # review also gives a narrower scenario grade (e.g. heavy-green/monogreen).
+        conditions=sorted(r.get('contexts',[]),key=lambda c:c.get('relation')!='applicability')
+        for c in conditions:
             if atoms(c.get('native')):
                 a=atoms(c['native']);label=c['native'];basis='explicit conditional grade; no ordinary grade provided';break
     if r.get('grade_weights'):
@@ -102,18 +106,23 @@ def prepare(row):
     sideboard='SB' in a or 'sideboard' in flags or str(r.get('native','')).lower().startswith('sideboard')
     if sideboard:
         label='1' if r.get('creator')=='draftsim' else 'F';a={label:1.};flags.discard('sideboard');basis='SB / sideboard grouped with lowest model rating'
-    gaps={}
-    if a and 'SB' not in a:
-        base=sum(value(g)*w for g,w in a.items())
-        for c in r.get('contexts',[]):
-            k='build_around' if c['kind']=='build_around_flag' else c['kind'];ca=atoms(c.get('native'))
-            if k=='sideboard':continue
-            if ca and 'SB' not in ca:
-                gap=sum(value(g)*w for g,w in ca.items())-base
-                if abs(gap)>1e-9:gaps.setdefault(k,[]).append(gap)
-    gaps={k:float(np.mean(v)) for k,v in gaps.items()}
+    # Source assembly sometimes copied a lone contextual grade into both fields.
+    # That is not evidence of two published grades. Prefix labels identify the
+    # historical conditional-only records despite their duplicated ordinary field.
+    explicit_only=str(r.get('native','')).lower().startswith('build-around')
+    ordinary=atoms(r.get('ordinary_native'))
+    conditional=[atoms(c.get('native')) for c in r.get('contexts',[])
+                 if c['kind'] in CONTEXT_FLAG_KINDS and atoms(c.get('native'))]
+    relevant=bool(flags & CONTEXT_FLAG_KINDS)
+    if sideboard:structure='sideboard'
+    elif relevant and (explicit_only or (not ordinary and conditional)):structure='conditional_only'
+    elif relevant and ordinary and any(c!=ordinary for c in conditional):structure='base_and_conditional'
+    elif relevant:structure='single_grade_with_context'
+    else:structure='ordinary'
+    applied=['context_flag'] if a and structure in ['conditional_only','single_grade_with_context'] else []
     if not a:basis='No verified letter or numeric grade'
-    r.update(grade_used=label,grade_atoms=a,grade_basis=basis,buckets=sorted(flags),context_gaps=gaps)
+    r.update(grade_used=label,grade_atoms=a,grade_basis=basis,
+             raw_buckets=sorted(flags),buckets=applied,context_gaps={},rating_structure=structure)
     return r
 
 
@@ -139,6 +148,7 @@ def training_inputs(truth_dir,period):
 
 class BucketModel:
     def __init__(self,monotone,grade_lambda,context_lambda,use_gaps=False):
+        assert not use_gaps,'The shared context-flag model has no conditional-gap terms'
         self.monotone=monotone;self.grade_lambda=grade_lambda;self.context_lambda=context_lambda;self.use_gaps=use_gaps
 
     def basis(self,row):
@@ -165,7 +175,8 @@ class BucketModel:
         self.labels={v:sorted({g for r in rows for g in r['grade_atoms'] if g!='SB' and value(g)==v}) for v in self.levels}
         self.has_sb=any('SB' in r['grade_atoms'] for r in rows)
         self.contexts=[c for c in CONTEXTS if any(c in r['buckets'] for r in rows)]
-        self.gap_contexts=[c for c in CONTEXTS if self.use_gaps and any(abs(r.get('context_gaps',{}).get(c,0))>1e-9 for r in rows)]
+        self.gap_contexts=[]
+        assert self.contexts in [[],['context_flag']],self.contexts
         assert self.levels
         x=np.stack([self.basis(r)[0] for r in rows]);y=np.array([r['actual'] for r in rows]);nbase=len(self.levels)+int(self.has_sb);p=x.shape[1]
         regularizer=[]
@@ -246,7 +257,7 @@ class BucketModel:
             counts.append({'grade':g,'native_value':None if g=='SB' else value(g),'card_set_observations':len(members),'distinct_card_names':len({norm(r['name']) for r in members}),'effective_weight':sum(r['grade_atoms'][g] for r in members),'mapped_wr':pred,'observed_mean_wr':float(np.mean([r['actual'] for r in members])) if members else None,**self.topup_audit[g]})
         contexts=[{'bucket':k,'card_set_observations':sum(k in r['buckets'] for r in rows),'distinct_card_names':len({norm(r['name']) for r in rows if k in r['buckets']}),'offset_pp':float(self.coef[nbase+i]),**self.context_topups[k]} for i,k in enumerate(self.contexts)]
         gap_mapping=[{'bucket':k,'nonzero_gap_card_set_observations':sum(abs(r.get('context_gaps',{}).get(k,0))>1e-9 for r in rows),'pp_per_native_grade_step':float(self.coef[nbase+len(self.contexts)+i]),**self.gap_topups[k]} for i,k in enumerate(self.gap_contexts)]
-        return {'model_type':'native_bucket','sideboard_policy':'SB and sideboard-marked inputs grouped with F; no separate SB/context-sideboard coefficient','sparse_topup_policy':'nearest-class-ten-sample-v1','minimum_bucket_samples':MINIMUM_BUCKET_SAMPLES,'use_gaps':self.use_gaps,'gap_contexts':self.gap_contexts,'context_gap_mapping':gap_mapping,'family':('monotone' if self.monotone else 'free')+' historical native curve + contexts + fixed ten-sample top-up','monotone':self.monotone,'final_mapping_monotone':bool(np.all(np.diff([r['mapped_wr'] for r in counts if r['grade']!='SB'])>=-1e-8)),'grade_lambda':self.grade_lambda,'context_lambda':self.context_lambda,'levels':self.levels,'has_sb':self.has_sb,'contexts':self.contexts,'coefficients':self.coef.tolist(),'base_coefficients':self.base_coef.tolist(),'train_n':self.train_n,'train_sets':self.train_sets,'base_training_rmse_pp':self.base_training_rmse,'training_rmse_pp':self.training_rmse,'grade_mapping':counts,'context_mapping':contexts}
+        return {'model_type':'native_bucket','context_policy':'single-context-flag-v1','rating_structure_counts':dict(Counter(r.get('rating_structure','ordinary') for r in rows)),'sideboard_policy':'SB and sideboard-marked inputs grouped with F; no separate SB/context-sideboard coefficient','sparse_topup_policy':'nearest-class-ten-sample-v1','minimum_bucket_samples':MINIMUM_BUCKET_SAMPLES,'use_gaps':False,'gap_contexts':[],'context_gap_mapping':[],'family':('monotone' if self.monotone else 'free')+' historical native curve + one shared context flag + fixed ten-sample top-up','monotone':self.monotone,'final_mapping_monotone':bool(np.all(np.diff([r['mapped_wr'] for r in counts if r['grade']!='SB'])>=-1e-8)),'grade_lambda':self.grade_lambda,'context_lambda':self.context_lambda,'levels':self.levels,'has_sb':self.has_sb,'contexts':self.contexts,'coefficients':self.coef.tolist(),'base_coefficients':self.base_coef.tolist(),'train_n':self.train_n,'train_sets':self.train_sets,'base_training_rmse_pp':self.base_training_rmse,'training_rmse_pp':self.training_rmse,'grade_mapping':counts,'context_mapping':contexts}
 
     @classmethod
     def restore(cls,spec):
@@ -347,7 +358,7 @@ def folds(rows):
 def choose_model(rows):
     if rows[0]['creator']=='draftsim':return choose_bot_model(rows)
     candidates=[]
-    for use_gaps in [False,True]:
+    for use_gaps in [False]:
         for monotone in [False,True]:
             for gl in GRADE_LAMBDAS:
                 for cl in CONTEXT_LAMBDAS:
@@ -383,20 +394,22 @@ def fit_stage(truth_dir,output):
         for raw_grade,n in Counter(r['native'] for r in all_rows if r['creator']==creator).items():
             members=[r for r in train if r['native']==raw_grade];bucket_counts.append({'creator':creator,'kind':'raw published label','bucket':raw_grade,'published_card_set_observations':n,'training_card_set_observations':len(members),'training_distinct_card_names':len({norm(r['name']) for r in members})})
         for ctx in CONTEXTS:
-            raw_prepared=[prepare(r) for r in all_rows if r['creator']==creator];members=[r for r in train if ctx in r['buckets']]
-            bucket_counts.append({'creator':creator,'kind':'context','bucket':ctx,'published_card_set_observations':sum(ctx in r['buckets'] for r in raw_prepared),'training_card_set_observations':len(members),'training_distinct_card_names':len({norm(r['name']) for r in members})})
+            raw_prepared=[prepare(r) for r in all_rows if r['creator']==creator]
+            bucket_field='buckets' if ctx=='context_flag' else 'raw_buckets'
+            members=[r for r in train if ctx in r[bucket_field]]
+            bucket_counts.append({'creator':creator,'kind':'applied context flag' if ctx=='context_flag' else 'published context','bucket':ctx,'published_card_set_observations':sum(ctx in r[bucket_field] for r in raw_prepared),'training_card_set_observations':len(members),'training_distinct_card_names':len({norm(r['name']) for r in members})})
         print('FIT',creator,len(train),spec['family'],'grade penalty',winner['grade_lambda'],'context penalty',winner['context_lambda'],'conditional gaps',winner['use_gaps'],'bot parameters',winner.get('n_coefficients'),'validation RMSE',round(winner['rmse_pp'],3),flush=True)
     package={'created_utc':datetime.now(timezone.utc).isoformat(),'fit_scope':'Historical nonbasic main-set PremierDraft FIRST_WEEK GIH, all colors and users, reported rates and n >= 500; FRA outcomes never loaded by fit stage','equal_weight':'One card-set observation has one unit of loss; no weighting by GIH count or creator semantic grade normalization','raw_grade_policy':'Each native letter/decimal bucket is fitted separately. Split host grades average fitted bucket values, with explicit nested host weights where recorded. SB is an unordered native bucket. Conditional-only grades use their explicit letter and retain the context flag. Unobserved grades interpolate on the native order or use the nearest supported endpoint. Unidentified SB stays unmapped.','penalty_policy':'Adjacent bucket differences divided by native-grade spacing receive grade_lambda penalty; unordered SB borrows strength from the lowest supported ordinary grade with the same penalty. Every observed context coefficient receives context_lambda penalty. An optional nonnegative conditional-grade-gap effect (conditional raw grade minus ordinary raw grade, on the native order) is compared with the flag-only model in historical CV. These gap coefficients share context_lambda shrinkage. No minimum-count bucket dropping or arbitrary 10-card claim.','sources_file_sha256':sha(ROOT/'inputs/historical_ratings.json'),'truth_manifests':files,'models':models,'join_exclusions':join_exclusions}
     package['active_creators']=CREATORS
-    package['raw_grade_policy']='Original labels are retained. SB and sideboard-marked ratings use F (or native 1 for a numeric bot source). No separate SB or sideboard-effect parameter is fitted. Ordinary split grades keep their original component weights. Missing qualitative grades stay unmapped.'
-    package['penalty_policy']='Letter models retain historical validation of the base curve and context penalties, then apply the user fixed ten-sample top-up inside every fit and validation fold. For n<10 real bucket memberships, fill 10-n fractional sample weight from nearest observed native classes, using their unsmoothed fitted coefficients, with equal-distance allocation balanced and capped at each donor class actual count. Sparse context effects fill toward the ordinary-card zero-effect baseline. All adjustments are simultaneous, not recursive. Draftsim instead uses a monotone linear/cubic B-spline regression with 2 or 4-9 total fitted coefficients, selected by historical purged leave-one-set-out RMSE; no per-numeric-bucket parameters.'
+    package['raw_grade_policy']='Original labels are retained. Explicit base/conditional pairs use only the base grade and no context offset. Conditional-only grades and single grades with build-around, synergy or scenario labels use the supplied grade plus one shared context-flag coefficient per creator. Multiple flags activate the coefficient only once. Copied same-grade fields are single ratings, not verified pairs. Tentative alternative ratings do not activate the context flag. SB and sideboard-marked ratings use F (or native 1 for the bot) with no context offset. Split grades keep their published weights. Missing qualitative grades stay unmapped.'
+    package['penalty_policy']='Letter models validate grade and shared context penalties on historical sets; conditional-gap terms are disabled. The user fixed ten-sample top-up is applied inside every fit and validation fold. For n<10 real grade memberships, fill 10-n fractional sample weight from nearest observed native classes using unsmoothed fitted coefficients, with equal-distance allocation balanced and capped at actual donor counts. A sparse context flag shrinks toward zero. All adjustments are simultaneous. Draftsim uses a monotone linear/cubic B-spline with 2 or 4-9 total coefficients selected by historical purged leave-one-set-out RMSE.'
     package['empty_class_policy']='Letter classes with n=0 borrow all ten sample weights. These remain labelled as zero real observations. The bot curve clamps to its historical endpoint outside the observed native-rating range.'
     modelpath=output/'historical_models.json';modelpath.write_text(json.dumps(package,ensure_ascii=False,indent=2,allow_nan=False))
     (output/'fit_lock.json').write_text(json.dumps({'models_sha256':sha(modelpath),'locked_before_FRA_outcome_read':True,'utc':datetime.now(timezone.utc).isoformat(),'historical_training_sets':sorted(files),'historical_ratings_sha256':sha(ROOT/'inputs/historical_ratings.json')},indent=2))
     (output/'historical_cv_candidates.json').write_text(json.dumps(validation,ensure_ascii=False,indent=2,allow_nan=False))
     pd.DataFrame(cv_ledger).to_csv(output/'historical_cv_predictions.csv',index=False)
     pd.DataFrame(bucket_counts).to_csv(output/'historical_bucket_counts.csv',index=False)
-    pd.DataFrame([{**{k:r.get(k) for k in ['creator','set','name','native','grade_used','actual','gih_n','grade_basis','source_url']},'contexts':'; '.join(r['buckets'])} for r in rows]).to_csv(output/'historical_training_observations.csv',index=False)
+    pd.DataFrame([{**{k:r.get(k) for k in ['creator','set','name','native','grade_used','actual','gih_n','grade_basis','rating_structure','source_url']},'contexts':'; '.join(r['buckets']),'published_contexts':'; '.join(r['raw_buckets'])} for r in rows]).to_csv(output/'historical_training_observations.csv',index=False)
     # This is a retrospective transfer experiment. The compute lock prevents label leakage;
     # it does not claim an analyst preregistration before FRA results were published.
     return package
@@ -421,7 +434,7 @@ def evaluate_stage(truth_dir,output,fra_truth):
             if item:r,pred,support=item
             else:r=None;pred=None;support=['Creator supplied no grade']
             primary=c['set']=='fra' and not c['type'].startswith('Basic Land') and wr is not None and n>=500
-            rec={'creator':creator,'card':c['name'],'set':c['set'],'rarity':c['rarity'],'color':''.join(c['colors']) or 'C','native_grade':None if r is None else r['native'],'grade_used':None if r is None else r['grade_used'],'contexts':[] if r is None else r['buckets'],'grade_atoms':{} if r is None else r['grade_atoms'],'context_gaps':{} if r is None else r['context_gaps'],'context_details':[] if r is None else r['contexts'],'prediction':pred,'actual':wr,'gih_n':n,'error_pp':None if pred is None or wr is None else pred-wr,'primary':primary,'support_notes':support,'source_url':None if r is None else r.get('source_url'),'oracle':c['oracle'],'cost':c['cost'],'type':c['type'],'scryfall_uri':c['scryfall_uri']}
+            rec={'creator':creator,'card':c['name'],'set':c['set'],'rarity':c['rarity'],'color':''.join(c['colors']) or 'C','native_grade':None if r is None else r['native'],'grade_used':None if r is None else r['grade_used'],'contexts':[] if r is None else r['raw_buckets'],'applied_contexts':[] if r is None else r['buckets'],'rating_structure':None if r is None else r['rating_structure'],'grade_atoms':{} if r is None else r['grade_atoms'],'context_gaps':{} if r is None else r['context_gaps'],'context_details':[] if r is None else r['contexts'],'prediction':pred,'actual':wr,'gih_n':n,'error_pp':None if pred is None or wr is None else pred-wr,'primary':primary,'support_notes':support,'source_url':None if r is None else r.get('source_url'),'oracle':c['oracle'],'cost':c['cost'],'type':c['type'],'scryfall_uri':c['scryfall_uri']}
             long.append(rec)
             if primary:
                 actual.append(wr);predicted.append(pred)

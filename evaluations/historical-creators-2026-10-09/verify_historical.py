@@ -20,6 +20,27 @@ def run(truth_dir,source_scratch,output):
     assert prepare({'creator':'alexnikolic','native':'SB','contexts':[]})['grade_atoms']=={'F':1.}
     assert prepare({'creator':'limitedresources','native':'Sideboard B','contexts':[{'kind':'sideboard','native':'B'}]})['grade_atoms']=={'F':1.}
     checks['hand_calculated_nearest_class_examples_and_SB_alias_pass']=True
+    # Independently specified rating cases check the user-requested semantics.
+    pair=prepare({'creator':'alexnikolic','native':'C+ / build-around B+',
+                  'ordinary_native':'C+','contexts':[{'kind':'build_around','native':'B+'},
+                                                    {'kind':'synergy','native':None}]})
+    assert pair['grade_atoms']=={'C+':1.} and pair['buckets']==[]
+    only=prepare({'creator':'limitedresources','native':'Build-around A',
+                  'ordinary_native':'A','contexts':[{'kind':'build_around','native':'A'}]})
+    assert only['rating_structure']=='conditional_only' and only['grade_atoms']=={'A':1.}
+    assert only['buckets']==['context_flag']
+    single=prepare({'creator':'alexnikolic','native':'B','ordinary_native':'B',
+                    'contexts':[{'kind':'build_around','native':None},{'kind':'synergy','native':None}]})
+    assert single['buckets']==['context_flag'] and single['grade_atoms']=={'B':1.}
+    copied=prepare({'creator':'limitedresources','native':'B','ordinary_native':'B',
+                    'contexts':[{'kind':'build_around','native':'B'}]})
+    assert copied['rating_structure']=='single_grade_with_context' and copied['buckets']==['context_flag']
+    narrow=prepare({'creator':'limitedresources','native':'B (heavy-green only; B+ in monogreen)',
+                    'ordinary_native':None,'contexts':[{'kind':'scenario','native':'B+'},
+                                                       {'kind':'build_around','native':'B','relation':'applicability'}]})
+    assert narrow['grade_atoms']=={'B':1.} and narrow['buckets']==['context_flag']
+    assert all(r['context_gaps']=={} for r in [pair,only,single,copied,narrow])
+    checks['explicit_pairs_base_only_and_other_context_cases_once_pass']=True
     assert sha(output/'historical_models.json')==analysis['fit_lock']['models_sha256']
     assert sha(ROOT/'inputs/historical_ratings.json')==package['sources_file_sha256']
     assert analysis['fra_truth_sha256']==json.loads((PREVIOUS/'inputs/ground_truth_manifest.json').read_text())['sha256']
@@ -51,6 +72,9 @@ def run(truth_dir,source_scratch,output):
             assert m['unconstrained_smoother_degrees_of_freedom']<=m['nominal_degrees_of_freedom']+1e-8
             assert np.all(np.diff([x['mapped_wr'] for x in m['grade_mapping']])>=-1e-8)
         else:
+            assert m['contexts']==['context_flag'] and len(m['context_mapping'])==1
+            assert not m['use_gaps'] and not m['context_gap_mapping']
+            assert len(m['coefficients'])==len(m['levels'])+1
             assert not m['has_sb'] and all(g['grade']!='SB' for g in m['grade_mapping'])
             assert 'sideboard' not in m['contexts'] and 'sideboard' not in m['gap_contexts']
             if m['monotone']:assert np.all(np.diff(m['base_coefficients'][:len(m['levels'])])>=-1e-8)
@@ -71,6 +95,7 @@ def run(truth_dir,source_scratch,output):
     checks['ten_sample_formula_and_donor_capacities_verified']=True
     checks['bot_has_fewer_than_ten_total_fitted_coefficients']=True
     checks['SB_grouped_with_F_without_separate_sideboard_parameters']=True
+    checks['three_letter_models_have_exactly_one_shared_context_coefficient']=True
     checks['final_curve_monotonicity']={k:m['final_mapping_monotone'] for k,m in package['models'].items()}
     checks['fit_file_accesses']=sorted(set(accesses))
     wide=pd.read_csv(output/'fra_predictions_wide.csv');long=pd.read_csv(output/'fra_predictions_long.csv');scores=pd.read_csv(output/'fra_scores.csv')
@@ -93,7 +118,7 @@ def run(truth_dir,source_scratch,output):
         assert sha(truth_dir/f'{s}_FIRST_WEEK.json')!=sha(truth_dir/f'{s}.json')
         assert sum(r['ever_drawn_game_count'] for r in first)<=sum(r['ever_drawn_game_count'] for r in mature)
     checks['FIRST_WEEK_responses_differ_from_mature_and_have_fewer_games']=True
-    checks['historical_target_period']='FIRST_WEEK';checks['training_observations']=sum(m['train_n'] for m in package['models'].values());checks['source_limitations']=['LR partial reconstructed historical coverage','Bot only two qualified editions','Sparse buckets remain below ten','Conditional-grade-gap family added after initial FRA inspection; both versions retained']
+    checks['historical_target_period']='FIRST_WEEK';checks['training_observations']=sum(m['train_n'] for m in package['models'].values());checks['source_limitations']=['LR partial reconstructed historical coverage','Bot only two qualified editions','Sparse buckets remain below ten','Shared context policy specified after FRA inspection; retrospective comparison']
     checks['script_sha256']=sha(ROOT/'historical_creators.py')
     (output/'validation.json').write_text(json.dumps(checks,indent=2))
     print('VALIDATED',checks['training_observations'],'historical observations; 295 cards;',len(shared),'common scored cards; guarded repeat fit had no FRA file access',flush=True)

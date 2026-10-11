@@ -9,6 +9,15 @@ Each card-set observation has equal weight.
 
 ## Requested changes
 
+- Each of the three letter-grade creators has exactly one shared context-flag
+  coefficient. Explicit base/conditional pairs use only the base bucket, with
+  flag 0. Conditional-only grades and single grades with build-around, synergy
+  or scenario labels use their supplied grade plus the coefficient, with flag 1.
+  Multiple labels activate it once. Tentative alternative grades are excluded.
+  Same-grade copies introduced by source assembly do not establish two separate
+  ratings. No conditional-grade-gap coefficient is fitted. Where a conditional
+  review has an applicability grade plus a narrower scenario grade, the primary
+  applicability grade is used (FRA Hexhaven Invigorator: B, not monogreen B+/A−).
 - Marc is removed from the active canonical inputs, fit, evaluation and display.
 - SB and explicitly sideboard-marked inputs are grouped with F for letter models
   (native 1 for a numeric bot source). There is no separate SB or sideboard-effect
@@ -43,20 +52,20 @@ memberships. F includes the grouped sideboard inputs.
 
 | Grade | Casual Spike | Alex Nikolic | LSV + Marshall / LR |
 |---|---:|---:|---:|
-| F | 52.00690% (20) | 50.62165% (20) | 49.26828% (13) |
-| D- | 52.75218% (22) | 50.79565% (26) | 51.43784% (1) |
-| D | 52.86566% (65) | 52.09870% (72) | 53.21294% (61) |
-| D+ | 53.86647% (101) | 53.06636% (157) | 53.59529% (16) |
-| C- | 53.86647% (116) | 54.57734% (187) | 53.59529% (27) |
-| C | 55.05715% (218) | 55.35578% (200) | 54.48918% (102) |
-| C+ | 56.01745% (192) | 56.64991% (221) | 55.53417% (67) |
-| C++ | 56.45768% (0) | 57.08437% (0) | 55.53417% (41) |
-| B- | 56.89791% (150) | 57.51884% (132) | 55.53417% (49) |
-| B | 58.41040% (135) | 58.98822% (85) | 56.24438% (119) |
-| B+ | 59.40137% (83) | 60.63965% (60) | 58.75319% (73) |
-| A- | 60.25391% (23) | 61.03106% (41) | 60.02972% (21) |
-| A | 61.61057% (26) | 62.62489% (46) | 62.10231% (23) |
-| A+ | 61.96420% (11) | 65.72842% (11) | 62.75242% (4) |
+| F | 52.00690% (20) | 50.63960% (20) | 49.26581% (13) |
+| D- | 52.75218% (22) | 50.81291% (26) | 51.50322% (1) |
+| D | 52.86566% (65) | 52.12515% (72) | 53.33382% (61) |
+| D+ | 53.86647% (101) | 53.08473% (157) | 53.62961% (16) |
+| C- | 53.86647% (116) | 54.59704% (187) | 53.62961% (27) |
+| C | 55.05715% (218) | 55.39071% (200) | 54.49344% (102) |
+| C+ | 56.01745% (192) | 56.68349% (221) | 55.56565% (67) |
+| C++ | 56.45768% (0) | 57.11061% (0) | 55.56565% (41) |
+| B- | 56.89791% (150) | 57.53772% (132) | 55.56565% (49) |
+| B | 58.41040% (135) | 59.02025% (85) | 56.25982% (119) |
+| B+ | 59.40137% (83) | 60.64768% (60) | 58.84939% (73) |
+| A- | 60.25391% (23) | 61.04135% (41) | 60.02512% (21) |
+| A | 61.61057% (26) | 62.63394% (46) | 62.18187% (23) |
+| A+ | 61.96420% (11) | 65.72981% (11) | 62.79196% (4) |
 
 ### Draftsim regression
 
@@ -82,17 +91,13 @@ at the clipped native rating. Fixed knots add no fitted parameters.
 
 | Creator | Term | Final coefficient | Real examples | Borrowed zero-effect weight |
 |---|---|---:|---:|---:|
-| Casual Spike | build_around offset, pp | -0.62308523 | 27 | 0 |
-| Alex Nikolic | build_around offset, pp | -0.39161851 | 22 | 0 |
-| Alex Nikolic | synergy offset, pp | -0.32280844 | 52 | 0 |
-| LSV + Marshall / Limited Resources | build_around offset, pp | -1.89227389 | 33 | 0 |
-| LSV + Marshall / Limited Resources | scenario offset, pp | -0.14739191 | 24 | 0 |
-| LSV + Marshall / Limited Resources | build_around conditional grade gap, pp/native step | +0.43705637 | 5 | 5 |
-| LSV + Marshall / Limited Resources | scenario conditional grade gap, pp/native step | +0.00000000 | 13 | 0 |
+| Casual Spike | Shared context flag, pp | -0.62308523 | 27 | 0 |
+| Alex Nikolic | Shared context flag, pp | -0.75189956 | 74 | 0 |
+| LSV + Marshall / Limited Resources | Shared context flag, pp | -1.86937656 | 39 | 0 |
 
 ## FRA evaluation
 
-The original October 7 ALL_TIME outcome snapshot remains frozen. The new shared
+The original October 7 ALL_TIME outcome snapshot remains frozen. The shared
 pool has 266 cards: the verified qualitative sideboard assessment of Refute
 Destiny now supplies an F model input under the requested alias. Four other LR
 qualitative assessments remain unmapped. The report also compares both policies
@@ -101,8 +106,8 @@ on the prior identical 265-card pool.
 | Source | Training observations | Historical sets | Pearson r | Spearman rho | MAE, pp | RMSE, pp |
 |---|---:|---:|---:|---:|---:|---:|
 | Casual Spike | 1162 | 5 | 0.690 | 0.648 | 2.333 | 3.073 |
-| Alex Nikolic | 1258 | 5 | 0.778 | 0.700 | 2.128 | 2.720 |
-| LSV + Marshall / Limited Resources | 543 | 5 | 0.717 | 0.650 | 2.301 | 2.932 |
+| Alex Nikolic | 1258 | 5 | 0.778 | 0.701 | 2.139 | 2.716 |
+| LSV + Marshall / Limited Resources | 543 | 5 | 0.710 | 0.644 | 2.295 | 2.958 |
 | Draftsim bot | 443 | 2 | 0.606 | 0.565 | 2.557 | 3.354 |
 
 ## Validation and limits
@@ -138,7 +143,8 @@ No media was played during research.
 
 This is retrospective analysis. The earlier conditional-gap family was added
 after inspection of an initial FRA evaluation. The current support rule,
-sideboard merge and regression cap were requested after that evaluation.
+sideboard merge, regression cap and shared context-flag encoding were requested
+after that evaluation.
 Numerical fitting/model selection still use history only. First-week GIH is
 noisy and depends on deck, player and cohort composition. FRA's early ALL_TIME
 horizon is about 7.6 days; historical windows use the site's FIRST_WEEK.
