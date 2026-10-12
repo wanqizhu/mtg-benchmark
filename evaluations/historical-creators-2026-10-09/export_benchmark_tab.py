@@ -1,14 +1,14 @@
 """Export only original AI predictions and four historical creator mappings.
 
-No fit or network request. Outcomes remain the original frozen Oct 7 snapshot.
+No fit or network request. Current evaluation outcomes come from the committed snapshot.
 """
 import argparse
-import csv
 import json
 from pathlib import Path
 
 import numpy as np
 from scipy.stats import pearsonr
+from refresh_benchmark_outcomes import apply_outcomes, write_export
 
 ROOT = Path(__file__).resolve().parent
 SOURCE_NAMES = {
@@ -18,7 +18,7 @@ SOURCE_NAMES = {
 }
 
 
-def export(model_data, destination):
+def export(model_data, destination, outcomes=None):
     ai = json.loads(model_data.read_text())
     history = json.loads((ROOT / 'results/analysis.json').read_text())
     assert ai['manifest']['sha256'] == history['fra_truth_sha256']
@@ -88,25 +88,11 @@ def export(model_data, destination):
                          historical_target='FIRST_WEEK', minimum_gih_games=500,
                          publication_cutoff='Within three calendar days of Arena launch',
                          retrospective=True, outcome_access_guard_verified=True))
-    destination.parent.mkdir(parents=True, exist_ok=True)
-    destination.write_text(json.dumps(data, ensure_ascii=False, allow_nan=False, separators=(',', ':')) + '\n')
-    headers = ['Card', 'Set', 'Rarity', 'Observed GIH (%)', 'GIH games', 'Shared comparison']
-    for s in sources:
-        headers.append(s['name'] + ' prediction (%)')
-        if s['kind'] == 'creator':
-            headers.append(s['name'] + ' raw grade')
-    with destination.with_suffix('.csv').open('w', encoding='utf-8-sig', newline='') as file:
-        writer = csv.writer(file, lineterminator='\n')
-        writer.writerow(headers)
-        for c in cards:
-            row = [c['name'], c['set'], c['rarity'], c['actual'], c['games'], c['shared']]
-            for s in sources:
-                row.append(c['values'][s['id']]['prediction'])
-                if s['kind'] == 'creator':
-                    row.append(c['values'][s['id']]['grade'])
-            writer.writerow(row)
+    if outcomes is not None:
+        data = apply_outcomes(data, json.loads(outcomes.read_text()))
+    write_export(data, destination)
     print('Exported', len(cards), 'cards,', len(sources), 'sources,', len(shared), 'shared cards;', destination.stat().st_size, 'bytes')
-    for s in sorted(sources, key=lambda s: -s['score']['pearson']):
+    for s in sorted(data['sources'], key=lambda s: -s['score']['pearson']):
         print(s['name'], f"r={s['score']['pearson']:.6f}", f"RMSE={s['score']['rmse']:.6f}")
 
 
@@ -114,5 +100,6 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--model-data', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--outcomes', type=Path, default=ROOT / 'inputs/fra_outcomes.json')
     args = parser.parse_args()
-    export(args.model_data, args.output)
+    export(args.model_data, args.output, args.outcomes)

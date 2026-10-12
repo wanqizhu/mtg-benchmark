@@ -95,20 +95,25 @@ at the clipped native rating. Fixed knots add no fitted parameters.
 | Alex Nikolic | Shared context flag, pp | -0.75189956 | 74 | 0 |
 | LSV + Marshall / Limited Resources | Shared context flag, pp | -1.86937656 | 39 | 0 |
 
-## FRA evaluation
+## Current FRA evaluation
 
-The original October 7 ALL_TIME outcome snapshot remains frozen. The shared
-pool has 266 cards: the verified qualitative sideboard assessment of Refute
+The website evaluation now uses the October 12, 2026 at 08:16:23 UTC ALL_TIME
+outcome pull. Predictions, historical fits, and the original shared 266-card
+comparison pool are held fixed. `inputs/fra_outcomes.json` commits the current
+card-level GIH percentages, sample counts, comparison membership, pull timestamp,
+raw response hash and normalized-statistics checksum. The original October 7
+analysis and its manifest remain archived in the sibling first-week directory.
+The shared pool has 266 cards: the verified qualitative sideboard assessment of Refute
 Destiny now supplies an F model input under the requested alias. Four other LR
 qualitative assessments remain unmapped. The report also compares both policies
 on the prior identical 265-card pool.
 
 | Source | Training observations | Historical sets | Pearson r | Spearman rho | MAE, pp | RMSE, pp |
 |---|---:|---:|---:|---:|---:|---:|
-| Casual Spike | 1162 | 5 | 0.690 | 0.648 | 2.333 | 3.073 |
-| Alex Nikolic | 1258 | 5 | 0.778 | 0.701 | 2.139 | 2.716 |
-| LSV + Marshall / Limited Resources | 543 | 5 | 0.710 | 0.644 | 2.295 | 2.958 |
-| Draftsim bot | 443 | 2 | 0.606 | 0.565 | 2.557 | 3.354 |
+| Casual Spike | 1162 | 5 | 0.692 | 0.651 | 2.324 | 3.067 |
+| Alex Nikolic | 1258 | 5 | 0.788 | 0.715 | 2.139 | 2.710 |
+| LSV + Marshall / Limited Resources | 543 | 5 | 0.719 | 0.653 | 2.269 | 2.931 |
+| Draftsim bot | 443 | 2 | 0.613 | 0.571 | 2.545 | 3.329 |
 
 ## Validation and limits
 
@@ -146,8 +151,9 @@ after inspection of an initial FRA evaluation. The current support rule,
 sideboard merge, regression cap and shared context-flag encoding were requested
 after that evaluation.
 Numerical fitting/model selection still use history only. First-week GIH is
-noisy and depends on deck, player and cohort composition. FRA's early ALL_TIME
-horizon is about 7.6 days; historical windows use the site's FIRST_WEEK.
+noisy and depends on deck, player and cohort composition. The archived October 7
+ALL_TIME horizon is about 7.6 days. The current October 12 pull is cumulative
+ALL_TIME rather than a first-week window; historical fitting still uses FIRST_WEEK.
 
 ## Reproduce
 
@@ -170,8 +176,10 @@ Limited Resources source.
 canonical print URLs from the retained raw Scryfall metadata. Images load on
 card click; their URLs are metadata, and no image files are vendored.
 
-The exporter checks the shared outcome hash, card coverage, and equality with
-the existing creator scores. It writes a compact analyzed JSON and a CSV;
+The exporter checks the original outcome hash, card coverage, and equality with
+the original creator scores, then applies the committed current outcome snapshot
+and recomputes all ten scores on the same 266 cards. Predictions and fits are
+unchanged. It writes a compact analyzed JSON and a CSV;
 live response envelopes remain local. The static assets are included in
 `harness/site_static`, and the site generator preserves the exported data when
 puzzle scores are updated.
@@ -181,6 +189,27 @@ python3 export_benchmark_tab.py \
   --model-data ../fra-week-one-2026-10-07/results/dashboard_data.json \
   --output /path/to/mtg-benchmark-site/data/draft-predictions.json
 ```
+
+The default `--outcomes` is `inputs/fra_outcomes.json`. To refresh outcomes
+directly from the existing website export, without accessing historical training
+files or fitting any model, run from the `mtg-benchmark` repository root:
+
+```sh
+python3 evaluations/historical-creators-2026-10-09/refresh_benchmark_outcomes.py \
+  --input ../mtg-benchmark-site/data/draft-predictions.json \
+  --output ../mtg-benchmark-site/data/draft-predictions.json --fetch
+```
+
+This saves the current normalized outcome snapshot under `inputs/` and updates
+the website JSON/CSV. To reproduce the committed snapshot without a network pull,
+replace `--fetch` with `--snapshot
+evaluations/historical-creators-2026-10-09/inputs/fra_outcomes.json`. A retained
+raw pull can instead be supplied with `--truth` and `--manifest`; the timestamp
+is copied from its actual pull manifest, not the export time. All 295 card rows
+receive current statistics, including newly reported cards; headline scoring
+retains the original 266-card membership. The UI date uses `outcome.retrieved_at`.
+The committed current statistics reproduce evaluation, while complete raw API
+responses and frozen historical training outcomes remain local.
 
 Open the site at `/#/draft-predictions`. The plot shows predicted versus observed
 GIH, with prediction on x and observation on y. Hover shows card rates,
@@ -214,7 +243,10 @@ SOS, TMT, ECL and TLA. Each JSON envelope holds its API response under `data`.
 Endpoints use `https://www.17lands.com/api/card_data?expansion=<SET>&event_type=PremierDraft&time_period=FIRST_WEEK`
 and the same URL with `time_period=ALL_TIME`. The FRA envelope must match the
 hash in the sibling `fra-week-one-2026-10-07/inputs/ground_truth_manifest.json`;
-a fresh download cannot reproduce that snapshot. Live envelopes stay local.
+a fresh download cannot reproduce that archived snapshot. These commands reproduce
+the original historical fitting/evaluation artifacts. Current website evaluation
+uses the separately committed `inputs/fra_outcomes.json` as described above.
+Complete live envelopes stay local.
 
 Source facts in `inputs/` are canonical refit inputs. `collection/` documents
 the original scratch research and manual attribution checks; it is not a fresh

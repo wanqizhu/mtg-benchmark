@@ -1,0 +1,1760 @@
+{
+  "schema_version": 1,
+  "expansion": "FRA",
+  "outcome": {
+    "url": "https://www.17lands.com/card_data?expansion=FRA&format=PremierDraft&time_period=ALL_TIME",
+    "api_url": "https://www.17lands.com/api/card_data?expansion=FRA&event_type=PremierDraft&time_period=ALL_TIME",
+    "event": "PremierDraft",
+    "time_period": "ALL_TIME",
+    "retrieved_at": "2026-10-12T08:16:23.012665+00:00",
+    "sha256": "c20b3516bd80e04cae788e0f80e594462df6091175ac2f396f8df3b1052e6c37",
+    "card_stats_sha256": "317cc1a08fd2fdc765006d9d41957cd04162688e36b2d14930cc82ea3a06e638",
+    "scope": "Cumulative ALL_TIME PremierDraft GIH, all tracked users and all deck colors; not a first-week-only window."
+  },
+  "minimum_gih_games": 500,
+  "shared_pool": [
+    "Academic Ascent",
+    "Aerid Konstrari",
+    "Afterthought Sentry",
+    "Ajani Resolute",
+    "Ajani Unrelenting",
+    "Ajani's Anguish",
+    "Apex Witchstalker",
+    "Arcane Amphisbaena",
+    "Archive Arbiter",
+    "Arni, Humble Scribe",
+    "Arni, Renowned Champion",
+    "Avatar of Burgeoning Echoes",
+    "Awaken the Inferno",
+    "Bestial Incursion",
+    "Blazing Crescendo",
+    "Blessed Ghoul",
+    "Bloodline Recollector // Ancestral Craving",
+    "Bloombrute",
+    "Blossom-Blessed Angel // Seed Suture",
+    "Break Under Pressure",
+    "Budding Insurgent",
+    "Campus Crier",
+    "Carnivorous Cultivator // Enroot",
+    "Cast Away Doubt",
+    "Chandra's Emberling",
+    "Chandra, Chill of Compliance",
+    "Chandra, Torch of Defiance",
+    "Charge the Sanctum",
+    "Clash of Elements",
+    "Codie, Ravenous Codex",
+    "Command the Stage",
+    "Compel Brutality",
+    "Countersculpt",
+    "Craftwork Crusher",
+    "Craterclaw Colossus",
+    "Cryotheory Adept",
+    "Curse-Marred Demon",
+    "Danitha, Spear of Agony",
+    "Danitha, Sword of Hope",
+    "Dark Matter Manipulator",
+    "Darklight Phoenix",
+    "Dedicated Commons",
+    "Denzilore Fatehold",
+    "Deserted Beach",
+    "Desperate Futurescribe",
+    "Diviner of Victory // Unwind History",
+    "Divining Duelist",
+    "Draconic Visitor",
+    "Eardrum Rattler",
+    "Edgar, Ancient Bloodlord",
+    "Edgar, Moonlit Sovereign",
+    "Emergency Phytomedic // Seed Suture",
+    "Emrakul, the Exigent Doom",
+    "Enlightened Confidant",
+    "Essence Burn",
+    "Extended Absence",
+    "Eye of Jace",
+    "Face Yourself",
+    "Fatehold Annex",
+    "Fatehold Charm",
+    "Fatehold Chronologist // Peer Review",
+    "Fateshaper Aspirant",
+    "Fblthp, Impossibly Lost",
+    "Fblthp, Knows the Way",
+    "Ferocity of the Hunt",
+    "Flickering Hound",
+    "Flourishing Grapple",
+    "Formidable Commons",
+    "Frostbite Pyromental",
+    "Fulminous Forte",
+    "Gallia, Tragic Host",
+    "Gallia, the Merrymaker",
+    "Garruk, Curse Breaker",
+    "Garruk, Veiled Butcher",
+    "Geist of Saint Thalia",
+    "Generous Revival",
+    "Ghalta the Immovable",
+    "Ghalta the Unstoppable",
+    "Gideon the Oathless",
+    "Gideon's Memorial",
+    "Graft Surgeon",
+    "Greenhouse Propagator",
+    "Grim Repriser",
+    "Guiding Hydra",
+    "Hall of Echoes",
+    "Hallway Heckler // Vicious Verse",
+    "Hapatra, the Desert Fang",
+    "Hapatra, the Desert Frost",
+    "Haunted Ridge",
+    "Heartstring Puller",
+    "Heartwood Crafter // Soul Tether",
+    "Hexhaven Battalion",
+    "Hexhaven Dueling Arena",
+    "Hexhaven Invigorator",
+    "Hungering Puppetbeast",
+    "Hunter's Axe",
+    "Icy Reception",
+    "Infinite Coursework",
+    "Ingris Stingerquill",
+    "Innovative Commons",
+    "Inspired Tethermage",
+    "Jace's Machinations",
+    "Jace, Reality Sculptor",
+    "Jiang Yanggu, Alone",
+    "Jiang Yanggu, Never Alone",
+    "Karn, Argent Defender",
+    "Karn, Gilded Guardian",
+    "Keeper of the Quiet Hour",
+    "Kindred Judgment",
+    "Kiora of Fire and Ashes",
+    "Kiora of Salt and Sand",
+    "Konstrari Annex",
+    "Konstrari Charm",
+    "Konstrari Improviser // Soul Tether",
+    "Koth of the Homestead",
+    "Koth, the Geomancer",
+    "Kwia Vigorbloom",
+    "Last Gasp",
+    "Lich's Relic",
+    "Liliana the Faultless",
+    "Liliana the Repentant",
+    "Loot, the Anomaly",
+    "Loot, the Nexus",
+    "Lyra, Archangel of Dawn",
+    "Lyra, Tolarian Archangel",
+    "Mabel, Bitter Recluse",
+    "Mabel, Valley Hero",
+    "Marwyn, the Clearcutter",
+    "Marwyn, the Preserver",
+    "Massacre Girl, Most Wanted",
+    "Master of Barbs",
+    "Medic's Kitesail",
+    "Memory Trap",
+    "Meticulous Commons",
+    "Mind Meanderer",
+    "Mindseeker Oculus",
+    "Multiply by Zero",
+    "Murmuring Volume",
+    "No Admittance",
+    "Null Summoner",
+    "Overgrown Farmland",
+    "Overwrite the Multiverse",
+    "Paradox Shaper // Omit Variables",
+    "Perfected Theory",
+    "Pia, Aether Ascetic",
+    "Pia, Determined Rebuilder",
+    "Plan for All Outcomes",
+    "Pompous Battlemage // Improvised Act",
+    "Predictive Preparations",
+    "Primal Witchstalker",
+    "Proctor of Potential",
+    "Proft, Sinister Mastermind",
+    "Prophesied End",
+    "Protege's Awakening",
+    "Prudent Fateseer // Peer Review",
+    "Puppet Crafting",
+    "Pyre Rhymer // Molten Tide",
+    "Rampart Hunter",
+    "Rank Rat",
+    "Recursive Recruitment",
+    "Refute Destiny",
+    "Repurposed Enforcer",
+    "Rescue Girl, First Responder",
+    "Restore with Empathy",
+    "Return to the Light Realms",
+    "Rewrite Regrets",
+    "Rise of the Deathbringer",
+    "Rockfall Vale",
+    "Roiling Canopy",
+    "Room of Refuge",
+    "Ruric Thar, Biomagus",
+    "Ruric Thar, Magecrusher",
+    "Saheeli, Consul of Oversight",
+    "Saheeli, Jewel of Avishkar",
+    "Samut, Hazoret's Champion",
+    "Samut, Tyrant of Naktamun",
+    "Sanctum Lurker",
+    "Screeching Soulbreaker",
+    "Seasoned Cryomancer",
+    "Semester Foreseer // Peer Review",
+    "Shatterwing Pegasus",
+    "Shipwreck Marsh",
+    "Silence the Echo",
+    "Simulacrum Shaper",
+    "Skilled Battlecarver",
+    "Solarium Sentry",
+    "Solitary Cell",
+    "Solve for Disappointment",
+    "Something Worth Saving",
+    "Sphinx of False Conclusions",
+    "Sphinx's Approach",
+    "Stingcaster Mage",
+    "Stingerquill Annex",
+    "Stingerquill Charm",
+    "Stingerquill Voxmancer // Vicious Verse",
+    "Stinging Vitriol",
+    "Sureshot Sower",
+    "Surgical Precision",
+    "Surveillance Phantasm",
+    "Tam's Resistance",
+    "Tarmogoyf",
+    "Tenured Tethermage",
+    "Terminal Criticism",
+    "Tether Technician",
+    "Tethermage's Advantage",
+    "Tetsuko Umezawa, Fugitive",
+    "Tetsuko Umezawa, Pursuer",
+    "Teyo, Diamondblade Mage",
+    "Teyo, Lightshield Expert",
+    "Thalia, the Survivor",
+    "The Echoverse Fulcrum",
+    "The Theorist, Jace Beleren",
+    "Theoretical Necromancer",
+    "Theorist's Proxy",
+    "Theorist's Sanctum",
+    "Theorix Annex",
+    "Theorix Charm",
+    "Theorix Metamage // Omit Variables",
+    "Tinybones, Pocket Nuisance",
+    "Titanbones, Towering Heart",
+    "Tomik, Izzet Sparkmage",
+    "Tomik, Orzhov Lawmage",
+    "Transformative Commons",
+    "Traxos, Academy Guardian",
+    "Traxos, Scourge Eternal",
+    "Twinned Vision",
+    "Twisted Fates",
+    "Uldaros Theorix",
+    "Undulating Witness",
+    "Unflinching Hortimancer",
+    "Unsummon",
+    "Variable Chaser // Arc of Fortune",
+    "Verdant Kraken",
+    "Vigorbloom Annex",
+    "Vigorbloom Charm",
+    "Vigorbloom Vanguard // Seed Suture",
+    "Vindictive Triumph",
+    "Vinelasher Adept",
+    "Violent Echoes",
+    "Void Extrapolator // Omit Variables",
+    "Vraska's Final Mercy",
+    "Vraska, Soul of Stone",
+    "Vraska, the Cutting Glare",
+    "Warrior's Blades",
+    "Way of the Cryomancer",
+    "Way of the Deathbringer",
+    "Way of the Healer",
+    "Way of the Mentor",
+    "Way of the Mind Sculptor",
+    "Way of the Necromancer",
+    "Way of the Paradox",
+    "Way of the Pyromancer",
+    "Way of the Warlord",
+    "Way of the Wildspeaker",
+    "Whiplash Wordsmith // Vicious Verse",
+    "Winter, Team Player",
+    "Winter, Tormented Loner",
+    "Woodwork Prodigy // Soul Tether",
+    "Wrath of the Bloodmane",
+    "Wrecking Gecko",
+    "Yargle, Goliath of Otaria",
+    "Yoshimaru, Beloved Companion",
+    "Yoshimaru, Scrappy Stray",
+    "Your Fate Ends Here",
+    "Yuriko, Blade of the Mighty",
+    "Yuriko, Hope from the Shadows"
+  ],
+  "cards": [
+    {
+      "name": "Academic Ascent",
+      "actual": 52.907874,
+      "games": 7772
+    },
+    {
+      "name": "Aerid Konstrari",
+      "actual": 64.746498,
+      "games": 5069
+    },
+    {
+      "name": "Afterthought Sentry",
+      "actual": 52.692018,
+      "games": 10624
+    },
+    {
+      "name": "Ajani Resolute",
+      "actual": 52.598131,
+      "games": 2675
+    },
+    {
+      "name": "Ajani Unrelenting",
+      "actual": 73.41311900000001,
+      "games": 6601
+    },
+    {
+      "name": "Ajani's Anguish",
+      "actual": 56.19931700000001,
+      "games": 9372
+    },
+    {
+      "name": "Apex Witchstalker",
+      "actual": 55.807054,
+      "games": 54606
+    },
+    {
+      "name": "Arcane Amphisbaena",
+      "actual": 55.825331,
+      "games": 55190
+    },
+    {
+      "name": "Archive Arbiter",
+      "actual": 55.720687999999996,
+      "games": 17629
+    },
+    {
+      "name": "Arni, Humble Scribe",
+      "actual": 54.89089499999999,
+      "games": 21264
+    },
+    {
+      "name": "Arni, Renowned Champion",
+      "actual": 46.108836,
+      "games": 3418
+    },
+    {
+      "name": "Artifist Acumen",
+      "actual": 49.465297,
+      "games": 4769
+    },
+    {
+      "name": "Austere Command",
+      "actual": 63.38851,
+      "games": 1027
+    },
+    {
+      "name": "Avatar of Burgeoning Echoes",
+      "actual": 59.91607799999999,
+      "games": 4528
+    },
+    {
+      "name": "Awaken the Inferno",
+      "actual": 55.686139999999995,
+      "games": 52329
+    },
+    {
+      "name": "Bestial Incursion",
+      "actual": 56.504768000000006,
+      "games": 52008
+    },
+    {
+      "name": "Blazing Crescendo",
+      "actual": 51.802586,
+      "games": 8044
+    },
+    {
+      "name": "Blessed Ghoul",
+      "actual": 53.968759,
+      "games": 22022
+    },
+    {
+      "name": "Bloodline Recollector // Ancestral Craving",
+      "actual": 51.373855,
+      "games": 2402
+    },
+    {
+      "name": "Bloombrute",
+      "actual": 57.589785000000006,
+      "games": 18795
+    },
+    {
+      "name": "Blossom-Blessed Angel // Seed Suture",
+      "actual": 56.066298,
+      "games": 36200
+    },
+    {
+      "name": "Break Under Pressure",
+      "actual": 59.791339,
+      "games": 33739
+    },
+    {
+      "name": "Budding Insurgent",
+      "actual": 51.040503,
+      "games": 14320
+    },
+    {
+      "name": "Campus Crier",
+      "actual": 55.800923999999995,
+      "games": 45691
+    },
+    {
+      "name": "Carnivorous Cultivator // Enroot",
+      "actual": 59.527067,
+      "games": 10234
+    },
+    {
+      "name": "Cast Away Doubt",
+      "actual": 52.922504,
+      "games": 14491
+    },
+    {
+      "name": "Chandra's Emberling",
+      "actual": 51.887467,
+      "games": 15391
+    },
+    {
+      "name": "Chandra, Chill of Compliance",
+      "actual": 59.88292,
+      "games": 5808
+    },
+    {
+      "name": "Chandra, Torch of Defiance",
+      "actual": 60.100376,
+      "games": 4782
+    },
+    {
+      "name": "Charge the Sanctum",
+      "actual": 50.288184,
+      "games": 5552
+    },
+    {
+      "name": "Clash of Elements",
+      "actual": 58.669134,
+      "games": 23774
+    },
+    {
+      "name": "Codie, Ravenous Codex",
+      "actual": 45.068493,
+      "games": 730
+    },
+    {
+      "name": "Command the Stage",
+      "actual": 49.839648,
+      "games": 8419
+    },
+    {
+      "name": "Compel Brutality",
+      "actual": 54.800428999999994,
+      "games": 51235
+    },
+    {
+      "name": "Consider",
+      "actual": 56.161395999999996,
+      "games": 917
+    },
+    {
+      "name": "Consign to Memory",
+      "actual": null,
+      "games": 25
+    },
+    {
+      "name": "Countersculpt",
+      "actual": 60.172179,
+      "games": 39726
+    },
+    {
+      "name": "Craftwork Crusher",
+      "actual": 62.504479999999994,
+      "games": 27902
+    },
+    {
+      "name": "Craterclaw Colossus",
+      "actual": 55.723780999999995,
+      "games": 2708
+    },
+    {
+      "name": "Cruel Calculations",
+      "actual": 48.628049000000004,
+      "games": 656
+    },
+    {
+      "name": "Cryotheory Adept",
+      "actual": 53.306838,
+      "games": 23149
+    },
+    {
+      "name": "Curse-Marred Demon",
+      "actual": 56.574535000000004,
+      "games": 8647
+    },
+    {
+      "name": "Danitha, Spear of Agony",
+      "actual": 50.827404,
+      "games": 12086
+    },
+    {
+      "name": "Danitha, Sword of Hope",
+      "actual": 52.109887,
+      "games": 8081
+    },
+    {
+      "name": "Dark Matter Manipulator",
+      "actual": 57.750209,
+      "games": 7174
+    },
+    {
+      "name": "Darklight Phoenix",
+      "actual": 53.562566000000004,
+      "games": 2821
+    },
+    {
+      "name": "Dedicated Commons",
+      "actual": 53.042417,
+      "games": 16385
+    },
+    {
+      "name": "Denzilore Fatehold",
+      "actual": 62.433316000000005,
+      "games": 5811
+    },
+    {
+      "name": "Deserted Beach",
+      "actual": 55.593804000000006,
+      "games": 6391
+    },
+    {
+      "name": "Desperate Futurescribe",
+      "actual": 57.899958,
+      "games": 26209
+    },
+    {
+      "name": "Diviner of Victory // Unwind History",
+      "actual": 59.972886,
+      "games": 11802
+    },
+    {
+      "name": "Divining Duelist",
+      "actual": 55.101398999999994,
+      "games": 19083
+    },
+    {
+      "name": "Draconic Visitor",
+      "actual": 54.201447,
+      "games": 7188
+    },
+    {
+      "name": "Eardrum Rattler",
+      "actual": 49.387515,
+      "games": 8490
+    },
+    {
+      "name": "Edgar, Ancient Bloodlord",
+      "actual": 52.507293,
+      "games": 7199
+    },
+    {
+      "name": "Edgar, Moonlit Sovereign",
+      "actual": 50.358779,
+      "games": 11567
+    },
+    {
+      "name": "Emergency Phytomedic // Seed Suture",
+      "actual": 54.394559,
+      "games": 28376
+    },
+    {
+      "name": "Emrakul, the Exigent Doom",
+      "actual": 52.810707,
+      "games": 2615
+    },
+    {
+      "name": "Enlightened Confidant",
+      "actual": 56.711502,
+      "games": 3643
+    },
+    {
+      "name": "Entrust the Spark",
+      "actual": null,
+      "games": 128
+    },
+    {
+      "name": "Essence Burn",
+      "actual": 49.470899,
+      "games": 756
+    },
+    {
+      "name": "Extended Absence",
+      "actual": 59.726201,
+      "games": 72608
+    },
+    {
+      "name": "Extrapolate the Impossible",
+      "actual": null,
+      "games": 456
+    },
+    {
+      "name": "Eye of Jace",
+      "actual": 50.286608,
+      "games": 5757
+    },
+    {
+      "name": "Eye of Ugin",
+      "actual": null,
+      "games": 5
+    },
+    {
+      "name": "Face Yourself",
+      "actual": 54.727031000000004,
+      "games": 6008
+    },
+    {
+      "name": "Fatehold Annex",
+      "actual": 55.72537,
+      "games": 25518
+    },
+    {
+      "name": "Fatehold Charm",
+      "actual": 58.177139,
+      "games": 23315
+    },
+    {
+      "name": "Fatehold Chronologist // Peer Review",
+      "actual": 56.416805000000004,
+      "games": 63435
+    },
+    {
+      "name": "Fateshaper Aspirant",
+      "actual": 52.054889,
+      "games": 14429
+    },
+    {
+      "name": "Fblthp, Impossibly Lost",
+      "actual": 59.865506999999994,
+      "games": 37474
+    },
+    {
+      "name": "Fblthp, Knows the Way",
+      "actual": 57.714245,
+      "games": 28227
+    },
+    {
+      "name": "Ferocity of the Hunt",
+      "actual": 52.842809,
+      "games": 21229
+    },
+    {
+      "name": "Flesh Duplicate",
+      "actual": 55.429498,
+      "games": 617
+    },
+    {
+      "name": "Flickering Hound",
+      "actual": 46.15113,
+      "games": 2832
+    },
+    {
+      "name": "Flourishing Grapple",
+      "actual": 44.21875,
+      "games": 640
+    },
+    {
+      "name": "Forest",
+      "actual": null,
+      "games": 0
+    },
+    {
+      "name": "Formidable Commons",
+      "actual": 55.704843000000004,
+      "games": 27687
+    },
+    {
+      "name": "Frostbite Pyromental",
+      "actual": 50.629164,
+      "games": 2702
+    },
+    {
+      "name": "Fulminous Forte",
+      "actual": 57.099055,
+      "games": 27722
+    },
+    {
+      "name": "Gallia, Tragic Host",
+      "actual": 55.635787,
+      "games": 22712
+    },
+    {
+      "name": "Gallia, the Merrymaker",
+      "actual": 50.90796400000001,
+      "games": 11289
+    },
+    {
+      "name": "Gardenize",
+      "actual": null,
+      "games": 301
+    },
+    {
+      "name": "Garruk, Curse Breaker",
+      "actual": 65.429579,
+      "games": 5389
+    },
+    {
+      "name": "Garruk, Veiled Butcher",
+      "actual": 66.264241,
+      "games": 5881
+    },
+    {
+      "name": "Geist of Saint Thalia",
+      "actual": 56.952397,
+      "games": 24452
+    },
+    {
+      "name": "Generous Revival",
+      "actual": 57.275639,
+      "games": 15923
+    },
+    {
+      "name": "Germinate Recruits",
+      "actual": 46.869245,
+      "games": 1086
+    },
+    {
+      "name": "Ghalta the Immovable",
+      "actual": 52.172996000000005,
+      "games": 4740
+    },
+    {
+      "name": "Ghalta the Unstoppable",
+      "actual": 53.803025999999996,
+      "games": 14804
+    },
+    {
+      "name": "Gideon the Oathless",
+      "actual": 60.102773,
+      "games": 10314
+    },
+    {
+      "name": "Gideon's Memorial",
+      "actual": 50.562969,
+      "games": 4796
+    },
+    {
+      "name": "Graft Surgeon",
+      "actual": 51.87141199999999,
+      "games": 13065
+    },
+    {
+      "name": "Greenhouse Propagator",
+      "actual": 54.35395,
+      "games": 40113
+    },
+    {
+      "name": "Grim Repriser",
+      "actual": 53.817589,
+      "games": 11041
+    },
+    {
+      "name": "Guiding Hydra",
+      "actual": 57.92629,
+      "games": 10175
+    },
+    {
+      "name": "Hall of Echoes",
+      "actual": 53.606370999999996,
+      "games": 4395
+    },
+    {
+      "name": "Hallway Heckler // Vicious Verse",
+      "actual": 52.208219,
+      "games": 18250
+    },
+    {
+      "name": "Hapatra, the Desert Fang",
+      "actual": 59.440678999999996,
+      "games": 29357
+    },
+    {
+      "name": "Hapatra, the Desert Frost",
+      "actual": 53.193007,
+      "games": 14015
+    },
+    {
+      "name": "Haunted Ridge",
+      "actual": 54.86568200000001,
+      "games": 5621
+    },
+    {
+      "name": "Heartstring Puller",
+      "actual": 54.69662400000001,
+      "games": 35962
+    },
+    {
+      "name": "Heartwood Crafter // Soul Tether",
+      "actual": 56.781105,
+      "games": 24642
+    },
+    {
+      "name": "Hexhaven Battalion",
+      "actual": 57.637598000000004,
+      "games": 60811
+    },
+    {
+      "name": "Hexhaven Dueling Arena",
+      "actual": 49.665104,
+      "games": 2986
+    },
+    {
+      "name": "Hexhaven Invigorator",
+      "actual": 54.335533000000005,
+      "games": 2122
+    },
+    {
+      "name": "Hungering Puppetbeast",
+      "actual": 61.989227,
+      "games": 10768
+    },
+    {
+      "name": "Hunter's Axe",
+      "actual": 51.327602999999996,
+      "games": 5235
+    },
+    {
+      "name": "Icy Reception",
+      "actual": 57.994854,
+      "games": 63347
+    },
+    {
+      "name": "Identity Echo",
+      "actual": null,
+      "games": 292
+    },
+    {
+      "name": "Infinite Coursework",
+      "actual": 56.068905,
+      "games": 59154
+    },
+    {
+      "name": "Ingris Stingerquill",
+      "actual": 57.197331,
+      "games": 3147
+    },
+    {
+      "name": "Innovative Commons",
+      "actual": 56.083816,
+      "games": 25198
+    },
+    {
+      "name": "Inspired Tethermage",
+      "actual": 51.737697000000004,
+      "games": 25177
+    },
+    {
+      "name": "Island",
+      "actual": null,
+      "games": 0
+    },
+    {
+      "name": "Jace's Machinations",
+      "actual": 57.635556,
+      "games": 11250
+    },
+    {
+      "name": "Jace, Reality Sculptor",
+      "actual": 58.298775000000006,
+      "games": 10369
+    },
+    {
+      "name": "Jiang Yanggu, Alone",
+      "actual": 53.351572999999995,
+      "games": 10234
+    },
+    {
+      "name": "Jiang Yanggu, Never Alone",
+      "actual": 55.426374,
+      "games": 22105
+    },
+    {
+      "name": "Karn, Argent Defender",
+      "actual": 49.226804,
+      "games": 776
+    },
+    {
+      "name": "Karn, Gilded Guardian",
+      "actual": 50.181818,
+      "games": 825
+    },
+    {
+      "name": "Keeper of the Quiet Hour",
+      "actual": 56.276357,
+      "games": 39601
+    },
+    {
+      "name": "Kindred Judgment",
+      "actual": 62.019802,
+      "games": 10100
+    },
+    {
+      "name": "Kiora of Fire and Ashes",
+      "actual": 61.484434,
+      "games": 31608
+    },
+    {
+      "name": "Kiora of Salt and Sand",
+      "actual": 54.182095,
+      "games": 9182
+    },
+    {
+      "name": "Konstrari Annex",
+      "actual": 54.464935999999994,
+      "games": 24726
+    },
+    {
+      "name": "Konstrari Charm",
+      "actual": 56.114853,
+      "games": 11284
+    },
+    {
+      "name": "Konstrari Improviser // Soul Tether",
+      "actual": 54.036721,
+      "games": 45532
+    },
+    {
+      "name": "Koth of the Homestead",
+      "actual": 54.595411000000006,
+      "games": 16560
+    },
+    {
+      "name": "Koth, the Geomancer",
+      "actual": 51.854076000000006,
+      "games": 13322
+    },
+    {
+      "name": "Kwia Vigorbloom",
+      "actual": 62.036632999999995,
+      "games": 4586
+    },
+    {
+      "name": "Last Gasp",
+      "actual": 57.08479199999999,
+      "games": 61999
+    },
+    {
+      "name": "Lich's Relic",
+      "actual": 63.316061999999995,
+      "games": 12545
+    },
+    {
+      "name": "Liliana the Faultless",
+      "actual": 58.026354999999995,
+      "games": 6678
+    },
+    {
+      "name": "Liliana the Repentant",
+      "actual": 56.281206,
+      "games": 10014
+    },
+    {
+      "name": "Living Library",
+      "actual": 53.304573,
+      "games": 5795
+    },
+    {
+      "name": "Loot, the Anomaly",
+      "actual": 47.826087,
+      "games": 2852
+    },
+    {
+      "name": "Loot, the Nexus",
+      "actual": 52.604359,
+      "games": 16242
+    },
+    {
+      "name": "Loyal Tutor",
+      "actual": null,
+      "games": 214
+    },
+    {
+      "name": "Lyra, Archangel of Dawn",
+      "actual": 58.990224000000005,
+      "games": 8081
+    },
+    {
+      "name": "Lyra, Tolarian Archangel",
+      "actual": 61.064239,
+      "games": 13512
+    },
+    {
+      "name": "Mabel, Bitter Recluse",
+      "actual": 53.875713000000005,
+      "games": 16655
+    },
+    {
+      "name": "Mabel, Valley Hero",
+      "actual": 50.667680000000004,
+      "games": 9211
+    },
+    {
+      "name": "Marwyn, the Clearcutter",
+      "actual": 55.216202,
+      "games": 15356
+    },
+    {
+      "name": "Marwyn, the Preserver",
+      "actual": 54.382672,
+      "games": 19714
+    },
+    {
+      "name": "Massacre Girl, Most Wanted",
+      "actual": 50.304362999999995,
+      "games": 11828
+    },
+    {
+      "name": "Master of Barbs",
+      "actual": 52.859926,
+      "games": 5647
+    },
+    {
+      "name": "Medic's Kitesail",
+      "actual": 54.535133,
+      "games": 15854
+    },
+    {
+      "name": "Memory Trap",
+      "actual": 56.041525,
+      "games": 54233
+    },
+    {
+      "name": "Meticulous Commons",
+      "actual": 54.405331000000004,
+      "games": 19658
+    },
+    {
+      "name": "Mind Meanderer",
+      "actual": 57.486225000000005,
+      "games": 25046
+    },
+    {
+      "name": "Mind Twist",
+      "actual": 64.369748,
+      "games": 1190
+    },
+    {
+      "name": "Mindseeker Oculus",
+      "actual": 60.160628,
+      "games": 90644
+    },
+    {
+      "name": "Mountain",
+      "actual": null,
+      "games": 0
+    },
+    {
+      "name": "Multiply by Zero",
+      "actual": 58.95093,
+      "games": 31628
+    },
+    {
+      "name": "Murmuring Volume",
+      "actual": 56.758018,
+      "games": 36416
+    },
+    {
+      "name": "Necrodominance",
+      "actual": null,
+      "games": 70
+    },
+    {
+      "name": "No Admittance",
+      "actual": 56.982158999999996,
+      "games": 57339
+    },
+    {
+      "name": "Null Summoner",
+      "actual": 62.740867,
+      "games": 13441
+    },
+    {
+      "name": "Omnipresence",
+      "actual": null,
+      "games": 21
+    },
+    {
+      "name": "Overgrown Farmland",
+      "actual": 53.192315,
+      "games": 5153
+    },
+    {
+      "name": "Overwrite the Multiverse",
+      "actual": 65.797775,
+      "games": 6023
+    },
+    {
+      "name": "Paradox Shaper // Omit Variables",
+      "actual": 55.279712999999994,
+      "games": 23685
+    },
+    {
+      "name": "Perfected Theory",
+      "actual": 51.922064,
+      "games": 5697
+    },
+    {
+      "name": "Pia, Aether Ascetic",
+      "actual": 49.39759,
+      "games": 5395
+    },
+    {
+      "name": "Pia, Determined Rebuilder",
+      "actual": 56.365361,
+      "games": 23188
+    },
+    {
+      "name": "Plains",
+      "actual": null,
+      "games": 0
+    },
+    {
+      "name": "Plan for All Outcomes",
+      "actual": 59.456843000000006,
+      "games": 40283
+    },
+    {
+      "name": "Pompous Battlemage // Improvised Act",
+      "actual": 53.474197000000004,
+      "games": 4922
+    },
+    {
+      "name": "Precise Redaction",
+      "actual": null,
+      "games": 222
+    },
+    {
+      "name": "Predictive Preparations",
+      "actual": 48.811274999999995,
+      "games": 8160
+    },
+    {
+      "name": "Primal Witchstalker",
+      "actual": 59.050206,
+      "games": 23563
+    },
+    {
+      "name": "Proctor of Potential",
+      "actual": 60.297877,
+      "games": 8997
+    },
+    {
+      "name": "Proft, Consulting Detective",
+      "actual": 57.682364,
+      "games": 32490
+    },
+    {
+      "name": "Proft, Sinister Mastermind",
+      "actual": 54.675344,
+      "games": 19667
+    },
+    {
+      "name": "Prophesied End",
+      "actual": 55.851768,
+      "games": 21156
+    },
+    {
+      "name": "Protege's Awakening",
+      "actual": 58.621402,
+      "games": 58117
+    },
+    {
+      "name": "Prudent Fateseer // Peer Review",
+      "actual": 55.771161,
+      "games": 26901
+    },
+    {
+      "name": "Puppet Crafting",
+      "actual": 50.729167,
+      "games": 1920
+    },
+    {
+      "name": "Pyre Rhymer // Molten Tide",
+      "actual": 50.592727000000004,
+      "games": 4977
+    },
+    {
+      "name": "Rampart Hunter",
+      "actual": 48.101841,
+      "games": 4399
+    },
+    {
+      "name": "Rank Rat",
+      "actual": 54.98999,
+      "games": 43457
+    },
+    {
+      "name": "Recursive Recruitment",
+      "actual": 61.224018,
+      "games": 38921
+    },
+    {
+      "name": "Refute Destiny",
+      "actual": 52.261579999999995,
+      "games": 1835
+    },
+    {
+      "name": "Repurposed Enforcer",
+      "actual": 60.105284999999995,
+      "games": 9688
+    },
+    {
+      "name": "Rescue Girl, First Responder",
+      "actual": 52.43402700000001,
+      "games": 18303
+    },
+    {
+      "name": "Restore with Empathy",
+      "actual": 54.965659,
+      "games": 14560
+    },
+    {
+      "name": "Return to the Light Realms",
+      "actual": 50.0,
+      "games": 870
+    },
+    {
+      "name": "Rewrite Regrets",
+      "actual": 59.274260999999996,
+      "games": 29873
+    },
+    {
+      "name": "Rise of the Deathbringer",
+      "actual": 56.03530799999999,
+      "games": 9403
+    },
+    {
+      "name": "Rockfall Vale",
+      "actual": 54.533823999999996,
+      "games": 6253
+    },
+    {
+      "name": "Roiling Canopy",
+      "actual": 49.194068,
+      "games": 1551
+    },
+    {
+      "name": "Room of Refuge",
+      "actual": 55.734660999999996,
+      "games": 67868
+    },
+    {
+      "name": "Root Maze",
+      "actual": null,
+      "games": 9
+    },
+    {
+      "name": "Ruric Thar, Biomagus",
+      "actual": 56.002363,
+      "games": 23699
+    },
+    {
+      "name": "Ruric Thar, Magecrusher",
+      "actual": 55.046516999999994,
+      "games": 18488
+    },
+    {
+      "name": "Saheeli, Consul of Oversight",
+      "actual": 55.099591000000004,
+      "games": 18325
+    },
+    {
+      "name": "Saheeli, Jewel of Avishkar",
+      "actual": 56.902741,
+      "games": 23679
+    },
+    {
+      "name": "Samut, Hazoret's Champion",
+      "actual": 56.110852,
+      "games": 6423
+    },
+    {
+      "name": "Samut, Tyrant of Naktamun",
+      "actual": 48.016277,
+      "games": 1966
+    },
+    {
+      "name": "Sanctum Lurker",
+      "actual": 61.860307000000006,
+      "games": 11783
+    },
+    {
+      "name": "Screeching Soulbreaker",
+      "actual": 54.011686999999995,
+      "games": 21562
+    },
+    {
+      "name": "Seasoned Cryomancer",
+      "actual": 59.381861,
+      "games": 5921
+    },
+    {
+      "name": "Semester Foreseer // Peer Review",
+      "actual": 54.134108000000005,
+      "games": 35449
+    },
+    {
+      "name": "Shatterwing Pegasus",
+      "actual": 54.09962,
+      "games": 23429
+    },
+    {
+      "name": "Shipwreck Marsh",
+      "actual": 57.943718,
+      "games": 9026
+    },
+    {
+      "name": "Silence the Echo",
+      "actual": 52.973698,
+      "games": 37260
+    },
+    {
+      "name": "Simulacrum Shaper",
+      "actual": 60.0,
+      "games": 10185
+    },
+    {
+      "name": "Skilled Battlecarver",
+      "actual": 53.124079,
+      "games": 30553
+    },
+    {
+      "name": "Solarium Sentry",
+      "actual": 56.176804000000004,
+      "games": 5294
+    },
+    {
+      "name": "Solitary Cell",
+      "actual": 50.251762,
+      "games": 2979
+    },
+    {
+      "name": "Solve for Disappointment",
+      "actual": 52.640195999999996,
+      "games": 12215
+    },
+    {
+      "name": "Something Worth Saving",
+      "actual": 57.012750000000004,
+      "games": 31842
+    },
+    {
+      "name": "Sphinx of False Conclusions",
+      "actual": 64.680477,
+      "games": 13661
+    },
+    {
+      "name": "Sphinx's Approach",
+      "actual": 56.712686,
+      "games": 19195
+    },
+    {
+      "name": "Splinter Twin",
+      "actual": 62.243667,
+      "games": 829
+    },
+    {
+      "name": "Stingcaster Mage",
+      "actual": 56.23711300000001,
+      "games": 3880
+    },
+    {
+      "name": "Stingerquill Annex",
+      "actual": 53.85383,
+      "games": 21044
+    },
+    {
+      "name": "Stingerquill Charm",
+      "actual": 55.82329299999999,
+      "games": 14691
+    },
+    {
+      "name": "Stingerquill Voxmancer // Vicious Verse",
+      "actual": 54.002786,
+      "games": 15077
+    },
+    {
+      "name": "Stinging Vitriol",
+      "actual": 53.789187999999996,
+      "games": 4051
+    },
+    {
+      "name": "Sublime Epiphany",
+      "actual": 66.445183,
+      "games": 1505
+    },
+    {
+      "name": "Sureshot Sower",
+      "actual": 53.680545,
+      "games": 31585
+    },
+    {
+      "name": "Surgical Precision",
+      "actual": 57.499011,
+      "games": 50540
+    },
+    {
+      "name": "Surveillance Phantasm",
+      "actual": 57.668072,
+      "games": 71889
+    },
+    {
+      "name": "Swamp",
+      "actual": null,
+      "games": 0
+    },
+    {
+      "name": "Tam's Resistance",
+      "actual": 56.292936999999995,
+      "games": 36827
+    },
+    {
+      "name": "Tam, the Possibility",
+      "actual": null,
+      "games": 138
+    },
+    {
+      "name": "Tarmogoyf",
+      "actual": 56.155384,
+      "games": 3501
+    },
+    {
+      "name": "Tenured Tethermage",
+      "actual": 58.513073999999996,
+      "games": 8299
+    },
+    {
+      "name": "Terminal Criticism",
+      "actual": 50.314465,
+      "games": 1431
+    },
+    {
+      "name": "Tether Technician",
+      "actual": 52.751775,
+      "games": 12392
+    },
+    {
+      "name": "Tethermage's Advantage",
+      "actual": 50.437663,
+      "games": 4227
+    },
+    {
+      "name": "Tetsuko Umezawa, Fugitive",
+      "actual": 54.629884,
+      "games": 18197
+    },
+    {
+      "name": "Tetsuko Umezawa, Pursuer",
+      "actual": 52.024291,
+      "games": 11362
+    },
+    {
+      "name": "Teyo, Diamondblade Mage",
+      "actual": 51.331967,
+      "games": 8784
+    },
+    {
+      "name": "Teyo, Lightshield Expert",
+      "actual": 56.245752,
+      "games": 19125
+    },
+    {
+      "name": "Thalia, the Survivor",
+      "actual": 54.89462,
+      "games": 14424
+    },
+    {
+      "name": "The Echoverse Fulcrum",
+      "actual": 58.876189999999994,
+      "games": 5250
+    },
+    {
+      "name": "The Theorist, Jace Beleren",
+      "actual": 68.39403200000001,
+      "games": 6233
+    },
+    {
+      "name": "Theoretical Necromancer",
+      "actual": 55.645637,
+      "games": 38977
+    },
+    {
+      "name": "Theorist's Proxy",
+      "actual": 57.46219,
+      "games": 10513
+    },
+    {
+      "name": "Theorist's Sanctum",
+      "actual": 57.959086000000006,
+      "games": 12514
+    },
+    {
+      "name": "Theorix Annex",
+      "actual": 56.570234,
+      "games": 34428
+    },
+    {
+      "name": "Theorix Charm",
+      "actual": 57.433151,
+      "games": 25393
+    },
+    {
+      "name": "Theorix Metamage // Omit Variables",
+      "actual": 54.566345000000005,
+      "games": 32203
+    },
+    {
+      "name": "Tinybones, Pocket Nuisance",
+      "actual": 55.725707,
+      "games": 17762
+    },
+    {
+      "name": "Titanbones, Towering Heart",
+      "actual": 52.386883,
+      "games": 12045
+    },
+    {
+      "name": "Tomik, Izzet Sparkmage",
+      "actual": 51.554656,
+      "games": 13347
+    },
+    {
+      "name": "Tomik, Orzhov Lawmage",
+      "actual": 54.025365,
+      "games": 17899
+    },
+    {
+      "name": "Transformative Commons",
+      "actual": 56.336618,
+      "games": 25976
+    },
+    {
+      "name": "Traxos, Academy Guardian",
+      "actual": 56.125716000000004,
+      "games": 23736
+    },
+    {
+      "name": "Traxos, Scourge Eternal",
+      "actual": 51.525465000000004,
+      "games": 8227
+    },
+    {
+      "name": "Twinned Vision",
+      "actual": 58.163489,
+      "games": 59319
+    },
+    {
+      "name": "Twisted Fates",
+      "actual": 56.956841000000004,
+      "games": 19046
+    },
+    {
+      "name": "Uldaros Theorix",
+      "actual": 69.62884700000001,
+      "games": 6628
+    },
+    {
+      "name": "Undulating Witness",
+      "actual": 56.03431,
+      "games": 59924
+    },
+    {
+      "name": "Unflinching Hortimancer",
+      "actual": 53.960249000000005,
+      "games": 30339
+    },
+    {
+      "name": "Unsummon",
+      "actual": 57.541299,
+      "games": 62350
+    },
+    {
+      "name": "Variable Chaser // Arc of Fortune",
+      "actual": 56.935601999999996,
+      "games": 9581
+    },
+    {
+      "name": "Verdant Kraken",
+      "actual": 58.96091,
+      "games": 10105
+    },
+    {
+      "name": "Vigorbloom Annex",
+      "actual": 53.41763,
+      "games": 19297
+    },
+    {
+      "name": "Vigorbloom Charm",
+      "actual": 56.519124,
+      "games": 16628
+    },
+    {
+      "name": "Vigorbloom Vanguard // Seed Suture",
+      "actual": 56.594047,
+      "games": 22308
+    },
+    {
+      "name": "Vindictive Triumph",
+      "actual": 54.56450900000001,
+      "games": 4294
+    },
+    {
+      "name": "Vinelasher Adept",
+      "actual": 55.732793,
+      "games": 47394
+    },
+    {
+      "name": "Violent Echoes",
+      "actual": 59.37082099999999,
+      "games": 28418
+    },
+    {
+      "name": "Void Extrapolator // Omit Variables",
+      "actual": 55.700079,
+      "games": 31675
+    },
+    {
+      "name": "Vraska's Final Mercy",
+      "actual": 54.54890999999999,
+      "games": 7892
+    },
+    {
+      "name": "Vraska, Soul of Stone",
+      "actual": 53.15367,
+      "games": 3488
+    },
+    {
+      "name": "Vraska, the Cutting Glare",
+      "actual": 62.894149,
+      "games": 11195
+    },
+    {
+      "name": "Warrior's Blades",
+      "actual": 54.92558,
+      "games": 15856
+    },
+    {
+      "name": "Way of the Cryomancer",
+      "actual": 52.849318999999994,
+      "games": 13512
+    },
+    {
+      "name": "Way of the Deathbringer",
+      "actual": 51.581482,
+      "games": 9137
+    },
+    {
+      "name": "Way of the Healer",
+      "actual": 57.085066,
+      "games": 26450
+    },
+    {
+      "name": "Way of the Mentor",
+      "actual": 50.46776200000001,
+      "games": 7910
+    },
+    {
+      "name": "Way of the Mind Sculptor",
+      "actual": 58.208000999999996,
+      "games": 32846
+    },
+    {
+      "name": "Way of the Necromancer",
+      "actual": 44.484412,
+      "games": 2502
+    },
+    {
+      "name": "Way of the Paradox",
+      "actual": 55.969884,
+      "games": 16868
+    },
+    {
+      "name": "Way of the Pyromancer",
+      "actual": 51.809874,
+      "games": 16852
+    },
+    {
+      "name": "Way of the Warlord",
+      "actual": 53.61602,
+      "games": 16579
+    },
+    {
+      "name": "Way of the Wildspeaker",
+      "actual": 54.833355,
+      "games": 22893
+    },
+    {
+      "name": "Whiplash Wordsmith // Vicious Verse",
+      "actual": 49.438106999999995,
+      "games": 11835
+    },
+    {
+      "name": "Winter, Team Player",
+      "actual": 47.559086,
+      "games": 5162
+    },
+    {
+      "name": "Winter, Tormented Loner",
+      "actual": 54.019625999999995,
+      "games": 16407
+    },
+    {
+      "name": "Woodwork Prodigy // Soul Tether",
+      "actual": 52.284184,
+      "games": 19044
+    },
+    {
+      "name": "Wrath of the Bloodmane",
+      "actual": 56.195068000000006,
+      "games": 53930
+    },
+    {
+      "name": "Wrecking Gecko",
+      "actual": 54.962779,
+      "games": 23374
+    },
+    {
+      "name": "Yargle, Glutton of Urborg",
+      "actual": 46.183953,
+      "games": 511
+    },
+    {
+      "name": "Yargle, Goliath of Otaria",
+      "actual": 45.921986,
+      "games": 1128
+    },
+    {
+      "name": "Yoshimaru, Beloved Companion",
+      "actual": 49.446188,
+      "games": 10834
+    },
+    {
+      "name": "Yoshimaru, Scrappy Stray",
+      "actual": 54.21452,
+      "games": 19504
+    },
+    {
+      "name": "Your Fate Ends Here",
+      "actual": 57.424898999999996,
+      "games": 25832
+    },
+    {
+      "name": "Yuriko, Blade of the Mighty",
+      "actual": 53.166965,
+      "games": 8936
+    },
+    {
+      "name": "Yuriko, Hope from the Shadows",
+      "actual": 53.55338,
+      "games": 12664
+    }
+  ]
+}

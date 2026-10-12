@@ -10,7 +10,9 @@ Use Python 3.11+ with the packages in `requirements.txt`:
 python evaluate.py --truth inputs/local/17lands_fra_all_time.json
 ```
 
-The supplied response must match `inputs/ground_truth_manifest.json`. It is the October 7 ALL_TIME snapshot requested by the user, rather than an exact seven-calendar-day slice. Suppressed rates stay missing.
+The supplied response must match `inputs/ground_truth_manifest.json`. It is the archived October 7 ALL_TIME snapshot requested by the user, rather than an exact seven-calendar-day slice. Suppressed rates stay missing.
+
+The public benchmark website now uses the October 12, 2026 outcome pull, with the original model predictions and historical creator fits held fixed. Its current normalized card statistics and refresh method are in the sibling [historical creator package](../historical-creators-2026-10-09/README.md). This directory preserves the original first-week analysis.
 
 Live 17Lands data and generated results stay local. `inputs/local/` and `results/` are gitignored. Results and the offline interactive dashboard are also copied to the task's `outputs/fra-week-one/` directory for review. This branch contains the reproducible code, frozen model submissions, native creator grades with attribution, card metadata, and source manifests. Before distributing results, consult [17Lands' usage guidelines](https://www.17lands.com/usage_guidelines) and its data-use notice. The public FRA game-data dump was unavailable at analysis time.
 

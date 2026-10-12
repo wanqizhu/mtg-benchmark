@@ -59,7 +59,7 @@ please do all your work as needed locally on scratch and only commit your final 
   function evaluationDetails() {
     const ais = data.sources.filter(s=>s.kind==='ai');
     return `<details class="dp-expand"><summary>Methodology</summary><div class="dp-expand-body">
-      <p>Overall results use the ${data.shared_cards} FRA main-set cards, GIH win rate taken on ${link(data.outcome.url,'October 7, 2026 at 05:58 UTC')}.</p>
+      <p>Overall results use the ${data.shared_cards} FRA main-set cards, GIH win rate taken on ${link(data.outcome.url,new Date(data.outcome.retrieved_at).toLocaleString('en-US',{month:'long',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit',hourCycle:'h23',timeZone:'UTC'})+' UTC')}.</p>
       <h3>Model predictions</h3>
       <p>Model predictions were made for every card before set release, using the same prompt.</p>
       <details class="dp-expand dp-inner"><summary>Full prompt</summary><div class="dp-expand-body"><pre class="dp-prompt">${E(predictionPrompt)}</pre></div></details>
