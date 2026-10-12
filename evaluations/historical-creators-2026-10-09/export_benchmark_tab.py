@@ -37,11 +37,17 @@ def export(model_data, destination, outcomes=None):
                     url=ai['sources'][key]['url'], commit=ai['sources'][key]['commit']) for key in ai_ids]
     audits = json.loads((ROOT / 'inputs/source_audit.json').read_text())['sources']
     fra_sources = {s['id']: s for s in json.loads((ROOT / 'inputs/fra_ratings.json').read_text())['sources']}
+    current_labels = {'casualspike': 'Ratings sheet', 'alexnikolic': 'Tier list',
+                      'limitedresources': 'Commons and uncommons review', 'draftsim': 'Bot pick order'}
     for key, model in models.items():
         fields = ['set', 'release', 'published_or_frozen', 'basis', 'url', 'rated_main', 'complete', 'notes']
         collection = [{k: row.get(k) for k in fields} for row in audits if row['creator'] == key and row['admitted']]
+        current_sources = [dict(label=current_labels[key], url=fra_sources[key]['url'])]
+        if fra_sources[key].get('rare_episode_url'):
+            current_sources.append(dict(label='Rares and mythics review', url=fra_sources[key]['rare_episode_url']))
         sources.append(dict(id=key, name=SOURCE_NAMES.get(key, model['name']), kind='creator', model=model,
                             collection=collection, url=fra_sources[key]['url'],
+                            current_sources=current_sources,
                             provisional=key == 'draftsim', fra_provenance=fra_sources[key].get('caveat', '')))
     cards = []
     for card in ai['cards']:

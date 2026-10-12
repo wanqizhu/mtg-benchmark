@@ -221,8 +221,15 @@ historical detail sections use the same creator ranking. The CSV follows the
 same grouped column order. Unused grades with no historical observations
 are omitted from the fitted-coefficient display; their fallback mappings remain
 in the model artifact, and the predictions are unchanged.
-Methodology includes the full shared prediction prompt. Data collection,
-fitting and final coefficients are grouped under Content Creator Historical
+Methodology includes the full shared prediction prompt. Current-set creator links
+appear under Methodology → Content creator ratings for
+this set, including both LR reviews. Card details also link each published grade
+to its original rating source. Historical source links remain in the creator
+historical data sections.
+17Lands historical rows link to the visual tier-list page and separately label
+the exact dated API version as Snapshot JSON. The source audit URLs remain
+unchanged. Casual Spike's details link the community reviewer's Reddit profile.
+Data collection, fitting and final coefficients are grouped under Content Creator Historical
 Data Details. All expansions and the full card table are collapsed initially.
 
 ### Historical fits
