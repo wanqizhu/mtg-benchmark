@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reality Fracture prediction evaluation</title>
+<style>
+  :root { color-scheme: light dark; --bg:#f9fafc; --ink:#202837; --muted:#566379; --line:#d7dce4; --surface:#fff; --accent:#3659a9; --common:#427dba; --uncommon:#2d927d; --rare:#b27927; --mythic:#9660b2; }
+  @media(prefers-color-scheme:dark) { :root { --bg:#171c25; --ink:#e3e8f1; --muted:#a6b2c6; --line:#414958; --surface:#222936; --accent:#9cb9ff; --common:#80b9ed; --uncommon:#70c8ab; --rare:#e9b56c; --mythic:#c69bea; } }
+  * { box-sizing:border-box; } body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+  main { max-width:1280px; margin:0 auto; padding:36px 26px 56px; } h1 { font-size:28px; font-weight:600; letter-spacing:-.025em; margin:0 0 8px; } h2 { font-size:20px; font-weight:600; margin:28px 0 10px; } h3 { font-size:16px; font-weight:600; margin:0 0 8px; }
+  p { margin:8px 0 14px; } a { color:var(--accent); } .muted { color:var(--muted); } .eyebrow { color:var(--muted); font-size:12px; letter-spacing:.09em; text-transform:uppercase; margin-bottom:8px; }
+  nav { display:flex; gap:18px; flex-wrap:wrap; padding:16px 0; border-bottom:1px solid var(--line); margin-bottom:22px; } nav a { font-size:14px; text-decoration:none; }
+  .controls { display:flex; gap:16px; align-items:end; flex-wrap:wrap; margin:18px 0 12px; } label { display:flex; flex-direction:column; gap:5px; color:var(--muted); font-size:13px; }
+  select,input { font:inherit; color:var(--ink); background:var(--surface); border:1px solid var(--line); border-radius:5px; padding:8px 10px; min-height:38px; } select { max-width:100%; } .check { flex-direction:row; align-items:center; padding-bottom:7px; } .check input { min-height:0; }
+  .plot { width:100%; min-width:0; } #model-grid { height:990px; } #scatter { height:540px; } #calibration { height:330px; }
+  .detail-grid { display:grid; grid-template-columns:minmax(0,1.6fr) minmax(260px,1fr); gap:28px; align-items:start; } .detail { border-left:2px solid var(--line); padding-left:20px; } .rule { white-space:pre-wrap; font-size:14px; margin:12px 0; }
+  .detail table { font-size:12px; } table { border-collapse:collapse; width:100%; font-size:13px; font-variant-numeric:tabular-nums; } th,td { text-align:right; padding:9px 9px; border-bottom:1px solid var(--line); } th:first-child,td:first-child { text-align:left; } th { color:var(--muted); font-weight:500; } tr[data-card] { cursor:pointer; } tr[data-card]:hover { background:var(--surface); } .table-wrap { overflow-x:auto; } .group { font-weight:500; color:var(--muted); } .notice { font-size:13px; color:var(--muted); }
+  .legend { display:flex; flex-wrap:wrap; gap:18px; font-size:12px; color:var(--muted); } .legend i { display:inline-block; width:8px; height:8px; border-radius:50%; margin-right:5px; } .section { padding-top:10px; }
+  details { margin:18px 0; } summary { color:var(--accent); cursor:pointer; } footer { border-top:1px solid var(--line); margin-top:28px; padding-top:16px; color:var(--muted); font-size:12px; }
+  @media(max-width:740px) { main { padding:24px 14px; } .detail-grid { grid-template-columns:1fr; } .detail { border-left:0; padding-left:0; border-top:1px solid var(--line); padding-top:18px; } #model-grid { height:1700px; } #scatter { height:450px; } h1 { font-size:24px; } select { width:100%; } .controls label { max-width:100%; } }
+</style>
+<script>__PLOTLY_LIBRARY__</script>
+</head>
+<body>
+<main>
+  <div class="eyebrow">FRA • Premier Draft • prerelease predictions</div>
+  <h1>Which predictions held up?</h1>
+  <p class="muted" id="snapshot-line"></p>
+  <nav aria-label="Analysis sections"><a href="#models">Six models</a><a href="#leaderboard">Models and creators</a><a href="#explore">Card explorer</a><a href="#method">Method and sources</a><a href="native-creators/creator_table.html">Updated creator table, including LR rares</a></nav>
+  <section id="models">
+    <h2>Six original model forecasts</h2>
+    <p class="notice">Same reported main-set cards in every panel. The diagonal is a perfect prediction. Hover a point for its card, mana cost, rules, sample count, and error.</p>
+    <div class="legend" aria-label="Card rarity legend"><span><i style="background:var(--common)"></i>Common</span><span><i style="background:var(--uncommon)"></i>Uncommon</span><span><i style="background:var(--rare)"></i>Rare</span><span><i style="background:var(--mythic)"></i>Mythic</span></div>
+    <div id="model-grid" class="plot" aria-label="Six model predicted versus observed GIH scatterplots"></div>
+  </section>
+  <section id="leaderboard" class="section">
+    <h2>Models and prerelease creator grades</h2>
+    <p class="notice">These plots retain the original creator conversion. The <a href="native-creators/creator_models.html">updated native-grade models</a> include LR rares and the requested contextual terms; their complete card table is available separately.</p>
+    <div class="controls"><label>Comparison pool<select id="score-pool"><option value="main_shared_creators">Shared cards: models and broad creator reviews</option><option value="main_available">Each source's available main-set cards</option><option value="cu_shared_including_lr">Shared commons/uncommons, including LSV + Marshall</option><option value="main_n1000">Main set, at least 1,000 GIH observations</option><option value="main_n5000">Main set, at least 5,000 GIH observations</option></select></label></div>
+    <p class="notice" id="pool-note"></p>
+    <div class="table-wrap"><table id="score-table"><thead><tr><th>Predictor</th><th>Cards</th><th>Pearson r</th><th>Spearman ρ</th><th>Raw MAE<br>(models, pp)</th><th>Calibrated MAE<br>(all, pp)</th><th>Raw bias<br>(models, pp)</th></tr></thead><tbody></tbody></table></div>
+    <p class="notice">Correlations use the original forecast or grade index. Creator percentages use monotone mappings trained without the scored card. Model percentages receive the same conversion in the calibrated MAE column. A conversion estimated using this format's outcomes is retrospective calibration, not an original percentage forecast.</p>
+  </section>
+  <section id="explore" class="section">
+    <h2>Inspect individual cards and errors</h2>
+    <div class="controls">
+      <label>Predictor<select id="source-picker"></select></label>
+      <label>Percentage scale<select id="scale-picker"><option value="submitted">Original model / converted creator</option><option value="calibrated">Common calibration for every predictor</option></select></label>
+      <label>Minimum GIH observations<select id="minimum-picker"><option value="500">500</option><option value="1000">1,000</option><option value="5000">5,000</option></select></label>
+      <label class="check"><input id="show-intervals" type="checkbox">Approximate observed intervals</label>
+    </div>
+    <p class="notice" id="source-note"></p>
+    <div class="detail-grid">
+      <div><div id="scatter" class="plot" aria-label="Selected predictor versus observed GIH scatterplot"></div><div id="calibration" class="plot" aria-label="Monotone grade or prediction conversion"></div></div>
+      <aside class="detail" aria-live="polite" id="card-detail"><h3>Card detail</h3><p class="muted">Hover or click a point, or select a card from the error table.</p></aside>
+    </div>
+    <h3>Largest absolute errors for this predictor</h3>
+    <div class="table-wrap"><table id="mistakes-table"><thead><tr><th>Card</th><th>Predicted</th><th>Observed</th><th>Error (pp)</th><th>GIH count</th></tr></thead><tbody></tbody></table></div>
+    <h3 style="margin-top:24px">Errors by card group</h3><p class="notice">Uses the selected predictor, scale, and observation threshold. Color is the card's printed front-face color, rather than deck archetype. Groups overlap; groups with fewer than three cards are omitted.</p>
+    <div class="table-wrap"><table id="groups-table"><thead><tr><th>Group</th><th>Cards</th><th>Mean error (pp)</th><th>MAE (pp)</th></tr></thead><tbody></tbody></table></div>
+  </section>
+  <section id="method" class="section">
+    <h2>Method and provenance</h2>
+    <p>Original model forecasts come from the submitted commits in PRs #8–#13. Prepared creatures and their front-face names resolve to the same card. Missing cards and suppressed 17Lands rates remain missing.</p>
+    <p>Creator grade conversion uses increasing isotonic regression: each grade's mean win rate is pooled with adjacent grades when needed to preserve tier ordering. Five shared card folds, repeated twenty times, keep the scored card out of every training sample. Card identity, color, rarity, and rules never enter the mapping. Explicit ordinary grades with conditional alternatives are retained at their ordinary grade. Conditional-only and sideboard-only grades have no invented general percentage.</p>
+    <p>Alex and Marc's preserved September editions are used; their October joint tier list is excluded. In these original plots, Limited Resources uses only the prerelease common/uncommon episode with Marshall and LSV. The <a href="native-creators/creator_table.html">updated analysis</a> includes episode 873's September 29 release-day rare audio review. The community collector retains native grades and original evidence links.</p>
+    <details><summary>Source editions and coverage</summary><div id="source-list"></div></details>
+    <details><summary>Lords of Limited and other limits</summary><p>Episode 497, published September 21, supplies selected card picks and format hypotheses rather than a complete card grade table. Its accessible opening explicitly praises Craftwork Crusher, which is now first by reported GIH among the 107 main-set uncommons (62.47%, 18,994 observations). A full card correlation is therefore not assigned. Episode 498 incorporates early-access games and is excluded. Jim Davis' ungraded commentary is also excluded from numerical scoring.</p><p>Observed GIH rates reflect deck selection, archetypes, and player usage as well as card strength. Intervals are approximate binomial intervals, and repeated cards/players/decks are not independent. This early snapshot may change. The Astra model forecasted a first-month window and several other models forecasted eventual all-time rates; this is an early checkpoint.</p></details>
+    <p><a href="report.html">Detailed report</a> · <a href="scores.csv">All score tables</a> · <a href="cards_and_predictions.csv">Joined card data</a> · <a href="predictions_long.csv">Card/source table with explicit units</a> · <a href="mistakes.csv">Error rankings</a> · <a href="calibration.csv">Tier conversion audit</a> · <a href="paired_comparisons.csv">Paired comparisons</a> · <a href="validation.json">Validation</a></p>
+  </section>
+  <footer>Observed data: <a href="https://www.17lands.com/card_data?expansion=FRA&amp;format=PremierDraft&amp;time_period=ALL_TIME">17Lands</a>. This independent analysis is not endorsed by 17Lands. Live data and charts are retained locally; consult <a href="https://www.17lands.com/usage_guidelines">17Lands' usage guidelines</a> before distributing them.</footer>
+</main>
+<script>
+const DATA = __EVALUATION_DATA__;
+const sources = DATA.sources, cards = DATA.cards;
+const models = Object.keys(sources).filter(k=>sources[k].kind==='model');
+const byName = new Map(cards.map(c=>[c.name,c]));
+const scorePool=document.getElementById('score-pool'), sourcePicker=document.getElementById('source-picker'), scalePicker=document.getElementById('scale-picker'), minPicker=document.getElementById('minimum-picker'), intervals=document.getElementById('show-intervals');
+const fmt=(v,d=2)=>v==null?'—':Number(v).toFixed(d), escapeText=v=>String(v).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const css=k=>getComputedStyle(document.documentElement).getPropertyValue(k).trim();
+const palette=()=>({common:css('--common'),uncommon:css('--uncommon'),rare:css('--rare'),mythic:css('--mythic')});
+const mainObserved=cards.filter(c=>c.set==='fra' && c.actual!=null && c.n>=500);
+const allValues=mainObserved.flatMap(c=>[c.actual,...models.map(k=>c.values[k]?.raw).filter(v=>v!=null)]);
+const domain=[Math.floor(Math.min(...allValues))-1,Math.ceil(Math.max(...allValues))+1];
+const statsText=c=>c.power!=null?' · '+c.power+'/'+c.toughness:c.loyalty!=null?' · Loyalty '+c.loyalty:'';
+const wrap=(s,n=62)=>String(s).split('\n').flatMap(line=>{let words=line.split(' '),lines=[],cur='';for(let w of words){if((cur+' '+w).length>n&&cur){lines.push(cur);cur=w}else cur+=(cur?' ':'')+w}if(cur)lines.push(cur);return lines}).join('<br>');
+const value=(card,key,cal)=>sources[key].kind.startsWith('model')&&!cal?card.values[key]?.raw:card.values[key]?.cal;
+const options={responsive:true,displaylogo:false,modeBarButtonsToRemove:['lasso2d','select2d','toImage']};
+function baseLayout(){return {paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',font:{family:'system-ui, sans-serif',color:css('--ink'),size:12},hoverlabel:{bgcolor:css('--surface'),font:{color:css('--ink'),size:12}},margin:{l:60,r:22,t:30,b:56},showlegend:false,xaxis:{title:'Predicted GIH win rate (%)',range:domain,gridcolor:css('--line'),zeroline:false},yaxis:{title:'Observed GIH win rate (%)',range:domain,gridcolor:css('--line'),zeroline:false},shapes:[{type:'line',x0:domain[0],x1:domain[1],y0:domain[0],y1:domain[1],line:{color:css('--muted'),width:1,dash:'dot'}}]};}
+function traces(key,selected,cal=false,errorBars=false){let traces=[];for(let rarity of ['common','uncommon','rare','mythic']){const group=selected.filter(c=>c.rarity===rarity&&value(c,key,cal)!=null);if(!group.length)continue;traces.push({type:'scatter',mode:'markers',name:rarity,x:group.map(c=>value(c,key,cal)),y:group.map(c=>c.actual),marker:{size:7,color:palette()[rarity],opacity:.72},customdata:group.map(c=>[c.name,fmt(value(c,key,cal)),fmt(c.actual),c.n.toLocaleString(),fmt(value(c,key,cal)-c.actual),escapeText(c.values[key].native),escapeText(c.cost),escapeText(c.type+statsText(c)),wrap(escapeText(c.oracle)),c.name]),hovertemplate:'<b>%{customdata[0]}</b><br>%{customdata[6]} · %{customdata[7]}<br>Predicted %{customdata[1]}% · Observed %{customdata[2]}%<br>Error %{customdata[4]} pp · GIH %{customdata[3]}<br>Original: %{customdata[5]}<br><br>%{customdata[8]}<extra></extra>',error_y:errorBars?{type:'data',symmetric:false,array:group.map(c=>c.interval[1]-c.actual),arrayminus:group.map(c=>c.actual-c.interval[0]),color:palette()[rarity],thickness:.7,width:1}:undefined});}return traces;}
+function modelGrid(){const mobile=window.innerWidth<740,cols=mobile?1:2,rows=Math.ceil(models.length/cols);let layout=baseLayout();layout.shapes=[];layout.annotations=[];layout.margin={l:56,r:22,t:38,b:54};let data=[];models.forEach((key,i)=>{let col=i%cols,row=Math.floor(i/cols),xd=[col/cols+.045,col/cols+1/cols-.025],yd=[1-(row+1)/rows+.055,1-row/rows-.052];let index=i+1,xref=index===1?'x':'x'+index,yref=index===1?'y':'y'+index,axisX=index===1?'xaxis':'xaxis'+index,axisY=index===1?'yaxis':'yaxis'+index;layout[axisX]={...baseLayout().xaxis,domain:xd,anchor:yref,title:row===rows-1?'Predicted GIH (%)':'',nticks:mobile?5:4};layout[axisY]={...baseLayout().yaxis,domain:yd,anchor:xref,title:col===0?'Observed GIH (%)':'',nticks:5};data.push(...traces(key,mainObserved).map(t=>({...t,xaxis:xref,yaxis:yref})));layout.shapes.push({type:'line',xref,yref,x0:domain[0],x1:domain[1],y0:domain[0],y1:domain[1],line:{color:css('--muted'),width:1,dash:'dot'}});let score=DATA.scores.find(s=>s.pool==='main_available'&&s.source===key);layout.annotations.push({xref:'paper',yref:'paper',x:(xd[0]+xd[1])/2,y:yd[1]+.034,text:escapeText(sources[key].name)+' · ρ '+fmt(score.spearman_rho,3)+' · MAE '+fmt(score.mae_pp),showarrow:false,font:{size:12,color:css('--ink')}});});Plotly.react('model-grid',data,layout,options);}
+function renderScores(){let pool=scorePool.value,rows=DATA.scores.filter(r=>r.pool===pool).sort((a,b)=>b.spearman_rho-a.spearman_rho);document.getElementById('pool-note').textContent=!['main_shared_creators','cu_shared_including_lr'].includes(pool)?'Each row uses its available grades within this pool; different coverage limits direct comparisons.':'Every row uses the same '+DATA.pool_sizes[pool]+' cards. Ordered by Spearman rank correlation.';document.querySelector('#score-table tbody').innerHTML=rows.map(r=>'<tr><td>'+escapeText(r.name)+(r.kind.includes('ensemble')?' <span class="muted">(derived)</span>':'')+'</td><td>'+r.cards+'</td><td>'+fmt(r.pearson_r,3)+'</td><td>'+fmt(r.spearman_rho,3)+'</td><td>'+fmt(r.mae_pp)+'</td><td>'+fmt(r.calibrated_mae_pp)+'</td><td>'+fmt(r.bias_pp)+'</td></tr>').join('');}
+function detail(card){if(!card)return;let el=document.getElementById('card-detail');el.innerHTML='<h3>'+escapeText(card.name)+'</h3><p class="muted">'+escapeText(card.cost)+' · '+escapeText(card.rarity)+' · '+escapeText(card.color)+'</p><p>'+escapeText(card.type+statsText(card))+'</p><div class="rule">'+escapeText(card.oracle)+'</div><p>Observed <strong>'+fmt(card.actual)+'%</strong> · '+card.n.toLocaleString()+' GIH observations</p><p class="notice">Approximate interval '+fmt(card.interval?.[0])+'–'+fmt(card.interval?.[1])+'%</p><p><a href="'+escapeText(card.url)+'" target="_blank" rel="noreferrer">Card on Scryfall</a></p><div class="table-wrap"><table><thead><tr><th>Predictor</th><th>Original</th><th>Mapped %</th></tr></thead><tbody>'+Object.entries(card.values).map(([k,v])=>'<tr><td>'+escapeText(sources[k].name)+'</td><td>'+escapeText(v.native)+'</td><td>'+fmt(v.cal)+'</td></tr>').join('')+'</tbody></table></div>';}
+function groupRows(selected,key,cal){
+  const tests=new Map();
+  for(const c of selected)tests.set('color:'+c.color,d=>d.color===c.color);
+  for(const rarity of ['common','uncommon','rare','mythic'])tests.set('rarity:'+rarity,d=>d.rarity===rarity);
+  tests.set('mana:0-2',d=>d.cmc<=2&&!d.type.includes('Land'));
+  tests.set('mana:3-4',d=>d.cmc>=3&&d.cmc<=4);tests.set('mana:5+',d=>d.cmc>=5);
+  tests.set('prepared',d=>d.layout==='prepare');tests.set('empower Jace',d=>/empower/i.test(d.oracle));
+  tests.set('Way enchantment',d=>d.name.startsWith('Way of the'));tests.set('Heartwood text',d=>/Heartwood/i.test(d.oracle));
+  tests.set('threshold text',d=>/threshold/i.test(d.oracle));tests.set('planeswalker',d=>d.type.includes('Planeswalker'));
+  let rows=[];
+  for(const [name,test] of tests){let part=selected.filter(test);if(part.length<3)continue;let errors=part.map(c=>value(c,key,cal)-c.actual);rows.push({group:name,cards:part.length,bias_pp:errors.reduce((a,b)=>a+b,0)/part.length,mae_pp:errors.reduce((a,b)=>a+Math.abs(b),0)/part.length});}
+  return rows.sort((a,b)=>b.mae_pp-a.mae_pp);
+}
+function renderExplore(){let key=sourcePicker.value,cal=scalePicker.value==='calibrated',min=Number(minPicker.value),selected=mainObserved.filter(c=>c.n>=min&&value(c,key,cal)!=null),source=sources[key],human=!source.kind.startsWith('model');let layout=baseLayout();layout.title={text:escapeText(source.name),font:{size:15}};Plotly.react('scatter',traces(key,selected,cal,intervals.checked),layout,options);let note=selected.length+' cards. '+(human?'Creator grades mapped to held-out percentages.':cal?'Original percentages corrected with held-out monotone calibration.':'Original submitted percentages.');document.getElementById('source-note').textContent=note+(source.publication_or_recorded_date?' Edition date: '+source.publication_or_recorded_date+'.':'');let worst=[...selected].sort((a,b)=>Math.abs(value(b,key,cal)-b.actual)-Math.abs(value(a,key,cal)-a.actual)).slice(0,12);document.querySelector('#mistakes-table tbody').innerHTML=worst.map(c=>'<tr data-card="'+escapeText(c.name)+'"><td>'+escapeText(c.name)+'</td><td>'+fmt(value(c,key,cal))+'%</td><td>'+fmt(c.actual)+'%</td><td>'+fmt(value(c,key,cal)-c.actual)+'</td><td>'+c.n.toLocaleString()+'</td></tr>').join('');let groups=groupRows(selected,key,cal);document.querySelector('#groups-table tbody').innerHTML=groups.map(g=>'<tr><td>'+escapeText(g.group.replace(/_/g,' ').replace('mana:','Mana ').replace('rarity:',''))+'</td><td>'+g.cards+'</td><td>'+fmt(g.bias_pp)+'</td><td>'+fmt(g.mae_pp)+'</td></tr>').join('');let mapCards=mainObserved.filter(c=>c.values[key]?.cal!=null);let pairs=mapCards.map(c=>({x:c.values[key].raw,y:c.values[key].cal,name:c.name})).sort((a,b)=>a.x-b.x);let cl=baseLayout();cl.shapes=[];cl.xaxis={...cl.xaxis,title:human?'Original grade index (0–100)':'Original predicted GIH (%)',range:undefined};cl.yaxis={...cl.yaxis,title:'Held-out converted GIH (%)',range:undefined};cl.title={text:'Conversion, excluding each scored card',font:{size:13}};Plotly.react('calibration',[{type:'scatter',mode:'markers',x:pairs.map(p=>p.x),y:pairs.map(p=>p.y),text:pairs.map(p=>p.name),marker:{size:4,color:css('--accent'),opacity:.4},hovertemplate:'%{text}<br>Original %{x:.2f}<br>Held-out conversion %{y:.2f}%<extra></extra>'}],cl,options);}
+function sourcesList(){let el=document.getElementById('source-list');el.innerHTML='<ul>'+Object.entries(sources).filter(([k,s])=>!s.kind.includes('ensemble')).map(([k,s])=>'<li><a href="'+escapeText(s.url)+'" target="_blank" rel="noreferrer">'+escapeText(s.name)+'</a>'+ (s.publication_or_recorded_date?' · '+s.publication_or_recorded_date:' · frozen submitted commit')+(s.caveat?' · '+escapeText(s.caveat):'')+'</li>').join('')+'</ul>'+'<p><a href="https://chunk.science/mtga-reality-fracture.html">Community collector and original-source links</a> · <a href="https://audioboom.com/posts/8955341-our-prerelease-guide-for-reality-fracture">Lords of Limited 497</a></p>';}
+for(let kind of ['model','creator','model_ensemble','creator_ensemble']){let group=document.createElement('optgroup');group.label=kind==='model'?'Models':kind==='creator'?'Prerelease creators':'Derived aggregate';for(let [key,source] of Object.entries(sources)){if(source.kind!==kind)continue;let opt=document.createElement('option');opt.value=key;opt.textContent=source.name;group.append(opt);}if(group.children.length)sourcePicker.append(group);}sourcePicker.value='claude-opus-5.5';
+document.getElementById('snapshot-line').textContent=DATA.pool_sizes.main_available+' main-set cards with reported GIH rates · 17Lands ALL_TIME snapshot, 7 October 2026 · Six unchanged model submissions and ten prerelease creator editions';
+scorePool.addEventListener('change',renderScores);[sourcePicker,scalePicker,minPicker,intervals].forEach(e=>e.addEventListener('change',renderExplore));document.querySelector('#mistakes-table tbody').addEventListener('click',e=>{let tr=e.target.closest('[data-card]');if(tr)detail(byName.get(tr.dataset.card));});
+modelGrid();renderScores();renderExplore();sourcesList();
+document.getElementById('scatter').on('plotly_hover',e=>detail(byName.get(e.points[0].customdata[9])));document.getElementById('scatter').on('plotly_click',e=>detail(byName.get(e.points[0].customdata[9])));
+let resizeTimer;window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{modelGrid();renderExplore();},150);});matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{modelGrid();renderExplore();});
+</script>
+</body>
+</html>

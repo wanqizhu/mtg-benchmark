@@ -1,0 +1,535 @@
+{
+  "MSH_rare": {
+    "Thunderbolts Conspiracy": {
+      "grade": "C- / C",
+      "context": "build_around"
+    },
+    "Bruce Banner": {
+      "grade": "C+ / B-",
+      "note": "Front-face grade only; omitted from training because combined DFC grade is not available"
+    },
+    "The Wondrous Wasp": {
+      "grade": "B+"
+    },
+    "Tony Stark": {
+      "grade": "A"
+    },
+    "Secret Invasion": {
+      "grade": "C / C++"
+    },
+    "The Mighty Thor, Jane Foster": {
+      "grade": "B+ / A"
+    },
+    "Super-Adaptoid": {
+      "grade": "D / C"
+    },
+    "Cosmic Cube": {
+      "grade": "B / B+"
+    },
+    "Castle Doom": {
+      "grade": "B-",
+      "context": "build_around"
+    }
+  },
+  "SOS_rare": {
+    "Harmonized Trio": {
+      "grade": "B / B+"
+    },
+    "Postmortem Professor": {
+      "grade": "B+"
+    },
+    "Steal the Show": {
+      "grade": "B",
+      "context": "build_around"
+    },
+    "Antiquities on the Loose": {
+      "grade": "A-"
+    },
+    "Conciliator's Duelist": {
+      "grade": "B+ / A-"
+    },
+    "Professor Dellian Fel": {
+      "grade": "A / A+"
+    }
+  },
+  "ECL_rare": {
+    "Oko, Lorwyn Liege": {
+      "grade": "B+",
+      "context": "scenario"
+    },
+    "Champions of the Shoal": {
+      "grade": "A",
+      "context": "scenario"
+    },
+    "Champion of the Weird": {
+      "grade": "B+",
+      "context": "scenario"
+    },
+    "Bloodline Bidding": {
+      "grade": "A-",
+      "context": "build_around"
+    },
+    "Collective Inferno": {
+      "exclude": "Hosts explicitly say they confused this card with Soul Immolation; final Collective Inferno grade not verified"
+    },
+    "Trystan, Callous Cultivator": {
+      "grade": "B+"
+    },
+    "Champions of the Perfect": {
+      "exclude": "Detected grade refers to preceding Trystan card; own grade not verified in this extraction"
+    },
+    "Sapling Nursery": {
+      "grade": "B+",
+      "context": "build_around"
+    }
+  },
+  "MSH_cu": {
+    "Speedball, New Warrior": {
+      "grade": "C+",
+      "context": "build_around"
+    },
+    "Thor Odinson": {
+      "grade": "B- / C+"
+    },
+    "Visions of Villainy": {
+      "grade": "C- / D+"
+    },
+    "Robot Domination": {
+      "grade": "B",
+      "context": "build_around"
+    },
+    "Hawkeye's Bow": {
+      "grade": "D",
+      "conditional_native": "C",
+      "context": "scenario"
+    },
+    "Hire a Crew": {
+      "grade": "C / C-"
+    },
+    "Red Hulk": {
+      "grade": "C / C+"
+    },
+    "Go Nuts!": {
+      "grade": "C / C+"
+    },
+    "Claim the Kingdom": {
+      "grade": "C+ / C"
+    },
+    "Undercover Skrull": {
+      "grade": "C+ / B"
+    },
+    "Brave Brawler": {
+      "grade": "C"
+    },
+    "Thirst for Knowledge": {
+      "grade": "C / C+",
+      "context": "scenario"
+    },
+    "Ronin, Shadow Stalker": {
+      "grade": "D",
+      "context": "build_around",
+      "conditional_native": "B / B+ / C"
+    },
+    "Atlantis Attacks": {
+      "grade": "C+",
+      "context": "scenario",
+      "conditional_native": "B- / B"
+    },
+    "Madame Hydra": {
+      "context": "build_around"
+    },
+    "Iron Lad, Diverging Destiny": {
+      "context": "build_around"
+    },
+    "Villainous Hideout": {
+      "context": "build_around"
+    },
+    "Photon Blast Barrage": {
+      "context": "sideboard"
+    }
+  },
+  "ECL_cu": {
+    "Merrow Skyswimmer": {
+      "grade": "B"
+    },
+    "Thoughtweft Lieutenant": {
+      "grade": "B"
+    },
+    "Reaping Willow": {
+      "grade": "B",
+      "context": "scenario",
+      "conditional_native": "B+"
+    },
+    "Glister Bairn": {
+      "grade": "D / C+ / B-",
+      "grade_weights": {
+        "D": 0.5,
+        "C+": 0.25,
+        "B-": 0.25
+      }
+    },
+    "Wanderbrine Trapper": {
+      "grade": "B+"
+    },
+    "Crib Swap": {
+      "grade": "C-"
+    },
+    "Spell Snare": {
+      "grade": "F",
+      "conditional_native": "C",
+      "context": "sideboard"
+    },
+    "Temporal Cleansing": {
+      "grade": "C+"
+    },
+    "Illusion Spinners": {
+      "grade": "D / D+"
+    },
+    "Giantfall": {
+      "grade": "C / C-"
+    },
+    "Sourbread Auntie": {
+      "grade": "B+",
+      "context": "scenario",
+      "conditional_native": "B"
+    },
+    "Assert Perfection": {
+      "grade": "C+ / B-"
+    },
+    "Unforgiving Aim": {
+      "grade": "D",
+      "conditional_native": "C",
+      "context": "sideboard"
+    },
+    "Evershrike's Gift": {
+      "context": "scenario"
+    },
+    "Gravelgill Scoundrel": {
+      "context": "scenario",
+      "conditional_native": "D"
+    },
+    "Iron-Shield Elf": {
+      "context": "scenario",
+      "conditional_native": "C+"
+    },
+    "Boggart Mischief": {
+      "context": "scenario"
+    },
+    "Lys Alana Dignitary": {
+      "context": "scenario"
+    },
+    "Lys Alana Informant": {
+      "context": "scenario"
+    },
+    "Luminollusk": {
+      "context": "scenario"
+    },
+    "Prismatic Undercurrents": {
+      "context": "build_around"
+    }
+  },
+  "SOS_cu": {
+    "Render Speechless": {
+      "grade": "D+"
+    },
+    "Vibrant Outburst": {
+      "grade": "B"
+    },
+    "Teacher's Pest": {
+      "grade": "B-"
+    },
+    "Mind Roots": {
+      "grade": "B / B-"
+    },
+    "Pest Mascot": {
+      "grade": "C++"
+    },
+    "Old-Growth Educator": {
+      "grade": "C+ / B-"
+    },
+    "Kirol, History Buff": {
+      "grade": "B- / C++"
+    },
+    "Quandrix Charm": {
+      "grade": "B- / B"
+    },
+    "Proctor's Gaze": {
+      "grade": "B- / C+"
+    },
+    "Fractal Tender": {
+      "grade": "B-",
+      "conditional_native": "B- / B / B+",
+      "context": "scenario"
+    },
+    "Matterbending Mage": {
+      "grade": "B"
+    },
+    "Spellbook Seeker": {
+      "grade": "C / C-"
+    },
+    "Muse's Encouragement": {
+      "grade": "C"
+    },
+    "Burrog Banemaker": {
+      "grade": "C- / C"
+    },
+    "Dissection Practice": {
+      "grade": "C+ / C++"
+    },
+    "Duel Tactics": {
+      "grade": "B / B-"
+    },
+    "Living History": {
+      "grade": "C++"
+    },
+    "Strife Scholar": {
+      "grade": "D+"
+    },
+    "Garrison Excavator": {
+      "grade": "B",
+      "conditional_native": "B+",
+      "context": "build_around"
+    },
+    "Studious First-Year": {
+      "grade": "C+ / B-"
+    },
+    "Elite Interceptor": {
+      "grade": "C+ / C++"
+    },
+    "Spiritcall Enthusiast": {
+      "grade": "C / C-"
+    },
+    "Transcendent Archaic": {
+      "grade": "B+ / A-",
+      "context": "build_around"
+    },
+    "Zealous Lorecaster": {
+      "exclude": "Host disagreement and uncertain nested ranges not resolved in this extraction"
+    },
+    "Expressive Firedancer": {
+      "context": "scenario"
+    },
+    "Thunderdrum Soloist": {
+      "context": "scenario"
+    },
+    "Arcane Omens": {
+      "context": "build_around"
+    }
+  },
+  "TLA_cu": {
+    "Messenger Hawk": {
+      "grade": "C"
+    },
+    "Cruel Administrator": {
+      "grade": "B+ / B"
+    },
+    "Earth Kingdom Soldier": {
+      "grade": "C++ / C"
+    },
+    "Seismic Sense": {
+      "grade": "B-"
+    },
+    "True Ancestry": {
+      "grade": "C / C+"
+    },
+    "Walltop Sentries": {
+      "grade": "D+",
+      "conditional_native": "C",
+      "context": "scenario"
+    },
+    "Bumi, King of Three Trials": {
+      "grade": "C++ / B"
+    },
+    "Watery Grasp": {
+      "grade": "C++ / C"
+    },
+    "North Pole Patrol": {
+      "grade": "C+"
+    },
+    "Azula Always Lies": {
+      "grade": "C"
+    },
+    "Sold Out": {
+      "grade": "C+ / C++"
+    },
+    "Combustion Technique": {
+      "grade": "C+ / B"
+    },
+    "Kyoshi Battle Fan": {
+      "grade": "D / F"
+    },
+    "Waterbending Lesson": {
+      "exclude": "Detected B grade belongs to preceding card, before introduction of Waterbending Lesson"
+    },
+    "Bitter Work": {
+      "context": "build_around"
+    },
+    "Tolls of War": {
+      "context": "build_around"
+    },
+    "Haru, Hidden Talent": {
+      "context": "build_around"
+    },
+    "Kyoshi Island Plaza": {
+      "context": "build_around"
+    },
+    "Buzzard-Wasp Colony": {
+      "context": "build_around"
+    }
+  },
+  "supplemental": [
+    {
+      "set": "SOS",
+      "video": "bsBoYVrt-mI",
+      "name": "Inkling Mascot",
+      "grade": "C",
+      "start": 1087
+    },
+    {
+      "set": "SOS",
+      "video": "bsBoYVrt-mI",
+      "name": "Abigale, Poet Laureate",
+      "grade": "B+",
+      "start": 1425
+    },
+    {
+      "set": "SOS",
+      "video": "bsBoYVrt-mI",
+      "name": "Imperious Inkmage",
+      "grade": "C",
+      "start": 1481
+    },
+    {
+      "set": "SOS",
+      "video": "bsBoYVrt-mI",
+      "name": "Stirring Honormancer",
+      "grade": "B",
+      "start": 1896
+    },
+    {
+      "set": "SOS",
+      "video": "bsBoYVrt-mI",
+      "name": "Abstract Paintmage",
+      "grade": "C++",
+      "start": 2309
+    },
+    {
+      "set": "SOS",
+      "video": "bsBoYVrt-mI",
+      "name": "Stadium Tidalmage",
+      "grade": "C",
+      "start": 2750
+    },
+    {
+      "set": "SOS",
+      "video": "bsBoYVrt-mI",
+      "name": "Visionary's Dance",
+      "grade": "C++",
+      "start": 3030
+    },
+    {
+      "set": "SOS",
+      "video": "bsBoYVrt-mI",
+      "name": "Bogwater Lumaret",
+      "grade": "C+ / C++",
+      "start": 3100
+    },
+    {
+      "set": "SOS",
+      "video": "bsBoYVrt-mI",
+      "name": "Fractal Mascot",
+      "grade": "C",
+      "start": 6090
+    },
+    {
+      "set": "SOS",
+      "video": "bsBoYVrt-mI",
+      "name": "Flow State",
+      "grade": "B-",
+      "start": 6784
+    },
+    {
+      "set": "SOS",
+      "video": "bsBoYVrt-mI",
+      "name": "Divergent Equation",
+      "grade": "D",
+      "start": 6240,
+      "context": "build_around",
+      "conditional_native": "C"
+    },
+    {
+      "set": "SOS",
+      "video": "bsBoYVrt-mI",
+      "name": "Fractal Anomaly",
+      "grade": "D",
+      "start": 6350,
+      "context": "scenario",
+      "conditional_native": "B"
+    },
+    {
+      "set": "SOS",
+      "video": "bsBoYVrt-mI",
+      "name": "Fractalize",
+      "grade": "C+ / B- / C++",
+      "grade_weights": {
+        "C+": 0.25,
+        "B-": 0.25,
+        "C++": 0.5
+      },
+      "start": 6518
+    },
+    {
+      "set": "SOS",
+      "video": "bsBoYVrt-mI",
+      "name": "Tester of the Tangential",
+      "grade": "C+",
+      "start": 7112
+    },
+    {
+      "set": "SOS",
+      "video": "bsBoYVrt-mI",
+      "name": "Deluge Virtuoso",
+      "grade": "C",
+      "start": 7220
+    },
+    {
+      "set": "SOS",
+      "video": "Y1ESx1xg6fo",
+      "name": "Flashback",
+      "grade": "D",
+      "start": 4265,
+      "note": "A+ was explicitly a design score and is excluded from Limited grade"
+    },
+    {
+      "set": "SOS",
+      "video": "Y1ESx1xg6fo",
+      "name": "Zaffai and the Tempests",
+      "grade": "B",
+      "start": 8215,
+      "context": "build_around"
+    },
+    {
+      "set": "SOS",
+      "video": "Y1ESx1xg6fo",
+      "name": "Ark of Hunger",
+      "grade": "A-",
+      "start": 9081
+    },
+    {
+      "set": "SOS",
+      "video": "Y1ESx1xg6fo",
+      "name": "Geometer's Arthropod",
+      "grade": "B",
+      "start": 9275,
+      "context": "build_around"
+    },
+    {
+      "set": "SOS",
+      "video": "Y1ESx1xg6fo",
+      "name": "Together as One",
+      "grade": "A / A+",
+      "start": 9860,
+      "context": "build_around"
+    }
+  ]
+}

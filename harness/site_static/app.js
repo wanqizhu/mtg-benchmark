@@ -5,7 +5,7 @@ let lastListView = "leaderboard";
 let routeSeq = 0;
 
 const app = document.querySelector("#app");
-const VALID_VIEWS = new Set(["leaderboard", "problems", "models", "methodology", "detail"]);
+const VALID_VIEWS = new Set(["leaderboard", "problems", "models", "methodology", "detail", "draft-predictions"]);
 const methodologyCache = { text: null, promise: null };
 const runCache = new Map();
 const problemCache = new Map();
@@ -57,6 +57,7 @@ function parseHash() {
 }
 
 function viewPath(route) {
+  if (route.view === "draft-predictions") return "draft-predictions";
   if (route.view === "detail" && route.modelName && route.sampleId) {
     return `detail/${encodeURIComponent(route.modelName)}/${encodeURIComponent(route.sampleId)}`;
   }
@@ -72,6 +73,7 @@ function viewPath(route) {
 
 function routeHash(route) {
   const path = viewPath(route);
+  if (route.view === "draft-predictions") return "#/draft-predictions";
   if (omitRunFromHash()) return `#/${path}`;
   const runId = encodeURIComponent(route.runId || defaultRoute().runId);
   return `#/${runId}/${path}`;
@@ -544,6 +546,19 @@ function initRunSelector() {
 async function applyRoute(route = parseHash()) {
   canonicalizeHash(route);
   const seq = ++routeSeq;
+  window.DraftPredictions?.dispose();
+  if (route.view === "draft-predictions") {
+    currentView = lastListView = "draft-predictions";
+    document.querySelectorAll(".nav-button").forEach(button => button.classList.toggle("active", button.dataset.view === "draft-predictions"));
+    app.classList.remove("split");
+    document.querySelector(".run-picker").hidden = true;
+    try {
+      await window.DraftPredictions.mount(app, { isCurrent: () => seq === routeSeq });
+    } catch (error) {
+      if (seq === routeSeq) app.innerHTML = `<section class="card"><h2>Could not load draft predictions</h2><p>${esc(error.message)}</p></section>`;
+    }
+    return;
+  }
   const meta = manifestRun(route.runId);
   try {
     DATA = await loadRun(meta?.run_id || route.runId);
@@ -585,6 +600,10 @@ async function applyRoute(route = parseHash()) {
 
 function setView(view) {
   const route = parseHash();
+  if (view === "draft-predictions") {
+    navigate({ view, problemId: null, modelName: null, sampleId: null });
+    return;
+  }
   if (view === "problems") {
     navigate({
       view,
