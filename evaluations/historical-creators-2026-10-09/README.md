@@ -186,7 +186,10 @@ Open the site at `/#/draft-predictions`. The plot shows predicted versus observe
 GIH, with prediction on x and observation on y. Hover shows card rates,
 differences and samples; clicking opens its Scryfall image and prediction stats.
 The full table defaults to descending observed GIH. Source names are colored
-by AI model or content creator. Unused grades with no historical observations
+by AI model or content creator. Prediction columns keep AI models first and
+content creators second; each group is ordered by descending Pearson r. Creator
+historical detail sections use the same creator ranking. The CSV follows the
+same grouped column order. Unused grades with no historical observations
 are omitted from the fitted-coefficient display; their fallback mappings remain
 in the model artifact, and the predictions are unchanged.
 Methodology includes the full shared prediction prompt. Data collection,

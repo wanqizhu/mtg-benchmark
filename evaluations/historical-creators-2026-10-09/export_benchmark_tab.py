@@ -76,6 +76,9 @@ def export(model_data, destination):
             prior = next(r for r in history['scores'] if r['creator'] == source['id'] and r['pool'] == 'common cards across all active creators')
             assert abs(prior['pearson'] - source['score']['pearson']) < 1e-10
             assert abs(prior['rmse_pp'] - source['score']['rmse']) < 1e-10
+    # Keep table/CSV columns grouped, with each group ranked by Pearson r.
+    # Filtering this ordered list also ranks the creator detail sections.
+    sources.sort(key=lambda s: (s['kind'] != 'ai', -s['score']['pearson'], s['name']))
     data = dict(schema_version=1, expansion='FRA', name='Reality Fracture',
                 shared_cards=len(shared), catalog_cards=len(cards), sources=sources, cards=cards,
                 outcome=dict(url=ai['manifest']['page_url'], retrieved_at=ai['manifest']['retrieved_at'],
