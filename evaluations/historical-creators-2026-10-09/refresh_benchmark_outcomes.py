@@ -92,7 +92,8 @@ def write_export(data, destination):
                                      separators=(',', ':')) + '\n')
     headers = ['Card', 'Set', 'Rarity', 'Observed GIH (%)', 'GIH games', 'Shared comparison']
     for source in data['sources']:
-        headers.append(source['name'] + ' prediction (%)')
+        label = source['name'] + (' ' + source['prediction_marker'] if source.get('prediction_marker') else '')
+        headers.append(label + ' prediction (%)')
         if source['kind'] == 'creator':
             headers.append(source['name'] + ' raw grade')
     with destination.with_suffix('.csv').open('w', encoding='utf-8-sig', newline='') as file:

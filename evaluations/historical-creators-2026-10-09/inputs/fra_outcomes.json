@@ -6,9 +6,9 @@
     "api_url": "https://www.17lands.com/api/card_data?expansion=FRA&event_type=PremierDraft&time_period=ALL_TIME",
     "event": "PremierDraft",
     "time_period": "ALL_TIME",
-    "retrieved_at": "2026-10-12T08:16:23.012665+00:00",
-    "sha256": "c20b3516bd80e04cae788e0f80e594462df6091175ac2f396f8df3b1052e6c37",
-    "card_stats_sha256": "317cc1a08fd2fdc765006d9d41957cd04162688e36b2d14930cc82ea3a06e638",
+    "retrieved_at": "2026-10-14T12:56:41.339501+00:00",
+    "sha256": "d186c280bc3c936db58f46829d06d6840f5fcf5d29efff02a6100825b44b06d4",
+    "card_stats_sha256": "4dcf01d294093750fc46864de0c065b940d3886d433576b32acf8906aabda915",
     "scope": "Cumulative ALL_TIME PremierDraft GIH, all tracked users and all deck colors; not a first-week-only window."
   },
   "minimum_gih_games": 500,
@@ -283,178 +283,178 @@
   "cards": [
     {
       "name": "Academic Ascent",
-      "actual": 52.907874,
-      "games": 7772
+      "actual": 52.684999,
+      "games": 8473
     },
     {
       "name": "Aerid Konstrari",
-      "actual": 64.746498,
-      "games": 5069
+      "actual": 64.83036,
+      "games": 5718
     },
     {
       "name": "Afterthought Sentry",
-      "actual": 52.692018,
-      "games": 10624
+      "actual": 52.690583000000004,
+      "games": 12042
     },
     {
       "name": "Ajani Resolute",
-      "actual": 52.598131,
-      "games": 2675
+      "actual": 52.393617000000006,
+      "games": 3008
     },
     {
       "name": "Ajani Unrelenting",
-      "actual": 73.41311900000001,
-      "games": 6601
+      "actual": 73.32801500000001,
+      "games": 7521
     },
     {
       "name": "Ajani's Anguish",
-      "actual": 56.19931700000001,
-      "games": 9372
+      "actual": 56.15833,
+      "games": 10636
     },
     {
       "name": "Apex Witchstalker",
-      "actual": 55.807054,
-      "games": 54606
+      "actual": 55.767154,
+      "games": 62960
     },
     {
       "name": "Arcane Amphisbaena",
-      "actual": 55.825331,
-      "games": 55190
+      "actual": 55.89851,
+      "games": 62075
     },
     {
       "name": "Archive Arbiter",
-      "actual": 55.720687999999996,
-      "games": 17629
+      "actual": 55.77358100000001,
+      "games": 20334
     },
     {
       "name": "Arni, Humble Scribe",
-      "actual": 54.89089499999999,
-      "games": 21264
+      "actual": 54.677125000000004,
+      "games": 24096
     },
     {
       "name": "Arni, Renowned Champion",
-      "actual": 46.108836,
-      "games": 3418
+      "actual": 45.938677,
+      "games": 3718
     },
     {
       "name": "Artifist Acumen",
-      "actual": 49.465297,
-      "games": 4769
+      "actual": 49.235474,
+      "games": 5232
     },
     {
       "name": "Austere Command",
-      "actual": 63.38851,
-      "games": 1027
+      "actual": 62.704565,
+      "games": 1161
     },
     {
       "name": "Avatar of Burgeoning Echoes",
-      "actual": 59.91607799999999,
-      "games": 4528
+      "actual": 60.078739999999996,
+      "games": 5080
     },
     {
       "name": "Awaken the Inferno",
-      "actual": 55.686139999999995,
-      "games": 52329
+      "actual": 55.902182,
+      "games": 60071
     },
     {
       "name": "Bestial Incursion",
-      "actual": 56.504768000000006,
-      "games": 52008
+      "actual": 56.418128,
+      "games": 58958
     },
     {
       "name": "Blazing Crescendo",
-      "actual": 51.802586,
-      "games": 8044
+      "actual": 51.584686999999995,
+      "games": 8803
     },
     {
       "name": "Blessed Ghoul",
-      "actual": 53.968759,
-      "games": 22022
+      "actual": 53.972352,
+      "games": 25174
     },
     {
       "name": "Bloodline Recollector // Ancestral Craving",
-      "actual": 51.373855,
-      "games": 2402
+      "actual": 51.51171599999999,
+      "games": 2646
     },
     {
       "name": "Bloombrute",
-      "actual": 57.589785000000006,
-      "games": 18795
+      "actual": 57.725534999999994,
+      "games": 21183
     },
     {
       "name": "Blossom-Blessed Angel // Seed Suture",
-      "actual": 56.066298,
-      "games": 36200
+      "actual": 56.078573,
+      "games": 41490
     },
     {
       "name": "Break Under Pressure",
-      "actual": 59.791339,
-      "games": 33739
+      "actual": 59.619572,
+      "games": 38115
     },
     {
       "name": "Budding Insurgent",
-      "actual": 51.040503,
-      "games": 14320
+      "actual": 50.813556999999996,
+      "games": 15549
     },
     {
       "name": "Campus Crier",
-      "actual": 55.800923999999995,
-      "games": 45691
+      "actual": 55.842155999999996,
+      "games": 51950
     },
     {
       "name": "Carnivorous Cultivator // Enroot",
-      "actual": 59.527067,
-      "games": 10234
+      "actual": 59.261814,
+      "games": 11596
     },
     {
       "name": "Cast Away Doubt",
-      "actual": 52.922504,
-      "games": 14491
+      "actual": 52.980534999999996,
+      "games": 16440
     },
     {
       "name": "Chandra's Emberling",
-      "actual": 51.887467,
-      "games": 15391
+      "actual": 51.666374999999995,
+      "games": 17133
     },
     {
       "name": "Chandra, Chill of Compliance",
-      "actual": 59.88292,
-      "games": 5808
+      "actual": 59.44286399999999,
+      "games": 6677
     },
     {
       "name": "Chandra, Torch of Defiance",
-      "actual": 60.100376,
-      "games": 4782
+      "actual": 60.153257,
+      "games": 5481
     },
     {
       "name": "Charge the Sanctum",
-      "actual": 50.288184,
-      "games": 5552
+      "actual": 50.337728999999996,
+      "games": 6218
     },
     {
       "name": "Clash of Elements",
-      "actual": 58.669134,
-      "games": 23774
+      "actual": 58.49536,
+      "games": 27156
     },
     {
       "name": "Codie, Ravenous Codex",
-      "actual": 45.068493,
-      "games": 730
+      "actual": 45.838509,
+      "games": 805
     },
     {
       "name": "Command the Stage",
-      "actual": 49.839648,
-      "games": 8419
+      "actual": 50.03739699999999,
+      "games": 9359
     },
     {
       "name": "Compel Brutality",
-      "actual": 54.800428999999994,
-      "games": 51235
+      "actual": 54.660965,
+      "games": 57295
     },
     {
       "name": "Consider",
-      "actual": 56.161395999999996,
-      "games": 917
+      "actual": 56.060606,
+      "games": 1056
     },
     {
       "name": "Consign to Memory",
@@ -463,143 +463,143 @@
     },
     {
       "name": "Countersculpt",
-      "actual": 60.172179,
-      "games": 39726
+      "actual": 60.137577,
+      "games": 45647
     },
     {
       "name": "Craftwork Crusher",
-      "actual": 62.504479999999994,
-      "games": 27902
+      "actual": 62.363648000000005,
+      "games": 31536
     },
     {
       "name": "Craterclaw Colossus",
-      "actual": 55.723780999999995,
-      "games": 2708
+      "actual": 56.094364,
+      "games": 3052
     },
     {
       "name": "Cruel Calculations",
-      "actual": 48.628049000000004,
-      "games": 656
+      "actual": 49.316939999999995,
+      "games": 732
     },
     {
       "name": "Cryotheory Adept",
-      "actual": 53.306838,
-      "games": 23149
+      "actual": 53.263718000000004,
+      "games": 25952
     },
     {
       "name": "Curse-Marred Demon",
-      "actual": 56.574535000000004,
-      "games": 8647
+      "actual": 56.352059,
+      "games": 9737
     },
     {
       "name": "Danitha, Spear of Agony",
-      "actual": 50.827404,
-      "games": 12086
+      "actual": 50.680809,
+      "games": 13293
     },
     {
       "name": "Danitha, Sword of Hope",
-      "actual": 52.109887,
-      "games": 8081
+      "actual": 51.87633,
+      "games": 8927
     },
     {
       "name": "Dark Matter Manipulator",
-      "actual": 57.750209,
-      "games": 7174
+      "actual": 57.803677,
+      "games": 8323
     },
     {
       "name": "Darklight Phoenix",
-      "actual": 53.562566000000004,
-      "games": 2821
+      "actual": 53.148379,
+      "games": 3208
     },
     {
       "name": "Dedicated Commons",
-      "actual": 53.042417,
-      "games": 16385
+      "actual": 53.074169999999995,
+      "games": 18444
     },
     {
       "name": "Denzilore Fatehold",
-      "actual": 62.433316000000005,
-      "games": 5811
+      "actual": 61.961794999999995,
+      "games": 6596
     },
     {
       "name": "Deserted Beach",
-      "actual": 55.593804000000006,
-      "games": 6391
+      "actual": 55.68675400000001,
+      "games": 7368
     },
     {
       "name": "Desperate Futurescribe",
-      "actual": 57.899958,
-      "games": 26209
+      "actual": 57.89385299999999,
+      "games": 29789
     },
     {
       "name": "Diviner of Victory // Unwind History",
-      "actual": 59.972886,
-      "games": 11802
+      "actual": 59.912611999999996,
+      "games": 13503
     },
     {
       "name": "Divining Duelist",
-      "actual": 55.101398999999994,
-      "games": 19083
+      "actual": 55.02366,
+      "games": 21767
     },
     {
       "name": "Draconic Visitor",
-      "actual": 54.201447,
-      "games": 7188
+      "actual": 53.853719,
+      "games": 8135
     },
     {
       "name": "Eardrum Rattler",
-      "actual": 49.387515,
-      "games": 8490
+      "actual": 49.276624000000005,
+      "games": 9193
     },
     {
       "name": "Edgar, Ancient Bloodlord",
-      "actual": 52.507293,
-      "games": 7199
+      "actual": 52.904199,
+      "games": 7954
     },
     {
       "name": "Edgar, Moonlit Sovereign",
-      "actual": 50.358779,
-      "games": 11567
+      "actual": 50.158002999999994,
+      "games": 12658
     },
     {
       "name": "Emergency Phytomedic // Seed Suture",
-      "actual": 54.394559,
-      "games": 28376
+      "actual": 54.356768,
+      "games": 31606
     },
     {
       "name": "Emrakul, the Exigent Doom",
-      "actual": 52.810707,
-      "games": 2615
+      "actual": 52.359473,
+      "games": 2882
     },
     {
       "name": "Enlightened Confidant",
-      "actual": 56.711502,
-      "games": 3643
+      "actual": 57.350142999999996,
+      "games": 4204
     },
     {
       "name": "Entrust the Spark",
       "actual": null,
-      "games": 128
+      "games": 145
     },
     {
       "name": "Essence Burn",
-      "actual": 49.470899,
-      "games": 756
+      "actual": 48.639053,
+      "games": 845
     },
     {
       "name": "Extended Absence",
-      "actual": 59.726201,
-      "games": 72608
+      "actual": 59.600044,
+      "games": 82609
     },
     {
       "name": "Extrapolate the Impossible",
-      "actual": null,
-      "games": 456
+      "actual": 49.108911,
+      "games": 505
     },
     {
       "name": "Eye of Jace",
-      "actual": 50.286608,
-      "games": 5757
+      "actual": 50.352058,
+      "games": 6391
     },
     {
       "name": "Eye of Ugin",
@@ -608,58 +608,58 @@
     },
     {
       "name": "Face Yourself",
-      "actual": 54.727031000000004,
-      "games": 6008
+      "actual": 54.968627000000005,
+      "games": 6853
     },
     {
       "name": "Fatehold Annex",
-      "actual": 55.72537,
-      "games": 25518
+      "actual": 55.698800000000006,
+      "games": 29243
     },
     {
       "name": "Fatehold Charm",
-      "actual": 58.177139,
-      "games": 23315
+      "actual": 58.085609999999996,
+      "games": 26609
     },
     {
       "name": "Fatehold Chronologist // Peer Review",
-      "actual": 56.416805000000004,
-      "games": 63435
+      "actual": 56.482451,
+      "games": 72596
     },
     {
       "name": "Fateshaper Aspirant",
-      "actual": 52.054889,
-      "games": 14429
+      "actual": 52.054047999999995,
+      "games": 16504
     },
     {
       "name": "Fblthp, Impossibly Lost",
-      "actual": 59.865506999999994,
-      "games": 37474
+      "actual": 59.664804000000004,
+      "games": 43855
     },
     {
       "name": "Fblthp, Knows the Way",
-      "actual": 57.714245,
-      "games": 28227
+      "actual": 57.646021000000005,
+      "games": 31742
     },
     {
       "name": "Ferocity of the Hunt",
-      "actual": 52.842809,
-      "games": 21229
+      "actual": 52.78459599999999,
+      "games": 23630
     },
     {
       "name": "Flesh Duplicate",
-      "actual": 55.429498,
-      "games": 617
+      "actual": 54.99276400000001,
+      "games": 691
     },
     {
       "name": "Flickering Hound",
-      "actual": 46.15113,
-      "games": 2832
+      "actual": 45.528192000000004,
+      "games": 3086
     },
     {
       "name": "Flourishing Grapple",
-      "actual": 44.21875,
-      "games": 640
+      "actual": 44.412192,
+      "games": 689
     },
     {
       "name": "Forest",
@@ -668,188 +668,188 @@
     },
     {
       "name": "Formidable Commons",
-      "actual": 55.704843000000004,
-      "games": 27687
+      "actual": 55.607344000000005,
+      "games": 31753
     },
     {
       "name": "Frostbite Pyromental",
-      "actual": 50.629164,
-      "games": 2702
+      "actual": 50.54762699999999,
+      "games": 3013
     },
     {
       "name": "Fulminous Forte",
-      "actual": 57.099055,
-      "games": 27722
+      "actual": 56.936083,
+      "games": 31228
     },
     {
       "name": "Gallia, Tragic Host",
-      "actual": 55.635787,
-      "games": 22712
+      "actual": 55.50751699999999,
+      "games": 25674
     },
     {
       "name": "Gallia, the Merrymaker",
-      "actual": 50.90796400000001,
-      "games": 11289
+      "actual": 50.923759999999994,
+      "games": 12395
     },
     {
       "name": "Gardenize",
       "actual": null,
-      "games": 301
+      "games": 320
     },
     {
       "name": "Garruk, Curse Breaker",
-      "actual": 65.429579,
-      "games": 5389
+      "actual": 65.650341,
+      "games": 6166
     },
     {
       "name": "Garruk, Veiled Butcher",
-      "actual": 66.264241,
-      "games": 5881
+      "actual": 66.00267600000001,
+      "games": 6727
     },
     {
       "name": "Geist of Saint Thalia",
-      "actual": 56.952397,
-      "games": 24452
+      "actual": 56.849000000000004,
+      "games": 28245
     },
     {
       "name": "Generous Revival",
-      "actual": 57.275639,
-      "games": 15923
+      "actual": 57.40317700000001,
+      "games": 18384
     },
     {
       "name": "Germinate Recruits",
-      "actual": 46.869245,
-      "games": 1086
+      "actual": 47.473074,
+      "games": 1207
     },
     {
       "name": "Ghalta the Immovable",
-      "actual": 52.172996000000005,
-      "games": 4740
+      "actual": 52.474878999999994,
+      "games": 5374
     },
     {
       "name": "Ghalta the Unstoppable",
-      "actual": 53.803025999999996,
-      "games": 14804
+      "actual": 53.455494,
+      "games": 16481
     },
     {
       "name": "Gideon the Oathless",
-      "actual": 60.102773,
-      "games": 10314
+      "actual": 59.724816999999994,
+      "games": 11774
     },
     {
       "name": "Gideon's Memorial",
-      "actual": 50.562969,
-      "games": 4796
+      "actual": 50.56450099999999,
+      "games": 5403
     },
     {
       "name": "Graft Surgeon",
-      "actual": 51.87141199999999,
-      "games": 13065
+      "actual": 51.691637,
+      "games": 14217
     },
     {
       "name": "Greenhouse Propagator",
-      "actual": 54.35395,
-      "games": 40113
+      "actual": 54.427269,
+      "games": 44768
     },
     {
       "name": "Grim Repriser",
-      "actual": 53.817589,
-      "games": 11041
+      "actual": 53.578616999999994,
+      "games": 12421
     },
     {
       "name": "Guiding Hydra",
-      "actual": 57.92629,
-      "games": 10175
+      "actual": 58.06760800000001,
+      "games": 11478
     },
     {
       "name": "Hall of Echoes",
-      "actual": 53.606370999999996,
-      "games": 4395
+      "actual": 53.79798,
+      "games": 4950
     },
     {
       "name": "Hallway Heckler // Vicious Verse",
-      "actual": 52.208219,
-      "games": 18250
+      "actual": 52.314269,
+      "games": 20352
     },
     {
       "name": "Hapatra, the Desert Fang",
-      "actual": 59.440678999999996,
-      "games": 29357
+      "actual": 59.34354,
+      "games": 33574
     },
     {
       "name": "Hapatra, the Desert Frost",
-      "actual": 53.193007,
-      "games": 14015
+      "actual": 53.243675999999994,
+      "games": 15615
     },
     {
       "name": "Haunted Ridge",
-      "actual": 54.86568200000001,
-      "games": 5621
+      "actual": 54.947957,
+      "games": 6437
     },
     {
       "name": "Heartstring Puller",
-      "actual": 54.69662400000001,
-      "games": 35962
+      "actual": 54.76692,
+      "games": 40351
     },
     {
       "name": "Heartwood Crafter // Soul Tether",
-      "actual": 56.781105,
-      "games": 24642
+      "actual": 56.893637,
+      "games": 27801
     },
     {
       "name": "Hexhaven Battalion",
-      "actual": 57.637598000000004,
-      "games": 60811
+      "actual": 57.672011,
+      "games": 69167
     },
     {
       "name": "Hexhaven Dueling Arena",
-      "actual": 49.665104,
-      "games": 2986
+      "actual": 49.698614,
+      "games": 3318
     },
     {
       "name": "Hexhaven Invigorator",
-      "actual": 54.335533000000005,
-      "games": 2122
+      "actual": 55.014686999999995,
+      "games": 2383
     },
     {
       "name": "Hungering Puppetbeast",
-      "actual": 61.989227,
-      "games": 10768
+      "actual": 61.902064,
+      "games": 12355
     },
     {
       "name": "Hunter's Axe",
-      "actual": 51.327602999999996,
-      "games": 5235
+      "actual": 51.240673,
+      "games": 5763
     },
     {
       "name": "Icy Reception",
-      "actual": 57.994854,
-      "games": 63347
+      "actual": 57.935256,
+      "games": 73520
     },
     {
       "name": "Identity Echo",
       "actual": null,
-      "games": 292
+      "games": 321
     },
     {
       "name": "Infinite Coursework",
-      "actual": 56.068905,
-      "games": 59154
+      "actual": 56.135674,
+      "games": 67515
     },
     {
       "name": "Ingris Stingerquill",
-      "actual": 57.197331,
-      "games": 3147
+      "actual": 56.949059000000005,
+      "games": 3612
     },
     {
       "name": "Innovative Commons",
-      "actual": 56.083816,
-      "games": 25198
+      "actual": 56.064485,
+      "games": 28906
     },
     {
       "name": "Inspired Tethermage",
-      "actual": 51.737697000000004,
-      "games": 25177
+      "actual": 51.662094,
+      "games": 28067
     },
     {
       "name": "Island",
@@ -858,193 +858,193 @@
     },
     {
       "name": "Jace's Machinations",
-      "actual": 57.635556,
-      "games": 11250
+      "actual": 57.802929999999996,
+      "games": 12899
     },
     {
       "name": "Jace, Reality Sculptor",
-      "actual": 58.298775000000006,
-      "games": 10369
+      "actual": 58.357895000000006,
+      "games": 11875
     },
     {
       "name": "Jiang Yanggu, Alone",
-      "actual": 53.351572999999995,
-      "games": 10234
+      "actual": 53.138994,
+      "games": 11389
     },
     {
       "name": "Jiang Yanggu, Never Alone",
-      "actual": 55.426374,
-      "games": 22105
+      "actual": 55.425541,
+      "games": 24698
     },
     {
       "name": "Karn, Argent Defender",
-      "actual": 49.226804,
-      "games": 776
+      "actual": 49.642005,
+      "games": 838
     },
     {
       "name": "Karn, Gilded Guardian",
-      "actual": 50.181818,
-      "games": 825
+      "actual": 51.602563999999994,
+      "games": 936
     },
     {
       "name": "Keeper of the Quiet Hour",
-      "actual": 56.276357,
-      "games": 39601
+      "actual": 56.300419999999995,
+      "games": 45989
     },
     {
       "name": "Kindred Judgment",
-      "actual": 62.019802,
-      "games": 10100
+      "actual": 62.037819000000006,
+      "games": 11846
     },
     {
       "name": "Kiora of Fire and Ashes",
-      "actual": 61.484434,
-      "games": 31608
+      "actual": 61.431113,
+      "games": 35972
     },
     {
       "name": "Kiora of Salt and Sand",
-      "actual": 54.182095,
-      "games": 9182
+      "actual": 54.11423,
+      "games": 10330
     },
     {
       "name": "Konstrari Annex",
-      "actual": 54.464935999999994,
-      "games": 24726
+      "actual": 54.409856999999995,
+      "games": 27756
     },
     {
       "name": "Konstrari Charm",
-      "actual": 56.114853,
-      "games": 11284
+      "actual": 56.080545,
+      "games": 12614
     },
     {
       "name": "Konstrari Improviser // Soul Tether",
-      "actual": 54.036721,
-      "games": 45532
+      "actual": 53.961218,
+      "games": 51209
     },
     {
       "name": "Koth of the Homestead",
-      "actual": 54.595411000000006,
-      "games": 16560
+      "actual": 54.512222,
+      "games": 18328
     },
     {
       "name": "Koth, the Geomancer",
-      "actual": 51.854076000000006,
-      "games": 13322
+      "actual": 52.001078,
+      "games": 14842
     },
     {
       "name": "Kwia Vigorbloom",
-      "actual": 62.036632999999995,
-      "games": 4586
+      "actual": 62.61346399999999,
+      "games": 5288
     },
     {
       "name": "Last Gasp",
-      "actual": 57.08479199999999,
-      "games": 61999
+      "actual": 57.005881,
+      "games": 70398
     },
     {
       "name": "Lich's Relic",
-      "actual": 63.316061999999995,
-      "games": 12545
+      "actual": 63.214135999999996,
+      "games": 14318
     },
     {
       "name": "Liliana the Faultless",
-      "actual": 58.026354999999995,
-      "games": 6678
+      "actual": 58.102402,
+      "games": 7578
     },
     {
       "name": "Liliana the Repentant",
-      "actual": 56.281206,
-      "games": 10014
+      "actual": 56.096919,
+      "games": 11391
     },
     {
       "name": "Living Library",
-      "actual": 53.304573,
-      "games": 5795
+      "actual": 52.987398,
+      "games": 6745
     },
     {
       "name": "Loot, the Anomaly",
-      "actual": 47.826087,
-      "games": 2852
+      "actual": 47.985820000000004,
+      "games": 3103
     },
     {
       "name": "Loot, the Nexus",
-      "actual": 52.604359,
-      "games": 16242
+      "actual": 52.427078,
+      "games": 18170
     },
     {
       "name": "Loyal Tutor",
       "actual": null,
-      "games": 214
+      "games": 223
     },
     {
       "name": "Lyra, Archangel of Dawn",
-      "actual": 58.990224000000005,
-      "games": 8081
+      "actual": 58.891808999999995,
+      "games": 9132
     },
     {
       "name": "Lyra, Tolarian Archangel",
-      "actual": 61.064239,
-      "games": 13512
+      "actual": 60.899429999999995,
+      "games": 15432
     },
     {
       "name": "Mabel, Bitter Recluse",
-      "actual": 53.875713000000005,
-      "games": 16655
+      "actual": 53.724059999999994,
+      "games": 18649
     },
     {
       "name": "Mabel, Valley Hero",
-      "actual": 50.667680000000004,
-      "games": 9211
+      "actual": 50.784608,
+      "games": 10005
     },
     {
       "name": "Marwyn, the Clearcutter",
-      "actual": 55.216202,
-      "games": 15356
+      "actual": 55.196654,
+      "games": 17213
     },
     {
       "name": "Marwyn, the Preserver",
-      "actual": 54.382672,
-      "games": 19714
+      "actual": 54.371822,
+      "games": 21833
     },
     {
       "name": "Massacre Girl, Most Wanted",
-      "actual": 50.304362999999995,
-      "games": 11828
+      "actual": 50.22985,
+      "games": 13052
     },
     {
       "name": "Master of Barbs",
-      "actual": 52.859926,
-      "games": 5647
+      "actual": 53.183462000000006,
+      "games": 6361
     },
     {
       "name": "Medic's Kitesail",
-      "actual": 54.535133,
-      "games": 15854
+      "actual": 54.313987,
+      "games": 17988
     },
     {
       "name": "Memory Trap",
-      "actual": 56.041525,
-      "games": 54233
+      "actual": 55.974431,
+      "games": 61169
     },
     {
       "name": "Meticulous Commons",
-      "actual": 54.405331000000004,
-      "games": 19658
+      "actual": 54.411372,
+      "games": 22442
     },
     {
       "name": "Mind Meanderer",
-      "actual": 57.486225000000005,
-      "games": 25046
+      "actual": 57.454419,
+      "games": 28795
     },
     {
       "name": "Mind Twist",
-      "actual": 64.369748,
-      "games": 1190
+      "actual": 64.202899,
+      "games": 1380
     },
     {
       "name": "Mindseeker Oculus",
-      "actual": 60.160628,
-      "games": 90644
+      "actual": 60.163500000000006,
+      "games": 103119
     },
     {
       "name": "Mountain",
@@ -1053,63 +1053,63 @@
     },
     {
       "name": "Multiply by Zero",
-      "actual": 58.95093,
-      "games": 31628
+      "actual": 59.00648699999999,
+      "games": 36074
     },
     {
       "name": "Murmuring Volume",
-      "actual": 56.758018,
-      "games": 36416
+      "actual": 56.669419,
+      "games": 43602
     },
     {
       "name": "Necrodominance",
       "actual": null,
-      "games": 70
+      "games": 88
     },
     {
       "name": "No Admittance",
-      "actual": 56.982158999999996,
-      "games": 57339
+      "actual": 56.96384,
+      "games": 64878
     },
     {
       "name": "Null Summoner",
-      "actual": 62.740867,
-      "games": 13441
+      "actual": 62.910128,
+      "games": 15422
     },
     {
       "name": "Omnipresence",
       "actual": null,
-      "games": 21
+      "games": 22
     },
     {
       "name": "Overgrown Farmland",
-      "actual": 53.192315,
-      "games": 5153
+      "actual": 53.075052,
+      "games": 5756
     },
     {
       "name": "Overwrite the Multiverse",
-      "actual": 65.797775,
-      "games": 6023
+      "actual": 65.900829,
+      "games": 6877
     },
     {
       "name": "Paradox Shaper // Omit Variables",
-      "actual": 55.279712999999994,
-      "games": 23685
+      "actual": 55.284641,
+      "games": 27561
     },
     {
       "name": "Perfected Theory",
-      "actual": 51.922064,
-      "games": 5697
+      "actual": 51.974823,
+      "games": 6355
     },
     {
       "name": "Pia, Aether Ascetic",
-      "actual": 49.39759,
-      "games": 5395
+      "actual": 49.659631999999995,
+      "games": 5876
     },
     {
       "name": "Pia, Determined Rebuilder",
-      "actual": 56.365361,
-      "games": 23188
+      "actual": 56.413014,
+      "games": 26033
     },
     {
       "name": "Plains",
@@ -1118,133 +1118,133 @@
     },
     {
       "name": "Plan for All Outcomes",
-      "actual": 59.456843000000006,
-      "games": 40283
+      "actual": 59.528218,
+      "games": 45911
     },
     {
       "name": "Pompous Battlemage // Improvised Act",
-      "actual": 53.474197000000004,
-      "games": 4922
+      "actual": 53.622924000000005,
+      "games": 5479
     },
     {
       "name": "Precise Redaction",
       "actual": null,
-      "games": 222
+      "games": 253
     },
     {
       "name": "Predictive Preparations",
-      "actual": 48.811274999999995,
-      "games": 8160
+      "actual": 48.800625,
+      "games": 8963
     },
     {
       "name": "Primal Witchstalker",
-      "actual": 59.050206,
-      "games": 23563
+      "actual": 59.0349,
+      "games": 27106
     },
     {
       "name": "Proctor of Potential",
-      "actual": 60.297877,
-      "games": 8997
+      "actual": 60.400736,
+      "games": 10331
     },
     {
       "name": "Proft, Consulting Detective",
-      "actual": 57.682364,
-      "games": 32490
+      "actual": 57.56091,
+      "games": 37145
     },
     {
       "name": "Proft, Sinister Mastermind",
-      "actual": 54.675344,
-      "games": 19667
+      "actual": 54.649896,
+      "games": 22022
     },
     {
       "name": "Prophesied End",
-      "actual": 55.851768,
-      "games": 21156
+      "actual": 55.695033,
+      "games": 23819
     },
     {
       "name": "Protege's Awakening",
-      "actual": 58.621402,
-      "games": 58117
+      "actual": 58.640169,
+      "games": 68332
     },
     {
       "name": "Prudent Fateseer // Peer Review",
-      "actual": 55.771161,
-      "games": 26901
+      "actual": 55.793081,
+      "games": 30640
     },
     {
       "name": "Puppet Crafting",
-      "actual": 50.729167,
-      "games": 1920
+      "actual": 50.828205999999994,
+      "games": 2113
     },
     {
       "name": "Pyre Rhymer // Molten Tide",
-      "actual": 50.592727000000004,
-      "games": 4977
+      "actual": 50.549853,
+      "games": 5456
     },
     {
       "name": "Rampart Hunter",
-      "actual": 48.101841,
-      "games": 4399
+      "actual": 48.009078,
+      "games": 4847
     },
     {
       "name": "Rank Rat",
-      "actual": 54.98999,
-      "games": 43457
+      "actual": 55.007121999999995,
+      "games": 48441
     },
     {
       "name": "Recursive Recruitment",
-      "actual": 61.224018,
-      "games": 38921
+      "actual": 60.953623,
+      "games": 44483
     },
     {
       "name": "Refute Destiny",
-      "actual": 52.261579999999995,
-      "games": 1835
+      "actual": 52.84748999999999,
+      "games": 2072
     },
     {
       "name": "Repurposed Enforcer",
-      "actual": 60.105284999999995,
-      "games": 9688
+      "actual": 59.88078,
+      "games": 11072
     },
     {
       "name": "Rescue Girl, First Responder",
-      "actual": 52.43402700000001,
-      "games": 18303
+      "actual": 52.471242,
+      "games": 20516
     },
     {
       "name": "Restore with Empathy",
-      "actual": 54.965659,
-      "games": 14560
+      "actual": 54.816597,
+      "games": 16630
     },
     {
       "name": "Return to the Light Realms",
-      "actual": 50.0,
-      "games": 870
+      "actual": 49.754661,
+      "games": 1019
     },
     {
       "name": "Rewrite Regrets",
-      "actual": 59.274260999999996,
-      "games": 29873
+      "actual": 59.28066199999999,
+      "games": 34782
     },
     {
       "name": "Rise of the Deathbringer",
-      "actual": 56.03530799999999,
-      "games": 9403
+      "actual": 55.918974,
+      "games": 10762
     },
     {
       "name": "Rockfall Vale",
-      "actual": 54.533823999999996,
-      "games": 6253
+      "actual": 54.76459,
+      "games": 7094
     },
     {
       "name": "Roiling Canopy",
-      "actual": 49.194068,
-      "games": 1551
+      "actual": 49.058824,
+      "games": 1700
     },
     {
       "name": "Room of Refuge",
-      "actual": 55.734660999999996,
-      "games": 67868
+      "actual": 55.840004,
+      "games": 77577
     },
     {
       "name": "Root Maze",
@@ -1253,158 +1253,158 @@
     },
     {
       "name": "Ruric Thar, Biomagus",
-      "actual": 56.002363,
-      "games": 23699
+      "actual": 55.734834,
+      "games": 26836
     },
     {
       "name": "Ruric Thar, Magecrusher",
-      "actual": 55.046516999999994,
-      "games": 18488
+      "actual": 54.802753,
+      "games": 20634
     },
     {
       "name": "Saheeli, Consul of Oversight",
-      "actual": 55.099591000000004,
-      "games": 18325
+      "actual": 55.25821800000001,
+      "games": 20777
     },
     {
       "name": "Saheeli, Jewel of Avishkar",
-      "actual": 56.902741,
-      "games": 23679
+      "actual": 56.825455999999996,
+      "games": 26870
     },
     {
       "name": "Samut, Hazoret's Champion",
-      "actual": 56.110852,
-      "games": 6423
+      "actual": 56.127717,
+      "games": 7360
     },
     {
       "name": "Samut, Tyrant of Naktamun",
-      "actual": 48.016277,
-      "games": 1966
+      "actual": 47.806005,
+      "games": 2165
     },
     {
       "name": "Sanctum Lurker",
-      "actual": 61.860307000000006,
-      "games": 11783
+      "actual": 61.817375,
+      "games": 13514
     },
     {
       "name": "Screeching Soulbreaker",
-      "actual": 54.011686999999995,
-      "games": 21562
+      "actual": 53.82993700000001,
+      "games": 24191
     },
     {
       "name": "Seasoned Cryomancer",
-      "actual": 59.381861,
-      "games": 5921
+      "actual": 59.296558,
+      "games": 6653
     },
     {
       "name": "Semester Foreseer // Peer Review",
-      "actual": 54.134108000000005,
-      "games": 35449
+      "actual": 53.927444,
+      "games": 40217
     },
     {
       "name": "Shatterwing Pegasus",
-      "actual": 54.09962,
-      "games": 23429
+      "actual": 53.87520799999999,
+      "games": 26476
     },
     {
       "name": "Shipwreck Marsh",
-      "actual": 57.943718,
-      "games": 9026
+      "actual": 57.977441,
+      "games": 10373
     },
     {
       "name": "Silence the Echo",
-      "actual": 52.973698,
-      "games": 37260
+      "actual": 52.868154000000004,
+      "games": 41647
     },
     {
       "name": "Simulacrum Shaper",
-      "actual": 60.0,
-      "games": 10185
+      "actual": 59.874499,
+      "games": 11474
     },
     {
       "name": "Skilled Battlecarver",
-      "actual": 53.124079,
-      "games": 30553
+      "actual": 52.935863000000005,
+      "games": 34317
     },
     {
       "name": "Solarium Sentry",
-      "actual": 56.176804000000004,
-      "games": 5294
+      "actual": 56.14005399999999,
+      "games": 5912
     },
     {
       "name": "Solitary Cell",
-      "actual": 50.251762,
-      "games": 2979
+      "actual": 50.683268000000005,
+      "games": 3293
     },
     {
       "name": "Solve for Disappointment",
-      "actual": 52.640195999999996,
-      "games": 12215
+      "actual": 52.589437000000004,
+      "games": 13613
     },
     {
       "name": "Something Worth Saving",
-      "actual": 57.012750000000004,
-      "games": 31842
+      "actual": 56.873848,
+      "games": 36908
     },
     {
       "name": "Sphinx of False Conclusions",
-      "actual": 64.680477,
-      "games": 13661
+      "actual": 64.343816,
+      "games": 15613
     },
     {
       "name": "Sphinx's Approach",
-      "actual": 56.712686,
-      "games": 19195
+      "actual": 56.269683,
+      "games": 24132
     },
     {
       "name": "Splinter Twin",
-      "actual": 62.243667,
-      "games": 829
+      "actual": 62.913222999999995,
+      "games": 968
     },
     {
       "name": "Stingcaster Mage",
-      "actual": 56.23711300000001,
-      "games": 3880
+      "actual": 56.254256999999996,
+      "games": 4405
     },
     {
       "name": "Stingerquill Annex",
-      "actual": 53.85383,
-      "games": 21044
+      "actual": 53.937878,
+      "games": 23985
     },
     {
       "name": "Stingerquill Charm",
-      "actual": 55.82329299999999,
-      "games": 14691
+      "actual": 55.715824999999995,
+      "games": 16708
     },
     {
       "name": "Stingerquill Voxmancer // Vicious Verse",
-      "actual": 54.002786,
-      "games": 15077
+      "actual": 53.891544,
+      "games": 16947
     },
     {
       "name": "Stinging Vitriol",
-      "actual": 53.789187999999996,
-      "games": 4051
+      "actual": 53.594915,
+      "games": 4562
     },
     {
       "name": "Sublime Epiphany",
-      "actual": 66.445183,
-      "games": 1505
+      "actual": 66.916427,
+      "games": 1735
     },
     {
       "name": "Sureshot Sower",
-      "actual": 53.680545,
-      "games": 31585
+      "actual": 53.573457999999995,
+      "games": 35204
     },
     {
       "name": "Surgical Precision",
-      "actual": 57.499011,
-      "games": 50540
+      "actual": 57.478518,
+      "games": 57839
     },
     {
       "name": "Surveillance Phantasm",
-      "actual": 57.668072,
-      "games": 71889
+      "actual": 57.607467,
+      "games": 82281
     },
     {
       "name": "Swamp",
@@ -1413,348 +1413,348 @@
     },
     {
       "name": "Tam's Resistance",
-      "actual": 56.292936999999995,
-      "games": 36827
+      "actual": 56.203937,
+      "games": 42876
     },
     {
       "name": "Tam, the Possibility",
       "actual": null,
-      "games": 138
+      "games": 144
     },
     {
       "name": "Tarmogoyf",
-      "actual": 56.155384,
-      "games": 3501
+      "actual": 56.11729,
+      "games": 3956
     },
     {
       "name": "Tenured Tethermage",
-      "actual": 58.513073999999996,
-      "games": 8299
+      "actual": 58.551030999999995,
+      "games": 9455
     },
     {
       "name": "Terminal Criticism",
-      "actual": 50.314465,
-      "games": 1431
+      "actual": 51.272265,
+      "games": 1572
     },
     {
       "name": "Tether Technician",
-      "actual": 52.751775,
-      "games": 12392
+      "actual": 52.522667,
+      "games": 13676
     },
     {
       "name": "Tethermage's Advantage",
-      "actual": 50.437663,
-      "games": 4227
+      "actual": 50.650496000000004,
+      "games": 4535
     },
     {
       "name": "Tetsuko Umezawa, Fugitive",
-      "actual": 54.629884,
-      "games": 18197
+      "actual": 54.526039999999995,
+      "games": 20603
     },
     {
       "name": "Tetsuko Umezawa, Pursuer",
-      "actual": 52.024291,
-      "games": 11362
+      "actual": 51.96962499999999,
+      "games": 12642
     },
     {
       "name": "Teyo, Diamondblade Mage",
-      "actual": 51.331967,
-      "games": 8784
+      "actual": 51.03427000000001,
+      "games": 9717
     },
     {
       "name": "Teyo, Lightshield Expert",
-      "actual": 56.245752,
-      "games": 19125
+      "actual": 56.383275,
+      "games": 21572
     },
     {
       "name": "Thalia, the Survivor",
-      "actual": 54.89462,
-      "games": 14424
+      "actual": 54.781378999999994,
+      "games": 16261
     },
     {
       "name": "The Echoverse Fulcrum",
-      "actual": 58.876189999999994,
-      "games": 5250
+      "actual": 58.800999,
+      "games": 6005
     },
     {
       "name": "The Theorist, Jace Beleren",
-      "actual": 68.39403200000001,
-      "games": 6233
+      "actual": 68.449721,
+      "games": 7160
     },
     {
       "name": "Theoretical Necromancer",
-      "actual": 55.645637,
-      "games": 38977
+      "actual": 55.583083,
+      "games": 45611
     },
     {
       "name": "Theorist's Proxy",
-      "actual": 57.46219,
-      "games": 10513
+      "actual": 57.374055999999996,
+      "games": 12049
     },
     {
       "name": "Theorist's Sanctum",
-      "actual": 57.959086000000006,
-      "games": 12514
+      "actual": 57.970297,
+      "games": 14140
     },
     {
       "name": "Theorix Annex",
-      "actual": 56.570234,
-      "games": 34428
+      "actual": 56.494918000000006,
+      "games": 39554
     },
     {
       "name": "Theorix Charm",
-      "actual": 57.433151,
-      "games": 25393
+      "actual": 57.162592000000004,
+      "games": 28956
     },
     {
       "name": "Theorix Metamage // Omit Variables",
-      "actual": 54.566345000000005,
-      "games": 32203
+      "actual": 54.455604,
+      "games": 37436
     },
     {
       "name": "Tinybones, Pocket Nuisance",
-      "actual": 55.725707,
-      "games": 17762
+      "actual": 55.367175,
+      "games": 19936
     },
     {
       "name": "Titanbones, Towering Heart",
-      "actual": 52.386883,
-      "games": 12045
+      "actual": 52.157766,
+      "games": 13463
     },
     {
       "name": "Tomik, Izzet Sparkmage",
-      "actual": 51.554656,
-      "games": 13347
+      "actual": 51.442178999999996,
+      "games": 14908
     },
     {
       "name": "Tomik, Orzhov Lawmage",
-      "actual": 54.025365,
-      "games": 17899
+      "actual": 54.12476899999999,
+      "games": 19989
     },
     {
       "name": "Transformative Commons",
-      "actual": 56.336618,
-      "games": 25976
+      "actual": 56.187953,
+      "games": 29816
     },
     {
       "name": "Traxos, Academy Guardian",
-      "actual": 56.125716000000004,
-      "games": 23736
+      "actual": 55.867186000000004,
+      "games": 26955
     },
     {
       "name": "Traxos, Scourge Eternal",
-      "actual": 51.525465000000004,
-      "games": 8227
+      "actual": 51.534555000000005,
+      "games": 9058
     },
     {
       "name": "Twinned Vision",
-      "actual": 58.163489,
-      "games": 59319
+      "actual": 58.164559000000004,
+      "games": 69422
     },
     {
       "name": "Twisted Fates",
-      "actual": 56.956841000000004,
-      "games": 19046
+      "actual": 57.017343,
+      "games": 21853
     },
     {
       "name": "Uldaros Theorix",
-      "actual": 69.62884700000001,
-      "games": 6628
+      "actual": 69.41408799999999,
+      "games": 7595
     },
     {
       "name": "Undulating Witness",
-      "actual": 56.03431,
-      "games": 59924
+      "actual": 55.909483,
+      "games": 69600
     },
     {
       "name": "Unflinching Hortimancer",
-      "actual": 53.960249000000005,
-      "games": 30339
+      "actual": 53.925821,
+      "games": 33891
     },
     {
       "name": "Unsummon",
-      "actual": 57.541299,
-      "games": 62350
+      "actual": 57.54773600000001,
+      "games": 71697
     },
     {
       "name": "Variable Chaser // Arc of Fortune",
-      "actual": 56.935601999999996,
-      "games": 9581
+      "actual": 57.153192,
+      "games": 11058
     },
     {
       "name": "Verdant Kraken",
-      "actual": 58.96091,
-      "games": 10105
+      "actual": 58.71373,
+      "games": 11304
     },
     {
       "name": "Vigorbloom Annex",
-      "actual": 53.41763,
-      "games": 19297
+      "actual": 53.495104999999995,
+      "games": 21759
     },
     {
       "name": "Vigorbloom Charm",
-      "actual": 56.519124,
-      "games": 16628
+      "actual": 56.596384,
+      "games": 18639
     },
     {
       "name": "Vigorbloom Vanguard // Seed Suture",
-      "actual": 56.594047,
-      "games": 22308
+      "actual": 56.447037,
+      "games": 25027
     },
     {
       "name": "Vindictive Triumph",
-      "actual": 54.56450900000001,
-      "games": 4294
+      "actual": 54.552732000000006,
+      "games": 4997
     },
     {
       "name": "Vinelasher Adept",
-      "actual": 55.732793,
-      "games": 47394
+      "actual": 55.53565499999999,
+      "games": 54158
     },
     {
       "name": "Violent Echoes",
-      "actual": 59.37082099999999,
-      "games": 28418
+      "actual": 59.382312999999996,
+      "games": 32476
     },
     {
       "name": "Void Extrapolator // Omit Variables",
-      "actual": 55.700079,
-      "games": 31675
+      "actual": 55.490867,
+      "games": 36242
     },
     {
       "name": "Vraska's Final Mercy",
-      "actual": 54.54890999999999,
-      "games": 7892
+      "actual": 54.481448,
+      "games": 8948
     },
     {
       "name": "Vraska, Soul of Stone",
-      "actual": 53.15367,
-      "games": 3488
+      "actual": 53.243513,
+      "games": 4008
     },
     {
       "name": "Vraska, the Cutting Glare",
-      "actual": 62.894149,
-      "games": 11195
+      "actual": 62.82101599999999,
+      "games": 12733
     },
     {
       "name": "Warrior's Blades",
-      "actual": 54.92558,
-      "games": 15856
+      "actual": 54.853376,
+      "games": 17596
     },
     {
       "name": "Way of the Cryomancer",
-      "actual": 52.849318999999994,
-      "games": 13512
+      "actual": 52.84102000000001,
+      "games": 15329
     },
     {
       "name": "Way of the Deathbringer",
-      "actual": 51.581482,
-      "games": 9137
+      "actual": 51.620394000000005,
+      "games": 9905
     },
     {
       "name": "Way of the Healer",
-      "actual": 57.085066,
-      "games": 26450
+      "actual": 57.330017,
+      "games": 30150
     },
     {
       "name": "Way of the Mentor",
-      "actual": 50.46776200000001,
-      "games": 7910
+      "actual": 50.41657000000001,
+      "games": 8642
     },
     {
       "name": "Way of the Mind Sculptor",
-      "actual": 58.208000999999996,
-      "games": 32846
+      "actual": 58.13750399999999,
+      "games": 37788
     },
     {
       "name": "Way of the Necromancer",
-      "actual": 44.484412,
-      "games": 2502
+      "actual": 44.39006,
+      "games": 2656
     },
     {
       "name": "Way of the Paradox",
-      "actual": 55.969884,
-      "games": 16868
+      "actual": 56.054556,
+      "games": 19283
     },
     {
       "name": "Way of the Pyromancer",
-      "actual": 51.809874,
-      "games": 16852
+      "actual": 51.698175,
+      "games": 18461
     },
     {
       "name": "Way of the Warlord",
-      "actual": 53.61602,
-      "games": 16579
+      "actual": 53.527808,
+      "games": 18340
     },
     {
       "name": "Way of the Wildspeaker",
-      "actual": 54.833355,
-      "games": 22893
+      "actual": 54.824028000000006,
+      "games": 25487
     },
     {
       "name": "Whiplash Wordsmith // Vicious Verse",
-      "actual": 49.438106999999995,
-      "games": 11835
+      "actual": 49.329964,
+      "games": 13059
     },
     {
       "name": "Winter, Team Player",
-      "actual": 47.559086,
-      "games": 5162
+      "actual": 47.594623000000006,
+      "games": 5654
     },
     {
       "name": "Winter, Tormented Loner",
-      "actual": 54.019625999999995,
-      "games": 16407
+      "actual": 53.876794,
+      "games": 18327
     },
     {
       "name": "Woodwork Prodigy // Soul Tether",
-      "actual": 52.284184,
-      "games": 19044
+      "actual": 52.279678,
+      "games": 21253
     },
     {
       "name": "Wrath of the Bloodmane",
-      "actual": 56.195068000000006,
-      "games": 53930
+      "actual": 56.079241999999994,
+      "games": 60978
     },
     {
       "name": "Wrecking Gecko",
-      "actual": 54.962779,
-      "games": 23374
+      "actual": 54.95031,
+      "games": 26766
     },
     {
       "name": "Yargle, Glutton of Urborg",
-      "actual": 46.183953,
-      "games": 511
+      "actual": 46.014493,
+      "games": 552
     },
     {
       "name": "Yargle, Goliath of Otaria",
-      "actual": 45.921986,
-      "games": 1128
+      "actual": 46.550357,
+      "games": 1261
     },
     {
       "name": "Yoshimaru, Beloved Companion",
-      "actual": 49.446188,
-      "games": 10834
+      "actual": 49.4003,
+      "games": 12006
     },
     {
       "name": "Yoshimaru, Scrappy Stray",
-      "actual": 54.21452,
-      "games": 19504
+      "actual": 54.122012,
+      "games": 21834
     },
     {
       "name": "Your Fate Ends Here",
-      "actual": 57.424898999999996,
-      "games": 25832
+      "actual": 57.481335,
+      "games": 29333
     },
     {
       "name": "Yuriko, Blade of the Mighty",
-      "actual": 53.166965,
-      "games": 8936
+      "actual": 53.41079800000001,
+      "games": 9983
     },
     {
       "name": "Yuriko, Hope from the Shadows",
-      "actual": 53.55338,
-      "games": 12664
+      "actual": 53.528032,
+      "games": 14073
     }
   ]
 }

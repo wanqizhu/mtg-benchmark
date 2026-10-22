@@ -1,4 +1,4 @@
-"""Export only original AI predictions and four historical creator mappings.
+"""Export original and sandbox AI predictions plus four historical creator mappings.
 
 No fit or network request. Current evaluation outcomes come from the committed snapshot.
 """
@@ -9,6 +9,7 @@ from pathlib import Path
 import numpy as np
 from scipy.stats import pearsonr
 from refresh_benchmark_outcomes import apply_outcomes, write_export
+from sandbox_predictions import add_sandbox_sources, DEFAULT_BUNDLE
 
 ROOT = Path(__file__).resolve().parent
 SOURCE_NAMES = {
@@ -96,6 +97,7 @@ def export(model_data, destination, outcomes=None):
                          retrospective=True, outcome_access_guard_verified=True))
     if outcomes is not None:
         data = apply_outcomes(data, json.loads(outcomes.read_text()))
+    data = add_sandbox_sources(data, json.loads(DEFAULT_BUNDLE.read_text()))
     write_export(data, destination)
     print('Exported', len(cards), 'cards,', len(sources), 'sources,', len(shared), 'shared cards;', destination.stat().st_size, 'bytes')
     for s in sorted(data['sources'], key=lambda s: -s['score']['pearson']):

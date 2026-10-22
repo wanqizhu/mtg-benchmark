@@ -269,3 +269,33 @@ historical coefficients and exact borrowed weights. Downloads include
 evaluations, not extra coefficients. The source ZIP includes sibling catalog
 paths and derived results, with no live API envelopes. The optional prior-score
 summary enables the fixed 265-card comparison panel.
+
+## Sandbox forecasts in the benchmark tab
+
+The Draft Predictions tab includes five audited sandbox runs alongside the six
+original AI runs and four creator mappings. Original AI sources carry `*`
+(with internet, so they could see some community tierlists before release); sandbox sources
+carry `†` (without internet, only cards, rules and historical data). The sandbox
+runs happened after release with FRA outcomes and community reviews withheld.
+The markers appear in source names, plots, dialogs, all-card columns and CSV
+headers, so repeated model names remain distinguishable.
+
+`inputs/sandbox_predictions.json` freezes all five final prediction tables in
+percentage units, their source commits, file/transcript hashes, original prompt
+and audit counts. `sandbox_predictions.py` adds them without changing any
+existing forecast, creator rating, fitted creator model or shared-pool flag.
+The complete exporter includes this bundle automatically. Reapplying the bundle
+is idempotent. It can also update an already exported JSON directly:
+
+```sh
+python evaluations/historical-creators-2026-10-09/sandbox_predictions.py \
+  --input ../mtg-benchmark-site/data/draft-predictions.json \
+  --output ../mtg-benchmark-site/data/draft-predictions.json
+```
+
+All 15 sources use the existing 266-card comparison pool and the same October
+14, 2026 12:56:41 UTC PremierDraft ALL_TIME outcome snapshot. Scores therefore
+differ from the standalone sandbox report's 273-card comparison. The 295-card
+table retains each submission's full coverage; missing predictions remain null.
+The audit found no recorded forbidden reads in 1,804 messages and 693 tool calls,
+but 90 missing tool results prevent an unconditional isolation guarantee.
