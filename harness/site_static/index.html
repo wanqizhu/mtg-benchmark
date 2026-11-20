@@ -5,28 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
     <meta name="googlebot" content="noindex, nofollow, noarchive, nosnippet">
-    <title>MTG Puzzle Bench</title>
-    <link rel="stylesheet" href="styles.css?v=41">
-    <link rel="stylesheet" href="draft-predictions.css?v=4">
+    <title>MTG LLM Benchmark</title>
+    <link rel="stylesheet" href="styles.css?v=42">
+    <link rel="stylesheet" href="draft-predictions.css?v=9">
   </head>
   <body>
     <header class="topbar">
       <div>
-        <p class="eyebrow">MTG Puzzle Bench</p>
-        <p class="subtitle">Puzzles from <a class="title-link" href="https://www.patreon.com/mtgpuzzles" target="_blank" rel="noopener noreferrer">Possibility Storm</a></p>
+        <p class="eyebrow">MTG LLM Benchmark</p>
+        <p class="subtitle" id="puzzle-credit" hidden>Puzzles from <a class="title-link" href="https://www.patreon.com/mtgpuzzles" target="_blank" rel="noopener noreferrer">Possibility Storm</a></p>
       </div>
       <div class="topbar-controls">
         <label class="run-picker">
           <span>Version</span>
           <select id="run-select"></select>
         </label>
-        <nav>
-          <button class="nav-button active" data-view="leaderboard">Leaderboard</button>
-          <button class="nav-button" data-view="problems">Selected Problems</button>
-          <button class="nav-button" data-view="models">Models</button>
-          <button class="nav-button" data-view="draft-predictions">Draft Predictions</button>
-          <button class="nav-button" data-view="methodology">Methodology</button>
-        </nav>
+        <div class="site-navigation">
+          <nav aria-label="Main navigation">
+            <button class="nav-button active" data-view="leaderboard" data-section="puzzle-bench" aria-current="true">Puzzle</button>
+            <button class="nav-button" data-view="draft-predictions" data-section="draft-predictions">Draft Predictions</button>
+          </nav>
+          <nav class="puzzle-nav" aria-label="Puzzle pages">
+            <button class="nav-button active" data-view="leaderboard" aria-current="page">Leaderboard</button>
+            <button class="nav-button" data-view="problems">Selected Problems</button>
+            <button class="nav-button" data-view="models">Models</button>
+            <button class="nav-button" data-view="methodology">Methodology</button>
+          </nav>
+        </div>
       </div>
     </header>
     <main id="app" class="shell"></main>
@@ -34,7 +39,7 @@
       <button type="button" class="lightbox-close" aria-label="Close">Close</button>
       <img id="lightbox-image" alt="">
     </div>
-    <script src="draft-predictions.js?v=8"></script>
-    <script src="app.js?v=41"></script>
+    <script src="draft-predictions.js?v=15"></script>
+    <script src="app.js?v=43"></script>
   </body>
 </html>

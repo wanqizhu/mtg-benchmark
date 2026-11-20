@@ -81,6 +81,9 @@ h3 { font-size: 17px; margin-bottom: 10px; }
 .title-link:hover { color: var(--accent); }
 
 nav, .topbar-controls { display: flex; gap: 8px; flex-wrap: wrap; align-items: end; }
+.site-navigation { display: grid; gap: 8px; justify-items: end; }
+.puzzle-nav[hidden] { display: none; }
+.puzzle-nav button { font-size: 14px; padding: 5px 11px; }
 .run-picker {
   display: grid;
   gap: 4px;
@@ -155,6 +158,7 @@ button:hover, .link-button:hover, button.active { border-color: var(--accent); c
   }
   .problem-source-grid { grid-template-columns: 1fr; }
   .topbar, .topbar-controls { align-items: start; flex-direction: column; }
+  .site-navigation { justify-items: start; }
 }
 
 .card {

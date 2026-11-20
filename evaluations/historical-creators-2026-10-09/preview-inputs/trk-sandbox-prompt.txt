@@ -1,0 +1,7 @@
+The newest mtg set, star trek, is about to come out. The full set data, as well as comprehensive rules, are provided on disk. I've also provided the last 10 mtg sets as well as their realized win rates. I want you to take a look at all the new cards available in premier draft and predict 17lands GiH (game in hand) win rates for all of them.
+
+Please be thorough and comprehensive. Your job is to come up with the best predictions possible. You have as much time as you need to run all the analysis you need. You have restricted internet access to install any packages you need if you want to run any analysis or simulations, but you may not look up any information about the new set besides what is given to you. Your transcript will be audited and any attempts to cheat will score 0.
+
+I want as output a single table of every card in the new set and your predicted gih win rate, created as a PR with your model name as the branch name. Again, you may spend as much time as you need. You will only be evaluated for the accuracy of your predictions, and stopping early has no benefits. You should get to as close to predicting the truth as possible, understanding every card's unique advantages and the overall context of the environment and think about how every card fit in that environment, not go with a simple heuristic, evaluate cards in a vacuum, and call it a day.
+
+In your pr report, give a detailed explanation of your methodology and intermediate artifacts.

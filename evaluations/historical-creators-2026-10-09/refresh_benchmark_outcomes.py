@@ -4,16 +4,44 @@ import copy
 import csv
 import hashlib
 import json
+import math
+import statistics
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.request import Request, urlopen
 
-import numpy as np
-from scipy.stats import pearsonr
-
 ROOT = Path(__file__).resolve().parent
 API_URL = 'https://www.17lands.com/api/card_data?expansion=FRA&event_type=PremierDraft&time_period=ALL_TIME'
 PAGE_URL = 'https://www.17lands.com/card_data?expansion=FRA&format=PremierDraft&time_period=ALL_TIME'
+
+
+def eligible_outcome(card, minimum=500):
+    actual = card.get('actual')
+    return (actual is not None and math.isfinite(actual)
+            and card.get('games', 0) >= minimum
+            and not card.get('type', '').startswith('Basic Land'))
+
+
+def rescore_sources(data):
+    """Score every source on its own rated cards with eligible observed outcomes."""
+    minimum = data.get('outcome', {}).get('minimum_gih', data.get('fit', {}).get('minimum_gih_games', 500))
+    eligible = [card for card in data['cards'] if eligible_outcome(card, minimum)]
+    for source in data['sources']:
+        pool = [card for card in eligible
+                if (prediction := card['values'][source['id']]['prediction']) is not None
+                and math.isfinite(prediction)]
+        assert len(pool) >= 2, f"Insufficient scored cards for {source['id']}"
+        predictions = [card['values'][source['id']]['prediction'] for card in pool]
+        actual = [card['actual'] for card in pool]
+        source['score'] = dict(n=len(pool), pearson=statistics.correlation(predictions, actual),
+                               rmse=math.sqrt(statistics.fmean((p-a)**2 for p, a in zip(predictions, actual))))
+        source.pop('broad_score', None)
+    data['score_policy'] = 'per-source-rated-cards'
+    data['eligible_outcomes'] = len(eligible)
+    data.pop('broad_cards', None)
+    data.pop('preliminary', None)
+    data['sources'].sort(key=lambda s: (s['kind'] != 'ai', -s['score']['pearson'], s['name']))
+    return data
 
 
 def norm(name):
@@ -71,26 +99,21 @@ def apply_outcomes(data, snapshot):
         row = lookup[card['name']]
         actual, games = row['actual'], row['games']
         assert isinstance(games, int) and games >= 0
-        assert actual is None or (np.isfinite(actual) and 0 <= actual <= 100 and games >= 500)
+        assert actual is None or (math.isfinite(actual) and 0 <= actual <= 100 and games >= 500)
         assert not card['shared'] or actual is not None, 'Previously scored card unavailable'
         card.update(actual=actual, games=games)
-    pool = [c for c in refreshed['cards'] if c['shared']]
-    actual = np.array([c['actual'] for c in pool], dtype=float)
-    for source in refreshed['sources']:
-        predictions = np.array([c['values'][source['id']]['prediction'] for c in pool], dtype=float)
-        assert np.isfinite(predictions).all()
-        source['score'] = dict(n=len(pool), pearson=float(pearsonr(predictions, actual).statistic),
-                               rmse=float(np.sqrt(np.mean((predictions - actual) ** 2))))
-    refreshed['sources'].sort(key=lambda s: (s['kind'] != 'ai', -s['score']['pearson'], s['name']))
     refreshed['outcome'] = copy.deepcopy(snapshot['outcome'])
-    return refreshed
+    return rescore_sources(refreshed)
 
 
 def write_export(data, destination):
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_text(json.dumps(data, ensure_ascii=False, allow_nan=False,
                                      separators=(',', ':')) + '\n')
-    headers = ['Card', 'Set', 'Rarity', 'Observed GIH (%)', 'GIH games', 'Shared comparison']
+    include_outcomes = data.get('card_outcomes_available', True)
+    headers = ['Card', 'Set', 'Rarity']
+    if include_outcomes:
+        headers.extend(['Observed GIH (%)', 'GIH games', 'Scored sources'])
     for source in data['sources']:
         label = source['name'] + (' ' + source['prediction_marker'] if source.get('prediction_marker') else '')
         headers.append(label + ' prediction (%)')
@@ -100,7 +123,10 @@ def write_export(data, destination):
         writer = csv.writer(file, lineterminator='\n')
         writer.writerow(headers)
         for card in data['cards']:
-            row = [card['name'], card['set'], card['rarity'], card['actual'], card['games'], card['shared']]
+            row = [card['name'], card['set'], card['rarity']]
+            if include_outcomes:
+                scored = sum(card['values'][s['id']]['prediction'] is not None for s in data['sources']) if eligible_outcome(card) else 0
+                row.extend([card['actual'], card['games'], scored])
             for source in data['sources']:
                 row.append(card['values'][source['id']]['prediction'])
                 if source['kind'] == 'creator':
@@ -140,9 +166,9 @@ def main():
         args.save_snapshot.write_text(json.dumps(snapshot, ensure_ascii=False, allow_nan=False, indent=2) + '\n')
     write_export(refreshed, args.output)
     print('Outcome pull:', refreshed['outcome']['retrieved_at'])
-    print('Fixed comparison pool:', refreshed['shared_cards'], 'cards')
+    print('Eligible observed cards:', refreshed['eligible_outcomes'])
     for source in sorted(refreshed['sources'], key=lambda s: -s['score']['pearson']):
-        print(source['name'], f"r={source['score']['pearson']:.6f}", f"RMSE={source['score']['rmse']:.6f}")
+        print(source['name'], f"n={source['score']['n']}", f"r={source['score']['pearson']:.6f}", f"RMSE={source['score']['rmse']:.6f}")
 
 
 if __name__ == '__main__':

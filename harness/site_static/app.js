@@ -35,6 +35,7 @@ function parseHash() {
   const parts = encoded.split("/").filter(Boolean).map((part) => {
     try { return decodeURIComponent(part); } catch { return part; }
   });
+  if (parts[0] === "puzzle-bench") parts.shift();
   if (!parts.length) return route;
   let rest = parts;
   if (knownRunId(parts[0])) {
@@ -74,9 +75,9 @@ function viewPath(route) {
 function routeHash(route) {
   const path = viewPath(route);
   if (route.view === "draft-predictions") return "#/draft-predictions";
-  if (omitRunFromHash()) return `#/${path}`;
+  if (omitRunFromHash()) return `#/puzzle-bench/${path}`;
   const runId = encodeURIComponent(route.runId || defaultRoute().runId);
-  return `#/${runId}/${path}`;
+  return `#/puzzle-bench/${runId}/${path}`;
 }
 
 function navigate(patch, { replace = false } = {}) {
@@ -543,13 +544,30 @@ function initRunSelector() {
   selector.addEventListener("change", () => navigate({ runId: selector.value }));
 }
 
+function updateNavigation(view) {
+  const isDraft = view === "draft-predictions";
+  document.querySelector(".puzzle-nav").hidden = isDraft;
+  document.querySelector("#puzzle-credit").hidden = isDraft;
+  const activeView = view === "detail" ? lastListView : view;
+  const activeSection = isDraft ? "draft-predictions" : "puzzle-bench";
+  document.querySelectorAll(".nav-button").forEach((button) => {
+    const section = button.dataset.section;
+    const active = section ? section === activeSection : button.dataset.view === activeView;
+    button.classList.toggle("active", active);
+    if (active) button.setAttribute("aria-current", section === "puzzle-bench" ? "true" : "page");
+    else button.removeAttribute("aria-current");
+  });
+}
+
 async function applyRoute(route = parseHash()) {
   canonicalizeHash(route);
   const seq = ++routeSeq;
   window.DraftPredictions?.dispose();
-  if (route.view === "draft-predictions") {
-    currentView = lastListView = "draft-predictions";
-    document.querySelectorAll(".nav-button").forEach(button => button.classList.toggle("active", button.dataset.view === "draft-predictions"));
+  const view = VALID_VIEWS.has(route.view) ? route.view : "leaderboard";
+  if (view === "detail" && lastListView === "leaderboard") lastListView = "problems";
+  updateNavigation(view);
+  if (view === "draft-predictions") {
+    currentView = view;
     app.classList.remove("split");
     document.querySelector(".run-picker").hidden = true;
     try {
@@ -573,13 +591,8 @@ async function applyRoute(route = parseHash()) {
   const selector = document.querySelector("#run-select");
   if (selector && DATA) selector.value = DATA.run_id;
 
-  const view = VALID_VIEWS.has(route.view) ? route.view : "leaderboard";
   currentView = view === "detail" ? lastListView : view;
-  if (view === "detail" && lastListView === "leaderboard") lastListView = "problems";
   if (view !== "detail") lastListView = view;
-  document.querySelectorAll(".nav-button").forEach((button) => {
-    button.classList.toggle("active", button.dataset.view === (view === "detail" ? lastListView : view));
-  });
   app.classList.toggle("split", view === "problems" || view === "models");
   const picker = document.querySelector(".run-picker");
   if (picker) picker.hidden = view === "methodology" || !hasMultipleRuns();

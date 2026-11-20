@@ -6,9 +6,7 @@ import argparse
 import json
 from pathlib import Path
 
-import numpy as np
-from scipy.stats import pearsonr
-from refresh_benchmark_outcomes import apply_outcomes, write_export
+from refresh_benchmark_outcomes import apply_outcomes, rescore_sources, write_export
 from sandbox_predictions import add_sandbox_sources, DEFAULT_BUNDLE
 
 ROOT = Path(__file__).resolve().parent
@@ -73,19 +71,6 @@ def export(model_data, destination, outcomes=None):
                           shared=card['name'] in shared, values=values,
                           images=images[card['name']]['images']))
     assert len(cards) == 295 and len({c['name'] for c in cards}) == 295
-    for source in sources:
-        pool = [c for c in cards if c['shared']]
-        predicted = np.array([c['values'][source['id']]['prediction'] for c in pool])
-        actual = np.array([c['actual'] for c in pool])
-        source['score'] = dict(n=len(pool), pearson=float(pearsonr(predicted, actual).statistic),
-                               rmse=float(np.sqrt(np.mean((predicted - actual) ** 2))))
-        if source['kind'] == 'creator':
-            prior = next(r for r in history['scores'] if r['creator'] == source['id'] and r['pool'] == 'common cards across all active creators')
-            assert abs(prior['pearson'] - source['score']['pearson']) < 1e-10
-            assert abs(prior['rmse_pp'] - source['score']['rmse']) < 1e-10
-    # Keep table/CSV columns grouped, with each group ranked by Pearson r.
-    # Filtering this ordered list also ranks the creator detail sections.
-    sources.sort(key=lambda s: (s['kind'] != 'ai', -s['score']['pearson'], s['name']))
     data = dict(schema_version=1, expansion='FRA', name='Reality Fracture',
                 shared_cards=len(shared), catalog_cards=len(cards), sources=sources, cards=cards,
                 outcome=dict(url=ai['manifest']['page_url'], retrieved_at=ai['manifest']['retrieved_at'],
@@ -95,6 +80,13 @@ def export(model_data, destination, outcomes=None):
                          historical_target='FIRST_WEEK', minimum_gih_games=500,
                          publication_cutoff='Within three calendar days of Arena launch',
                          retrospective=True, outcome_access_guard_verified=True))
+    rescore_sources(data)
+    for source in sources:
+        if source['kind'] == 'creator':
+            prior = next(r for r in history['scores'] if r['creator'] == source['id'] and r['pool'] == 'own reported main-set coverage')
+            assert prior['n'] == source['score']['n']
+            assert abs(prior['pearson'] - source['score']['pearson']) < 1e-10
+            assert abs(prior['rmse_pp'] - source['score']['rmse']) < 1e-10
     if outcomes is not None:
         data = apply_outcomes(data, json.loads(outcomes.read_text()))
     data = add_sandbox_sources(data, json.loads(DEFAULT_BUNDLE.read_text()))

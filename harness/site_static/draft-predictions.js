@@ -1,7 +1,7 @@
-/* Frozen FRA comparison: original and sandbox AI forecasts plus historical creator fits. */
+/* Draft prediction comparisons from frozen forecasts and dated outcomes. */
 (() => {
-  let dataPromise, data, host, observer;
-  let selected, sortKey = 'actual', sortDirection = -1;
+  let dataPromise, data, host, observer, evaluations;
+  let selected, cardTableData, sortKey = 'actual', sortDirection = -1;
   const predictionPrompt = `the newest mtg set, reality fracture, is about to come out. full set is spoiled. I want you to take a look at all the cards and predict 17lands gih win rates for all of them.
 please be thorough and comprehensive. you may look at past sets win rates as well as community reviews and discussions for past sets and current set. your job is to come up with the best predictions possible. I want as output a single table of card and gih win rate. you may spend as much time as you need. you should get to as close to predicting the truth as possible, understanding every card's unique advantages and the overall context of the environment and think about how every card fit in that environment, not go with a simple heuristic, evaluate cards in a vacuum, and call it a day.
 please do all your work as needed locally on scratch and only commit your final table as a pr to [https://github.com/wanqizhu/mtg-benchmark](https://github.com/wanqizhu/mtg-benchmark). name your branch/pr with your model name an don't read any other prs. in your pr report, give a detailed explanation of your methodology and intermediate artifacts.`;
@@ -10,14 +10,38 @@ please do all your work as needed locally on scratch and only commit your final 
   const pct = value => value == null ? '—' : `${F(value)}%`;
   const pretty = value => String(value).replaceAll('_', ' ').replaceAll('-', ' ');
   const link = (url, text) => `<a href="${E(url)}" target="_blank" rel="noopener noreferrer">${E(text)}</a>`;
-  const displayName = s => (s.id === 'limitedresources' ? 'LSV + Marshall / LR' : s.name) + (s.prediction_marker ? ' ' + s.prediction_marker : '');
+  const displayName = s => (s.id === 'limitedresources' ? 'LSV + Marshall / LR' : s.name) +
+    (s.prediction_group !== 'sandbox' && s.prediction_marker ? ' ' + s.prediction_marker : '');
   const sourceColorClass = s => s.prediction_group === 'sandbox' ? 'dp-source-sandbox' : `dp-source-${s.kind}`;
+  const isArchivedSource = s => s.kind === 'ai' && s.prediction_group !== 'sandbox';
+  const rankedSources = set => set.sources.filter(s => !isArchivedSource(s));
+  const topSource = set => rankedSources(set).sort((a, b) => b.score.pearson - a.score.pearson)[0];
   const source = () => data.sources.find(s => s.id === selected);
   const table = (headers, rows) => `<div class="dp-scroll"><table class="dp-data-table"><thead><tr>${headers.map(h=>`<th>${E(h)}</th>`).join('')}</tr></thead><tbody>${rows.map(row=>`<tr>${row.map(v=>`<td>${v}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
-  const sharedCards = () => data.cards.filter(c => c.shared);
+  const scoredCards = () => data.cards.filter(c => c.actual != null && c.games >= 500 && c.values[selected].prediction != null && !c.type.startsWith('Basic Land'));
 
-  function protocolLegend() {
-    return `<div class="dp-protocol-notes" aria-label="Model prediction conditions">${(data.prediction_groups || []).map(g=>`<p data-prediction-group="${E(g.id)}"><strong>${E(g.marker)}</strong> ${E(g.description)}</p>`).join('')}</div>`;
+  const snapshotDate = outcome => new Date(outcome.retrieved_at).toLocaleString('en-US', {
+    month:'long', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit', hourCycle:'h23', timeZone:'UTC'
+  })+' UTC';
+
+  function averageScore(pair) {
+    const scores = pair.map(s => s?.score.pearson).filter(Number.isFinite);
+    return scores.length ? scores.reduce((sum, score) => sum + score, 0) / scores.length : -Infinity;
+  }
+
+  function pairedSources() {
+    const { FRA, TRK } = evaluations;
+    const trkSources = TRK ? rankedSources(TRK) : [];
+    const sourceKey = s => s.kind === 'creator' ? `creator:${s.id}` : `model:${s.name}`;
+    const remaining = new Map(trkSources.map(s => [sourceKey(s), s]));
+    const rows = rankedSources(FRA).map(s => {
+      const key = sourceKey(s);
+      const match = remaining.get(key);
+      remaining.delete(key);
+      return [s, match];
+    });
+    for (const s of remaining.values()) rows.push([null, s]);
+    return rows.sort((a, b) => averageScore(b) - averageScore(a));
   }
 
   function historicalSourceLinks(url) {
@@ -67,44 +91,157 @@ please do all your work as needed locally on scratch and only commit your final 
     return `<details class="dp-expand"><summary>${E(s.name)} <span>${s.model.historical_sets} sets · ${s.model.train_n.toLocaleString()} historical observations${s.provisional ? ' · provisional dates' : ''}</span></summary><div class="dp-expand-body"><h3>Data collection</h3>${collection(s)}<div class="dp-model-grid"><section><h3>Fit process</h3>${fitDetails(s)}</section><section><h3>Final model</h3>${modelDetails(s)}</section></div></div></details>`;
   }
 
-  function evaluationDetails() {
-    const ais = data.sources.filter(s=>s.kind==='ai' && s.prediction_group!=='sandbox');
+  function sandboxPromptDetails(fra, trk) {
+    const prompt = fra && trk ? fra
+      .replace('reality fracture', '[reality fracture (FRA) / star trek (TRK)]')
+      .replace('all the new cards and predict', 'all the new cards [TRK only: available in premier draft] and predict')
+      : fra || trk;
+    const formatted = E(prompt).replace(/\[[^\]\n]*\]/g, phrase => `<span class="dp-prompt-variant">${phrase}</span>`);
+    return prompt ? `<details class="dp-expand dp-inner"><summary>Full sandbox prompt</summary><div class="dp-expand-body"><pre class="dp-prompt">${formatted}</pre></div></details>` : '';
+  }
+
+  function evaluationDetails(rows) {
+    const data=evaluations.FRA;
+    const sets=[evaluations.FRA,evaluations.TRK].filter(Boolean);
+    const archived = data.sources.filter(isArchivedSource);
+    const submissions = rows.filter(([fra, trk]) => (fra ?? trk).kind === 'ai');
+    const submissionLink = s => s ? link(s.url, s.post_release ? 'Submission (post-release)' : 'Submission') : '—';
     return `<details class="dp-expand"><summary>Methodology</summary><div class="dp-expand-body">
-      <p>Overall results use the ${data.shared_cards} FRA main-set cards, GIH win rate taken on ${link(data.outcome.url,new Date(data.outcome.retrieved_at).toLocaleString('en-US',{month:'long',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit',hourCycle:'h23',timeZone:'UTC'})+' UTC')}.</p>
-      <section class="dp-method-section" aria-labelledby="dp-original-methodology">
-      <h3 id="dp-original-methodology" class="dp-method-heading dp-source-ai">Original model predictions</h3>
-      <p>Model predictions were made for every card before set release, using the same prompt. The original predictions allowed models to use content creator reviews available before the set’s September 29, 2026 MTG Arena release.</p>
-      <details class="dp-expand dp-inner"><summary>Full prompt</summary><div class="dp-expand-body"><pre class="dp-prompt">${E(predictionPrompt)}</pre></div></details>
-      <details class="dp-expand dp-inner"><summary>Original model submissions</summary><div class="dp-expand-body">${table(['Model','Original prediction source'],ais.map(s=>[E(s.name),link(s.url,'Prediction PR')]))}</div></details>
-      </section>
+      <p>GIH win rates taken on ${sets.map(set=>`${E(set.expansion)}: ${link(set.outcome.url,snapshotDate(set.outcome))}`).join(' · ')}.</p>
       <section class="dp-method-section" aria-labelledby="dp-sandbox-methodology">
-        <h3 id="dp-sandbox-methodology" class="dp-method-heading dp-source-sandbox">Sandbox model predictions (†)</h3>
-        <p>These models used only the supplied cards, rules, and historical data. They had no internet access to read current-set win rates or other reviews.</p>
-        ${data.sandbox_prompt ? `<details class="dp-expand dp-inner"><summary>Full prompt</summary><div class="dp-expand-body"><pre class="dp-prompt">${E(data.sandbox_prompt)}</pre></div></details>` : ''}
-        ${data.sandbox_audit ? `<p>${link(data.sandbox_audit.transcript_pr,'Transcript PR for all models')}</p>` : ''}
+        <h3 id="dp-sandbox-methodology" class="dp-method-heading dp-source-sandbox">Sandbox model predictions</h3>
+        <p>For both Reality Fracture and Star Trek, these models used only the supplied cards, rules, and historical data. They had no internet access to read current-set win rates or other reviews.</p>
+        ${sandboxPromptDetails(data.sandbox_prompt, evaluations.TRK?.sandbox_prompt)}
+        ${data.sandbox_audit ? `<p>${link(data.sandbox_audit.transcript_pr,'FRA transcript PR for all models')}</p>` : ''}
+        <details class="dp-expand dp-inner"><summary>Sandbox model submissions</summary><div class="dp-expand-body">${table(['Model', 'FRA', 'TRK'], submissions.map(([fra, trk])=>[E((fra ?? trk).name), submissionLink(fra), submissionLink(trk)]))}<p>${link('https://github.com/wanqizhu/mtg-win-rate-eval/blob/main/README.md','Star Trek sandbox dataset and rules')}</p></div></details>
       </section>
       <section class="dp-method-section" aria-labelledby="dp-creator-methodology">
       <h3 id="dp-creator-methodology" class="dp-method-heading dp-source-creator">Content creator models</h3>
       <p>I pulled historical tier lists for up to five earlier sets and compared them against realized win rates. I then used this data to fit a model converting categorical predictions (e.g. A−, 3.5) to win rates.</p>
-      <p>After aggregating the historical data, we fit a regression from each letter-grade bucket to its realized win rate, with smoothing between nearby tiers. Buckets with fewer than 10 observations receive enough weight from nearby buckets to reach 10. Each letter-grade creator model has one shared context coefficient: explicit base/conditional pairs use only the base bucket; conditional-only grades and single grades with context labels use their grade bucket plus the context coefficient. Draftsim's decimal ratings use a monotone spline with five fitted coefficients. Model settings are selected by holding out earlier sets; the final models are fitted on historical data and applied to FRA.</p>
+      <p>After aggregating the historical data, we fit a regression from each letter-grade bucket to its realized win rate, with smoothing between nearby tiers. Buckets with fewer than 10 observations receive enough weight from nearby buckets to reach 10. Each letter-grade creator model has one shared context coefficient: explicit base/conditional pairs use only the base bucket; conditional-only grades and single grades with context labels use their grade bucket plus the context coefficient. Draftsim's decimal ratings use a monotone spline with five fitted coefficients. Model settings are selected by holding out earlier sets; the final models are fitted on historical data and applied to FRA and TRK without refitting.</p>
       <p>This is my best effort representation of content creator ratings. LLMs have the advantage of more granular win rate predictions; although the content creator models have the advantage of seeing realized win rates for their buckets in earlier sets, the lack of granularity speaks unfairly to content creators' ability to discern cards. I'm sure they have nonzero predictability among cards rated in the same bucket, but chose coarser buckets for reader comprehension.</p>
       <details class="dp-expand dp-inner" id="dp-current-rating-sources"><summary>Current-set rating sources</summary><div class="dp-expand-body">
-        ${table(['Creator','Original rating sources'],data.sources.filter(s=>s.kind==='creator').map(s=>[E(s.name),(s.current_sources || [{url:s.url,label:'Current-set ratings'}]).map(r=>link(r.url,r.label)).join('<br>')]))}
+        ${table(['Set','Creator','Original rating sources'],sets.flatMap(set=>set.sources.filter(s=>s.kind==='creator').map(s=>[E(set.expansion),E(s.name),(s.current_sources || [{url:s.url,label:'Current-set ratings'}]).map(r=>link(r.url,r.label)).join('<br>')+(s.provenance?`<details><summary>Edition used</summary>${E(s.provenance)}</details>`:'')])))}
       </div></details>
+      </section>
+      <section class="dp-method-section" aria-labelledby="dp-original-methodology">
+        <h3 id="dp-original-methodology" class="dp-method-heading dp-source-ai">Original model predictions (Archived)</h3>
+        <p>These runs are archived because it’s hard to separate the influence of public tier lists from the models’ own predictions.</p>
+        <p>Original model predictions were made for Reality Fracture before set release, using the same prompt. These predictions allowed models to use content creator reviews available before the set’s September 29, 2026 MTG Arena release.</p>
+        <details class="dp-expand dp-inner"><summary>Full prompt</summary><div class="dp-expand-body"><pre class="dp-prompt">${E(predictionPrompt)}</pre></div></details>
+        <details class="dp-expand dp-inner"><summary>Original model submissions</summary><div class="dp-expand-body">${table(['Model','FRA Pearson r','Original prediction source'],archived.map(s=>[E(s.name),F(s.score.pearson,3),link(s.url,'Prediction PR')]))}</div></details>
       </section>
     </div></details>`;
   }
 
+  function scoreCell(s, set) {
+    if (!s) return '<td>—</td>';
+    return `<td><button class="dp-score ${sourceColorClass(s)}" data-source="${E(s.id)}" data-set="${set}" aria-pressed="${data.expansion===set&&selected===s.id}" title="${E(s.name)} · ${set} · ${s.score.n} scored cards">${F(s.score.pearson,3)}</button></td>`;
+  }
+
+  function cardTableMarkup() {
+    return `<details class="dp-expand" id="dp-card-table-details">
+      <summary>All card predictions</summary>
+      <div class="dp-expand-body">
+        <div class="dp-table-controls">
+          ${evaluations.TRK ? `<div class="dp-table-toggle" role="group" aria-label="Card prediction set">
+            <button type="button" data-card-set="FRA">FRA</button>
+            <button type="button" data-card-set="TRK">TRK</button>
+          </div>` : ''}
+          <input class="dp-search" id="dp-table-search" type="search" aria-label="Search card table" placeholder="Search cards…">
+          <span id="dp-table-count"></span>
+          <a class="link-button" id="dp-download" download>Download all predictions CSV</a>
+        </div>
+        <div class="dp-full-table">
+          <table class="dp-data-table" aria-label="All card predictions">
+            <thead id="dp-card-columns"></thead>
+            <tbody id="dp-card-rows"></tbody>
+          </table>
+        </div>
+      </div>
+    </details>`;
+  }
+
+  function setCardTableData(set) {
+    if (set !== cardTableData) {
+      cardTableData = set;
+      const showOutcomes = set.card_outcomes_available !== false;
+      sortKey = showOutcomes ? 'actual' : 'name';
+      sortDirection = showOutcomes ? -1 : 1;
+      const csvName = set.expansion === 'TRK' ? (showOutcomes ? 'draft-predictions-trk' : 'draft-predictions-trk-summary')
+        : evaluations.fraRefreshed ? 'draft-predictions-fra-current' : 'draft-predictions';
+      host.querySelector('#dp-download').href = `data/${csvName}.csv`;
+      host.querySelectorAll('[data-card-set]').forEach(button => {
+        button.setAttribute('aria-pressed', String(button.dataset.cardSet === set.expansion));
+      });
+      host.querySelector('#dp-card-columns').innerHTML = `<tr>
+        <th><button class="dp-sort" data-sort="name">Card ↕</button></th>
+        ${showOutcomes ? '<th class="dp-numeric"><button class="dp-sort" data-sort="actual">Observed<br>GIH ↕</button></th>' : ''}
+        ${set.sources.map(s => `<th class="dp-numeric"><button class="dp-sort ${sourceColorClass(s)}" data-sort="${E(s.id)}">${E(displayName(s))} ↕</button></th>`).join('')}
+      </tr>`;
+      host.querySelector('.dp-full-table').scrollTo(0, 0);
+    }
+    renderCardTable();
+  }
+
   function skeleton() {
-    const ordered = [...data.sources].sort((a,b)=>b.score.pearson-a.score.pearson);
-    selected = selected && data.sources.some(s=>s.id===selected) ? selected : ordered[0].id;
-    host.innerHTML = `<div class="draft-page"><div class="dp-heading"><div><h1>Win rate predictions: Reality Fracture</h1><p>How good are people and LLMs at predicting card win rates in a new format?</p></div><div class="dp-meta">FRA · Premier Draft GIH win rate from 17Lands</div></div>${protocolLegend()}<div class="dp-overview"><section class="dp-board"><h2>Overall comparison</h2><p class="dp-comparison-pool">Same ${data.shared_cards} cards for every source</p><div class="dp-source-legend"><span class="dp-source-ai">Models *</span><span class="dp-source-sandbox">Models †</span><span class="dp-source-creator">Content creators</span></div><table aria-label="Overall prediction scores"><thead><tr><th>Prediction source</th><th>Pearson r</th><th>RMSE<br>(pp)</th></tr></thead><tbody>${ordered.map(s=>`<tr data-source-row="${E(s.id)}"><td><button class="dp-source ${sourceColorClass(s)}" data-source="${E(s.id)}" aria-pressed="false">${E(displayName(s))}</button></td><td>${F(s.score.pearson,3)}</td><td>${F(s.score.rmse)}</td></tr>`).join('')}</tbody></table></section><section class="dp-chart-card"><div class="dp-chart-header"><div><h2 id="dp-selected-name"></h2><p id="dp-chart-description"></p></div></div><div id="dp-plot" class="dp-plot"></div><div class="dp-legend">${[['common','blue'],['uncommon','green'],['rare','gold'],['mythic','red']].map(([r,c])=>`<span><i class="dp-dot" style="background:var(--dp-${c})"></i>${r[0].toUpperCase()+r.slice(1)}</span>`).join('')}<span>Hover for rates · click for card details</span></div></section></div><div class="dp-extensions">${evaluationDetails()}<details class="dp-expand"><summary>Content Creator Historical Data Details</summary><div class="dp-expand-body dp-creator-group">${data.sources.filter(s=>s.kind==='creator').map(creatorDetails).join('')}</div></details><details class="dp-expand" id="dp-card-table-details"><summary>All card predictions <span>${data.catalog_cards} cards · all ${data.sources.length} sources · published creator grades</span></summary><div class="dp-expand-body"><div class="dp-table-controls"><input class="dp-search" id="dp-table-search" type="search" aria-label="Search card table" placeholder="Search cards…"><span id="dp-table-count"></span><a class="link-button" id="dp-download" href="data/draft-predictions.csv" download>Download all predictions CSV</a></div><div class="dp-full-table"><table class="dp-data-table" aria-label="All card predictions"><thead><tr><th><button class="dp-sort" data-sort="name">Card ↕</button></th><th class="dp-numeric"><button class="dp-sort" data-sort="actual">Observed<br>GIH ↕</button></th>${data.sources.map(s=>`<th class="dp-numeric"><button class="dp-sort ${sourceColorClass(s)}" data-sort="${E(s.id)}">${E(displayName(s))} ↕</button></th>`).join('')}</tr></thead><tbody id="dp-card-rows"></tbody></table></div></div></details></div><div id="dp-tooltip" class="dp-tooltip" role="tooltip" hidden></div><dialog id="dp-card-dialog" class="dp-dialog" aria-labelledby="dp-dialog-title"><div id="dp-dialog-content"></div></dialog></div>`;
-    host.querySelectorAll('[data-source]').forEach(button=>button.addEventListener('click',()=>{selected=button.dataset.source;renderPlot();}));
-    host.querySelector('#dp-table-search').addEventListener('input',renderCardTable);
-    host.querySelectorAll('[data-sort]').forEach(button=>button.addEventListener('click',()=>{const key=button.dataset.sort;sortDirection=key===sortKey?-sortDirection:key==='name'?1:-1;sortKey=key;renderCardTable();}));
-    host.querySelector('#dp-card-dialog').addEventListener('click',event=>{if(event.target.closest('[data-close]'))host.querySelector('#dp-card-dialog').close();});
-    renderCardTable();renderPlot();
-    observer = new ResizeObserver(()=>{if(host?.querySelector('#dp-plot'))renderPlot();});
+    const rows = pairedSources();
+    host.innerHTML = `<div class="draft-page">
+      <div class="dp-heading">
+        <div><h1>Win Rate Predictions</h1><p>How good are people and LLMs at predicting card win rates in a new format?</p></div>
+        <div class="dp-meta">FRA &amp; TRK · Premier Draft GIH win rate from ${link('https://www.17lands.com/', '17Lands')}</div>
+      </div>
+      <div class="dp-overview">
+        <section class="dp-board">
+          <h2>Overall comparison</h2>
+          <p class="dp-comparison-pool">Ranked by average Pearson r across available sets. Click a score for card predictions.</p>
+          <div class="dp-source-legend"><span class="dp-source-sandbox">Sandbox models</span><span class="dp-source-creator">Content creators</span></div>
+          <table aria-label="Overall prediction scores">
+            <thead><tr><th>Prediction source</th><th>FRA</th><th>Star Trek</th></tr></thead>
+            <tbody>${rows.map(([fra, trk]) => {
+              const s = fra ?? trk;
+              return `<tr><td><span class="dp-source ${sourceColorClass(s)}">${E(displayName(s))}</span>${fra && trk && fra.name !== trk.name ? `<small class="dp-card-meta">TRK: ${E(trk.name)}</small>` : ''}</td>${scoreCell(fra, 'FRA')}${scoreCell(trk, 'TRK')}</tr>`;
+            }).join('')}</tbody>
+          </table>
+        </section>
+        <section class="dp-chart-card">
+          <div class="dp-chart-header"><div><h2 id="dp-selected-name"></h2><p id="dp-chart-description"></p></div></div>
+          <div id="dp-plot" class="dp-plot"></div>
+          <div class="dp-legend">${[['Common', 'blue'], ['Uncommon', 'green'], ['Rare', 'gold'], ['Mythic', 'red']].map(([rarity, color]) => `<span><i class="dp-dot" style="background:var(--dp-${color})"></i>${rarity}</span>`).join('')}<span>Hover for rates · click for card details</span></div>
+        </section>
+      </div>
+      <div class="dp-extensions">
+        ${evaluationDetails(rows)}
+        <details class="dp-expand"><summary>Content Creator Historical Data Details</summary><div class="dp-expand-body dp-creator-group">${evaluations.FRA.sources.filter(s => s.kind === 'creator').map(creatorDetails).join('')}</div></details>
+        ${cardTableMarkup()}
+      </div>
+      <div id="dp-tooltip" class="dp-tooltip" role="tooltip" hidden></div>
+      <dialog id="dp-card-dialog" class="dp-dialog" aria-labelledby="dp-dialog-title"><div id="dp-dialog-content"></div></dialog>
+    </div>`;
+    host.querySelectorAll('[data-source]').forEach(button => button.addEventListener('click', () => {
+      data = evaluations[button.dataset.set];
+      selected = button.dataset.source;
+      renderPlot();
+      setCardTableData(data);
+    }));
+    host.querySelectorAll('[data-card-set]').forEach(button => button.addEventListener('click', () => {
+      setCardTableData(evaluations[button.dataset.cardSet]);
+    }));
+    host.querySelector('#dp-table-search').addEventListener('input', renderCardTable);
+    host.querySelector('#dp-card-columns').addEventListener('click', event => {
+      const button = event.target.closest('[data-sort]');
+      if (!button) return;
+      const key = button.dataset.sort;
+      sortDirection = key === sortKey ? -sortDirection : key === 'name' ? 1 : -1;
+      sortKey = key;
+      renderCardTable();
+    });
+    host.querySelector('#dp-card-dialog').addEventListener('click', event => {
+      if (event.target.closest('[data-close]')) host.querySelector('#dp-card-dialog').close();
+    });
+    setCardTableData(data);
+    renderPlot();
+    observer = new ResizeObserver(() => { if (host?.querySelector('#dp-plot')) renderPlot(); });
     observer.observe(host.querySelector('#dp-plot'));
   }
 
@@ -117,13 +254,19 @@ please do all your work as needed locally on scratch and only commit your final 
 
   function renderPlot() {
     const s=source(), plot=host.querySelector('#dp-plot');
-    host.querySelector('#dp-selected-name').textContent=displayName(s);
+    host.querySelector('#dp-selected-name').textContent=displayName(s)+' · '+data.name;
     host.querySelector('#dp-selected-name').className=sourceColorClass(s);
-    host.querySelector('#dp-chart-description').textContent='Predicted vs observed · dashed line = perfect prediction';
-    host.querySelectorAll('[data-source-row]').forEach(row=>row.classList.toggle('dp-selected',row.dataset.sourceRow===selected));
-    host.querySelectorAll('[data-source]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.source===selected)));
+    const showOutcomes = data.card_outcomes_available !== false;
+    host.querySelector('#dp-chart-description').textContent = `${s.score.n} scored cards` +
+      (showOutcomes ? ' · predicted vs observed · dashed line = perfect prediction' : '');
+    host.querySelectorAll('[data-source]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.source===selected&&b.dataset.set===data.expansion)));
     hideTooltip();
-    const cards=sharedCards(), width=Math.max(270,plot.clientWidth), height=360, left=58,right=14,top=15,bottom=47;
+    host.querySelector('.dp-legend').hidden = !showOutcomes;
+    if (!showOutcomes) {
+      plot.innerHTML = `<p>See ${link(data.outcome.url, 'Star Trek card win rates on 17Lands')}.</p>`;
+      return;
+    }
+    const cards=scoredCards(), width=Math.max(270,plot.clientWidth), height=360, left=58,right=14,top=15,bottom=47;
     let xs=cards.map(c=>c.values[selected].prediction);
     let ys=cards.map(c=>c.actual);
     let xmin=Math.min(...xs), xmax=Math.max(...xs), ymin=Math.min(...ys), ymax=Math.max(...ys);
@@ -154,33 +297,55 @@ please do all your work as needed locally on scratch and only commit your final 
     tip.hidden=false;tip.style.left=`${Math.max(8,Math.min(clientX+14,innerWidth-276))}px`;tip.style.top=`${Math.max(8,Math.min(clientY+14,innerHeight-tip.offsetHeight-12))}px`;
   }
   function hideTooltip(){const tip=host?.querySelector('#dp-tooltip');if(tip)tip.hidden=true;}
-  function showCard(card) {
-    hideTooltip();const s=source(),v=card.values[selected],error=v.prediction==null||card.actual==null?null:v.prediction-card.actual;
+  function showCard(card, s = source()) {
+    hideTooltip();
+    const v = card.values[s.id];
+    const error = v.prediction == null || card.actual == null ? null : v.prediction - card.actual;
     const adjustment = s.model?.model_type === 'native_bucket' && v.prediction != null
       ? (v.applied_contexts?.length ? s.model.context_mapping[0].offset_pp : 0) : null;
     host.querySelector('#dp-dialog-content').innerHTML=`<div class="dp-dialog-heading"><h2 id="dp-dialog-title">${E(card.name)}</h2><button data-close aria-label="Close card details">×</button></div>
       <div class="dp-card-detail-layout"><figure class="dp-card-images">${card.images.map(i=>`<img class="dp-card-image" src="${E(i.url)}" alt="${E(i.name)} — Scryfall card image" width="488" height="680" referrerpolicy="no-referrer">`).join('')}<p class="dp-image-status" hidden>Image unavailable. ${link(card.url,'View on Scryfall')}</p><figcaption>${link(card.url,'Image via Scryfall')}</figcaption></figure>
-      <section class="dp-card-stats" aria-label="Card prediction stats"><p class="dp-modal-source ${sourceColorClass(s)}">${E(displayName(s))}</p><div class="dp-detail-rates"><div><small>Predicted GIH</small><strong>${pct(v.prediction)}</strong></div><div><small>Observed GIH</small><strong>${pct(card.actual)}</strong></div><div><small>Difference</small><strong>${error==null?'—':`${error>=0?'+':''}${F(error)} pp`}</strong></div><div><small>GIH games</small><strong>${card.games.toLocaleString()}</strong></div></div>${v.grade!=null?`<p><b>Published grade:</b> ${E(v.grade)}${v.contexts?.length?`<br><b>Published context:</b> ${E(v.contexts.map(pretty).join(', '))}`:''}${adjustment!=null?`<br><b>Grade used:</b> ${E(v.grade_used)}<br><b>Context adjustment:</b> ${adjustment>0?'+':''}${F(adjustment)} pp`:''}${v.source_url?`<br>${link(v.source_url,'Original rating source')}`:''}</p>`:''}</section></div>`;
+      <section class="dp-card-stats" aria-label="Card prediction stats"><p class="dp-modal-source ${sourceColorClass(s)}">${E(displayName(s))}</p><div class="dp-detail-rates"><div><small>Predicted GIH</small><strong>${pct(v.prediction)}</strong></div>${card.games == null ? '' : `<div><small>Observed GIH</small><strong>${pct(card.actual)}</strong></div><div><small>Difference</small><strong>${error==null?'—':`${error>=0?'+':''}${F(error)} pp`}</strong></div><div><small>GIH games</small><strong>${card.games.toLocaleString()}</strong></div>`}</div>${v.grade!=null?`<p><b>Published grade:</b> ${E(v.grade)}${v.contexts?.length?`<br><b>Published context:</b> ${E(v.contexts.map(pretty).join(', '))}`:''}${adjustment!=null?`<br><b>Grade used:</b> ${E(v.grade_used)}<br><b>Context adjustment:</b> ${adjustment>0?'+':''}${F(adjustment)} pp`:''}${v.source_url?`<br>${link(v.source_url,'Original rating source')}`:''}</p>`:''}</section></div>`;
     host.querySelectorAll('.dp-card-image').forEach(img=>img.addEventListener('error',()=>{img.hidden=true;host.querySelector('.dp-image-status').hidden=false;}));
     host.querySelector('#dp-card-dialog').showModal();
   }
 
   function renderCardTable() {
+    const selectedSource = data === cardTableData ? source() : topSource(cardTableData);
+    const { cards, sources, catalog_cards: totalCards } = cardTableData;
+    const showOutcomes = cardTableData.card_outcomes_available !== false;
     const query=host.querySelector('#dp-table-search').value.trim().toLowerCase();
-    const rows=data.cards.filter(c=>c.name.toLowerCase().includes(query));
+    const rows=cards.filter(c=>c.name.toLowerCase().includes(query));
     const value=c=>sortKey==='name'?c.name:sortKey==='actual'?c.actual:c.values[sortKey].prediction;
     rows.sort((a,b)=>{const aa=value(a),bb=value(b);if(aa==null)return bb==null?a.name.localeCompare(b.name):1;if(bb==null)return -1;return sortDirection*(typeof aa==='string'?aa.localeCompare(bb):aa-bb)||a.name.localeCompare(b.name);});
     host.querySelectorAll('[data-sort]').forEach(b=>{b.closest('th').setAttribute('aria-sort',b.dataset.sort===sortKey?(sortDirection===1?'ascending':'descending'):'none');});
-    host.querySelector('#dp-table-count').textContent=`${rows.length} of ${data.catalog_cards} cards`;
-    host.querySelector('#dp-card-rows').innerHTML=rows.map(c=>`<tr><td><button class="dp-card-button" data-table-card="${data.cards.indexOf(c)}">${E(c.name)}</button><span class="dp-card-meta">${E(c.set.toUpperCase())} · ${E(c.rarity)}${c.shared?'':' · unscored'}</span></td><td class="dp-numeric">${pct(c.actual)}</td>${data.sources.map(s=>`<td class="dp-numeric">${pct(c.values[s.id].prediction)}${s.kind==='creator'&&c.values[s.id].grade!=null?`<span class="dp-cell-grade">${E(c.values[s.id].grade)}</span>`:''}</td>`).join('')}</tr>`).join('');
-    host.querySelectorAll('[data-table-card]').forEach(b=>b.addEventListener('click',()=>showCard(data.cards[Number(b.dataset.tableCard)])));
+    host.querySelector('#dp-table-count').textContent=`${rows.length} of ${totalCards} cards`;
+    host.querySelector('#dp-card-rows').innerHTML=rows.map(c=>`<tr><td><button class="dp-card-button" data-table-card="${cards.indexOf(c)}">${E(c.name)}</button><span class="dp-card-meta">${E(c.set.toUpperCase())} · ${E(c.rarity)}${showOutcomes&&(c.actual==null||c.values[selectedSource.id].prediction==null)?' · unscored':''}</span></td>${showOutcomes?`<td class="dp-numeric">${pct(c.actual)}</td>`:''}${sources.map(s=>`<td class="dp-numeric">${pct(c.values[s.id].prediction)}${s.kind==='creator'&&c.values[s.id].grade!=null?`<span class="dp-cell-grade">${E(c.values[s.id].grade)}</span>`:''}</td>`).join('')}</tr>`).join('');
+    host.querySelectorAll('[data-table-card]').forEach(b=>b.addEventListener('click',()=>showCard(cards[Number(b.dataset.tableCard)], selectedSource)));
   }
   function dispose(){observer?.disconnect();observer=null;hideTooltip();}
   async function mount(container,{isCurrent=()=>true}={}) {
     dispose();host=container;container.innerHTML='<p class="muted">Loading draft predictions…</p>';
-    dataPromise ??= fetch('data/draft-predictions.json?v=5').then(r=>{if(!r.ok)throw new Error('Could not load draft prediction data');return r.json();}).catch(error=>{dataPromise=null;throw error;});
-    const loaded=await dataPromise;if(!isCurrent())return;data=loaded;
-    if(data.catalog_cards!==data.cards.length||!data.sources.length||new Set(data.sources.map(s=>s.id)).size!==data.sources.length||data.cards.some(c=>data.sources.some(s=>!c.values[s.id])))throw new Error('Unexpected draft prediction dataset');
+    const load=async (path, optional=false)=>{
+      const response=await fetch(`data/${path}.json`,{cache:'no-cache'});
+      if (optional && response.status===404) return null;
+      if (!response.ok) throw new Error('Could not load draft prediction data');
+      const set=await response.json();
+      if (set.catalog_cards!==set.cards.length || !set.sources.length || new Set(set.sources.map(s=>s.id)).size!==set.sources.length || set.cards.some(c=>set.sources.some(s=>!c.values[s.id]))) throw new Error('Unexpected draft prediction dataset');
+      return set;
+    };
+    dataPromise ??= Promise.all([load('draft-predictions-fra-current',true),
+      load('draft-predictions-trk',true).then(local => local ?? load('draft-predictions-trk-summary',true))])
+      .then(async ([current,trek])=>({FRA:current??await load('draft-predictions'),TRK:trek,fraRefreshed:Boolean(current)}))
+      .catch(error=>{dataPromise=null;throw error;});
+    const loaded=await dataPromise;
+    if (!isCurrent()) return;
+    evaluations=loaded;
+    data = loaded.FRA;
+    selected = topSource(data).id;
+    cardTableData = null;
+    const url=new URL(location.href);
+    if (url.searchParams.has('draft')) {url.searchParams.delete('draft');history.replaceState(history.state,'',url);}
     skeleton();
   }
   window.DraftPredictions={mount,dispose};

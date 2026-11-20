@@ -9,3 +9,6 @@ datasets/manual_solutions.json
 *.egg-info/
 dist/
 build/
+
+# Raw 17Lands responses used only for local outcome previews.
+/evaluations/historical-creators-2026-10-09/preview-inputs/*.raw.json

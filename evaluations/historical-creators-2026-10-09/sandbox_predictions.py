@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 
 import numpy as np
-from scipy.stats import pearsonr
+from refresh_benchmark_outcomes import rescore_sources
 
 ROOT = Path(__file__).resolve().parent
 DEFAULT_BUNDLE = ROOT / 'inputs/sandbox_predictions.json'
@@ -20,7 +20,7 @@ def norm(name):
 
 
 def add_sandbox_sources(data, bundle):
-    """Preserve every existing forecast/creator fit and the established shared pool."""
+    """Preserve every existing forecast and creator fit; score each source's coverage."""
     assert bundle['schema_version'] == 1 and bundle['expansion'] == data['expansion'] == 'FRA'
     result = copy.deepcopy(data)
     result['prediction_groups'] = copy.deepcopy(GROUPS)
@@ -43,12 +43,6 @@ def add_sandbox_sources(data, bundle):
             assert not card['shared'] or rates.get(key) is not None, f'Missing shared card: {sid}, {key}'
         source = {k: copy.deepcopy(v) for k, v in model.items() if k != 'predictions'}
         source.update(kind='ai', prediction_group='sandbox', prediction_marker='†')
-        pool = [c for c in result['cards'] if c['shared']]
-        predicted = np.array([c['values'][sid]['prediction'] for c in pool], dtype=float)
-        actual = np.array([c['actual'] for c in pool], dtype=float)
-        assert np.isfinite(actual).all()
-        source['score'] = dict(n=len(pool), pearson=float(pearsonr(predicted, actual).statistic),
-                               rmse=float(np.sqrt(np.mean((predicted - actual) ** 2))))
         if sid in existing:
             result['sources'] = [source if s['id'] == sid else s for s in result['sources']]
         else:
@@ -56,8 +50,7 @@ def add_sandbox_sources(data, bundle):
         existing[sid] = source
     assert len({s['id'] for s in result['sources']}) == len(result['sources'])
     assert result['shared_cards'] == sum(c['shared'] for c in result['cards'])
-    result['sources'].sort(key=lambda s: (s['kind'] != 'ai', -s['score']['pearson'], s['name']))
-    return result
+    return rescore_sources(result)
 
 
 if __name__ == '__main__':
@@ -69,4 +62,4 @@ if __name__ == '__main__':
     args = parser.parse_args()
     data = add_sandbox_sources(json.loads(args.input.read_text()), json.loads(args.bundle.read_text()))
     write_export(data, args.output)
-    print(f"Exported {len(data['sources'])} sources / {data['catalog_cards']} cards / {data['shared_cards']} shared cards")
+    print(f"Exported {len(data['sources'])} sources / {data['catalog_cards']} cards / per-source scores")

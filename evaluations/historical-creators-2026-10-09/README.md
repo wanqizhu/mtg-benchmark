@@ -178,7 +178,7 @@ card click; their URLs are metadata, and no image files are vendored.
 
 The exporter checks the original outcome hash, card coverage, and equality with
 the original creator scores, then applies the committed current outcome snapshot
-and recomputes all ten scores on the same 266 cards. Predictions and fits are
+and scores each source on all of its rated main-set cards with eligible outcomes. Predictions and fits are
 unchanged. It writes a compact analyzed JSON and a CSV;
 live response envelopes remain local. The static assets are included in
 `harness/site_static`, and the site generator preserves the exported data when
