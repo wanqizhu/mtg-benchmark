@@ -244,7 +244,7 @@ def prelaunch_joint(path):
                               snapshot_sha256=digest(path.read_bytes())), rows=rows)
 
 
-def build(frozen, fra_original, trk_raw, fra_raw, site_dir, alex_ratings=None, *, public_summary=False):
+def build(frozen, fra_original, trk_raw, fra_raw, site_dir, alex_ratings=None):
     data = read_json(frozen)
     if alex_ratings is not None:
         data['creators'] = [prelaunch_joint(alex_ratings) if c['id'] == 'alexnikolic' else c
@@ -299,13 +299,7 @@ def build(frozen, fra_original, trk_raw, fra_raw, site_dir, alex_ratings=None, *
                    outcome=dict(url='https://www.17lands.com/card_data?expansion=TRK&format=PremierDraft&time_period=ALL_TIME',
                                 retrieved_at=stamp(trk_raw), sha256=digest(raw), minimum_gih=MIN_GIH))
     rescore_sources(payload)
-    filename = 'draft-predictions-trk.json'
-    if public_summary:
-        filename = 'draft-predictions-trk-summary.json'
-        payload['card_outcomes_available'] = False
-        for card in cards:
-            card.update(actual=None, games=None, shared=False)
-    write_export(payload, site_dir/'data'/filename)
+    write_export(payload, site_dir/'data/draft-predictions-trk.json')
     for s in sorted(sources, key=lambda s:-s['score']['pearson']):
         print(f"{s['name']}: {s['score']['n']} scored cards; r={s['score']['pearson']:.3f}, RMSE={s['score']['rmse']:.2f}")
     print(f"Eligible observed cards: {payload['eligible_outcomes']}; each source uses its own rated cards")
@@ -321,12 +315,10 @@ if __name__ == '__main__':
     for key in ('frozen', 'fra-original', 'trk-raw', 'site-dir'):
         build_cmd.add_argument('--'+key, type=Path, required=True)
     build_cmd.add_argument('--fra-raw', type=Path)
-    build_cmd.add_argument('--public-summary', action='store_true', help='Export forecasts and aggregate scores without observed card rates or counts')
     build_cmd.add_argument('--alex-ratings', type=Path,
                            default=Path(__file__).parent/'preview-inputs/alex-joint-2026-11-08.json')
     args = parser.parse_args()
     if args.command == 'freeze':
         freeze(args.raw, args.git_dir, args.output)
     else:
-        build(args.frozen, args.fra_original, args.trk_raw, args.fra_raw, args.site_dir, args.alex_ratings,
-              public_summary=args.public_summary)
+        build(args.frozen, args.fra_original, args.trk_raw, args.fra_raw, args.site_dir, args.alex_ratings)

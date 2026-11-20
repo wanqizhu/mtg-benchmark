@@ -165,10 +165,9 @@ please do all your work as needed locally on scratch and only commit your final 
   function setCardTableData(set) {
     if (set !== cardTableData) {
       cardTableData = set;
-      const showOutcomes = set.card_outcomes_available !== false;
-      sortKey = showOutcomes ? 'actual' : 'name';
-      sortDirection = showOutcomes ? -1 : 1;
-      const csvName = set.expansion === 'TRK' ? (showOutcomes ? 'draft-predictions-trk' : 'draft-predictions-trk-summary')
+      sortKey = 'actual';
+      sortDirection = -1;
+      const csvName = set.expansion === 'TRK' ? 'draft-predictions-trk'
         : evaluations.fraRefreshed ? 'draft-predictions-fra-current' : 'draft-predictions';
       host.querySelector('#dp-download').href = `data/${csvName}.csv`;
       host.querySelectorAll('[data-card-set]').forEach(button => {
@@ -176,7 +175,7 @@ please do all your work as needed locally on scratch and only commit your final 
       });
       host.querySelector('#dp-card-columns').innerHTML = `<tr>
         <th><button class="dp-sort" data-sort="name">Card ↕</button></th>
-        ${showOutcomes ? '<th class="dp-numeric"><button class="dp-sort" data-sort="actual">Observed<br>GIH ↕</button></th>' : ''}
+        <th class="dp-numeric"><button class="dp-sort" data-sort="actual">Observed<br>GIH ↕</button></th>
         ${set.sources.map(s => `<th class="dp-numeric"><button class="dp-sort ${sourceColorClass(s)}" data-sort="${E(s.id)}">${E(displayName(s))} ↕</button></th>`).join('')}
       </tr>`;
       host.querySelector('.dp-full-table').scrollTo(0, 0);
@@ -186,10 +185,11 @@ please do all your work as needed locally on scratch and only commit your final 
 
   function skeleton() {
     const rows = pairedSources();
+    const outcomeLinks = [evaluations.FRA, evaluations.TRK].filter(Boolean).map(set => link(set.outcome.url, set.expansion)).join(' &amp; ');
     host.innerHTML = `<div class="draft-page">
       <div class="dp-heading">
         <div><h1>Win Rate Predictions</h1><p>How good are people and LLMs at predicting card win rates in a new format?</p></div>
-        <div class="dp-meta">FRA &amp; TRK · Premier Draft GIH win rate from ${link('https://www.17lands.com/', '17Lands')}</div>
+        <div class="dp-meta">Premier Draft GIH win rate from 17Lands · ${outcomeLinks}</div>
       </div>
       <div class="dp-overview">
         <section class="dp-board">
@@ -256,16 +256,9 @@ please do all your work as needed locally on scratch and only commit your final 
     const s=source(), plot=host.querySelector('#dp-plot');
     host.querySelector('#dp-selected-name').textContent=displayName(s)+' · '+data.name;
     host.querySelector('#dp-selected-name').className=sourceColorClass(s);
-    const showOutcomes = data.card_outcomes_available !== false;
-    host.querySelector('#dp-chart-description').textContent = `${s.score.n} scored cards` +
-      (showOutcomes ? ' · predicted vs observed · dashed line = perfect prediction' : '');
+    host.querySelector('#dp-chart-description').textContent = `${s.score.n} scored cards · predicted vs observed · dashed line = perfect prediction`;
     host.querySelectorAll('[data-source]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.source===selected&&b.dataset.set===data.expansion)));
     hideTooltip();
-    host.querySelector('.dp-legend').hidden = !showOutcomes;
-    if (!showOutcomes) {
-      plot.innerHTML = `<p>See ${link(data.outcome.url, 'Star Trek card win rates on 17Lands')}.</p>`;
-      return;
-    }
     const cards=scoredCards(), width=Math.max(270,plot.clientWidth), height=360, left=58,right=14,top=15,bottom=47;
     let xs=cards.map(c=>c.values[selected].prediction);
     let ys=cards.map(c=>c.actual);
@@ -305,7 +298,7 @@ please do all your work as needed locally on scratch and only commit your final 
       ? (v.applied_contexts?.length ? s.model.context_mapping[0].offset_pp : 0) : null;
     host.querySelector('#dp-dialog-content').innerHTML=`<div class="dp-dialog-heading"><h2 id="dp-dialog-title">${E(card.name)}</h2><button data-close aria-label="Close card details">×</button></div>
       <div class="dp-card-detail-layout"><figure class="dp-card-images">${card.images.map(i=>`<img class="dp-card-image" src="${E(i.url)}" alt="${E(i.name)} — Scryfall card image" width="488" height="680" referrerpolicy="no-referrer">`).join('')}<p class="dp-image-status" hidden>Image unavailable. ${link(card.url,'View on Scryfall')}</p><figcaption>${link(card.url,'Image via Scryfall')}</figcaption></figure>
-      <section class="dp-card-stats" aria-label="Card prediction stats"><p class="dp-modal-source ${sourceColorClass(s)}">${E(displayName(s))}</p><div class="dp-detail-rates"><div><small>Predicted GIH</small><strong>${pct(v.prediction)}</strong></div>${card.games == null ? '' : `<div><small>Observed GIH</small><strong>${pct(card.actual)}</strong></div><div><small>Difference</small><strong>${error==null?'—':`${error>=0?'+':''}${F(error)} pp`}</strong></div><div><small>GIH games</small><strong>${card.games.toLocaleString()}</strong></div>`}</div>${v.grade!=null?`<p><b>Published grade:</b> ${E(v.grade)}${v.contexts?.length?`<br><b>Published context:</b> ${E(v.contexts.map(pretty).join(', '))}`:''}${adjustment!=null?`<br><b>Grade used:</b> ${E(v.grade_used)}<br><b>Context adjustment:</b> ${adjustment>0?'+':''}${F(adjustment)} pp`:''}${v.source_url?`<br>${link(v.source_url,'Original rating source')}`:''}</p>`:''}</section></div>`;
+      <section class="dp-card-stats" aria-label="Card prediction stats"><p class="dp-modal-source ${sourceColorClass(s)}">${E(displayName(s))}</p><div class="dp-detail-rates"><div><small>Predicted GIH</small><strong>${pct(v.prediction)}</strong></div><div><small>Observed GIH</small><strong>${pct(card.actual)}</strong></div><div><small>Difference</small><strong>${error==null?'—':`${error>=0?'+':''}${F(error)} pp`}</strong></div><div><small>GIH games</small><strong>${card.games.toLocaleString()}</strong></div></div>${v.grade!=null?`<p><b>Published grade:</b> ${E(v.grade)}${v.contexts?.length?`<br><b>Published context:</b> ${E(v.contexts.map(pretty).join(', '))}`:''}${adjustment!=null?`<br><b>Grade used:</b> ${E(v.grade_used)}<br><b>Context adjustment:</b> ${adjustment>0?'+':''}${F(adjustment)} pp`:''}${v.source_url?`<br>${link(v.source_url,'Original rating source')}`:''}</p>`:''}</section></div>`;
     host.querySelectorAll('.dp-card-image').forEach(img=>img.addEventListener('error',()=>{img.hidden=true;host.querySelector('.dp-image-status').hidden=false;}));
     host.querySelector('#dp-card-dialog').showModal();
   }
@@ -313,14 +306,13 @@ please do all your work as needed locally on scratch and only commit your final 
   function renderCardTable() {
     const selectedSource = data === cardTableData ? source() : topSource(cardTableData);
     const { cards, sources, catalog_cards: totalCards } = cardTableData;
-    const showOutcomes = cardTableData.card_outcomes_available !== false;
     const query=host.querySelector('#dp-table-search').value.trim().toLowerCase();
     const rows=cards.filter(c=>c.name.toLowerCase().includes(query));
     const value=c=>sortKey==='name'?c.name:sortKey==='actual'?c.actual:c.values[sortKey].prediction;
     rows.sort((a,b)=>{const aa=value(a),bb=value(b);if(aa==null)return bb==null?a.name.localeCompare(b.name):1;if(bb==null)return -1;return sortDirection*(typeof aa==='string'?aa.localeCompare(bb):aa-bb)||a.name.localeCompare(b.name);});
     host.querySelectorAll('[data-sort]').forEach(b=>{b.closest('th').setAttribute('aria-sort',b.dataset.sort===sortKey?(sortDirection===1?'ascending':'descending'):'none');});
     host.querySelector('#dp-table-count').textContent=`${rows.length} of ${totalCards} cards`;
-    host.querySelector('#dp-card-rows').innerHTML=rows.map(c=>`<tr><td><button class="dp-card-button" data-table-card="${cards.indexOf(c)}">${E(c.name)}</button><span class="dp-card-meta">${E(c.set.toUpperCase())} · ${E(c.rarity)}${showOutcomes&&(c.actual==null||c.values[selectedSource.id].prediction==null)?' · unscored':''}</span></td>${showOutcomes?`<td class="dp-numeric">${pct(c.actual)}</td>`:''}${sources.map(s=>`<td class="dp-numeric">${pct(c.values[s.id].prediction)}${s.kind==='creator'&&c.values[s.id].grade!=null?`<span class="dp-cell-grade">${E(c.values[s.id].grade)}</span>`:''}</td>`).join('')}</tr>`).join('');
+    host.querySelector('#dp-card-rows').innerHTML=rows.map(c=>`<tr><td><button class="dp-card-button" data-table-card="${cards.indexOf(c)}">${E(c.name)}</button><span class="dp-card-meta">${E(c.set.toUpperCase())} · ${E(c.rarity)}${c.actual==null||c.values[selectedSource.id].prediction==null?' · unscored':''}</span></td><td class="dp-numeric">${pct(c.actual)}</td>${sources.map(s=>`<td class="dp-numeric">${pct(c.values[s.id].prediction)}${s.kind==='creator'&&c.values[s.id].grade!=null?`<span class="dp-cell-grade">${E(c.values[s.id].grade)}</span>`:''}</td>`).join('')}</tr>`).join('');
     host.querySelectorAll('[data-table-card]').forEach(b=>b.addEventListener('click',()=>showCard(cards[Number(b.dataset.tableCard)], selectedSource)));
   }
   function dispose(){observer?.disconnect();observer=null;hideTooltip();}
@@ -334,8 +326,7 @@ please do all your work as needed locally on scratch and only commit your final 
       if (set.catalog_cards!==set.cards.length || !set.sources.length || new Set(set.sources.map(s=>s.id)).size!==set.sources.length || set.cards.some(c=>set.sources.some(s=>!c.values[s.id]))) throw new Error('Unexpected draft prediction dataset');
       return set;
     };
-    dataPromise ??= Promise.all([load('draft-predictions-fra-current',true),
-      load('draft-predictions-trk',true).then(local => local ?? load('draft-predictions-trk-summary',true))])
+    dataPromise ??= Promise.all([load('draft-predictions-fra-current',true), load('draft-predictions-trk',true)])
       .then(async ([current,trek])=>({FRA:current??await load('draft-predictions'),TRK:trek,fraRefreshed:Boolean(current)}))
       .catch(error=>{dataPromise=null;throw error;});
     const loaded=await dataPromise;

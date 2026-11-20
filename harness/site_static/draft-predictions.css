@@ -56,7 +56,6 @@
 .dp-inner { margin:10px 0; }
 .dp-prompt { white-space:pre-wrap; overflow-wrap:anywhere; font:inherit; line-height:1.65; margin:12px 0 0; }
 .dp-prompt-variant { color:var(--muted); }
-.dp-legend[hidden] { display:none; }
 .dp-creator-group { display:grid; gap:10px; }
 .dp-model-grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:20px; }
 .dp-scroll { overflow:auto; }

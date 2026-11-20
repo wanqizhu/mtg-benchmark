@@ -33,7 +33,7 @@ the existing Muse Spark 1.3 row. Argon's 30 Stardates rows are outside the
 main-set scoring pool.
 
 The site's existing Reality Fracture export supplies the exact creator model
-coefficients. The build never fits a model. The single local page uses reported
+coefficients. The build never fits a model. The comparison page uses reported
 17Lands Premier Draft GIH with at least 500 reported observations per card.
 Each source is scored independently on every card it rated with an eligible
 outcome. Basics and Stardates are excluded. The table shows only Pearson r,
@@ -55,11 +55,6 @@ python3 evaluations/historical-creators-2026-10-09/star_trek_preview.py build \
 ```
 
 Add `--fra-raw NEW_FRA_RESPONSE` to refresh the local Reality Fracture results
-as well. Add `--public-summary` to build a Star Trek export with the predictions
-and aggregate scores, omitting the observed rates and game counts for each card.
-The full local Star Trek export takes precedence when both are present. Preserve file
-modification times if copying existing responses: the export records the time
-the snapshot was saved, not the most recent game date. The inputs and outputs
-containing early card-level outcome data are local and ignored by Git. See
-[17Lands usage guidance](https://www.17lands.com/usage_guidelines) before
-publishing a version of the card-level comparison.
+as well. Local and public previews read the same Star Trek exports. Preserve
+file modification times if copying existing responses. The export records when
+the snapshot was saved. Git ignores raw input responses.

@@ -110,10 +110,7 @@ def write_export(data, destination):
     destination.parent.mkdir(parents=True, exist_ok=True)
     destination.write_text(json.dumps(data, ensure_ascii=False, allow_nan=False,
                                      separators=(',', ':')) + '\n')
-    include_outcomes = data.get('card_outcomes_available', True)
-    headers = ['Card', 'Set', 'Rarity']
-    if include_outcomes:
-        headers.extend(['Observed GIH (%)', 'GIH games', 'Scored sources'])
+    headers = ['Card', 'Set', 'Rarity', 'Observed GIH (%)', 'GIH games', 'Scored sources']
     for source in data['sources']:
         label = source['name'] + (' ' + source['prediction_marker'] if source.get('prediction_marker') else '')
         headers.append(label + ' prediction (%)')
@@ -123,10 +120,8 @@ def write_export(data, destination):
         writer = csv.writer(file, lineterminator='\n')
         writer.writerow(headers)
         for card in data['cards']:
-            row = [card['name'], card['set'], card['rarity']]
-            if include_outcomes:
-                scored = sum(card['values'][s['id']]['prediction'] is not None for s in data['sources']) if eligible_outcome(card) else 0
-                row.extend([card['actual'], card['games'], scored])
+            scored = sum(card['values'][s['id']]['prediction'] is not None for s in data['sources']) if eligible_outcome(card) else 0
+            row = [card['name'], card['set'], card['rarity'], card['actual'], card['games'], scored]
             for source in data['sources']:
                 row.append(card['values'][source['id']]['prediction'])
                 if source['kind'] == 'creator':
